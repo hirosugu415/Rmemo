@@ -147,11 +147,41 @@ body,
 }
 
 .compose-open-title-text {
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* "＋ 新規" while editing, "← 前回: …" on a blank note. */
+.compose-title-action {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding: 1px 8px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compose-title-action:hover {
+  color: var(--status-accent, var(--accent));
+  border-color: var(--status-accent, var(--accent));
+}
+
+.compose-title-previous {
+  max-width: 45%;
+}
+
+.compose-title-spacer {
+  flex: 1;
 }
 
 /* Heading buttons (本文 / H1–H4), Word-style. */

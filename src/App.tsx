@@ -118,6 +118,17 @@ const blankSession = (status: Status): ComposeSession => ({
   title: null,
 });
 
+/** Filename of the note "← 前回" reopens, kept across restarts. */
+const LAST_NOTE_KEY = "rmemo.lastNote";
+
+function readLastNote(): string | null {
+  try {
+    return localStorage.getItem(LAST_NOTE_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   const [view, setView] = useState<View>("compose");
 
@@ -132,6 +143,10 @@ export default function App() {
     null,
   );
   const sessionRef = useRef<ComposeSession>(blankSession("scratch"));
+  /** The session that was open when the compose box last went blank. Kept as
+   *  the session object, not its filename: the save still in flight can
+   *  rename the file (title change), and `commitSave` updates this object. */
+  const previousRef = useRef<Pick<ComposeSession, "filename">>({ filename: readLastNote() });
   const composeBodyRef = useRef("");
   const composeHandle = useRef<ComposeHandle | null>(null);
   /** Every disk operation on the compose session runs through this chain, one
@@ -367,6 +382,8 @@ export default function App() {
   );
 
   const resetToBlank = useCallback(() => {
+    const s = sessionRef.current;
+    if (s.filename !== null || composeBodyRef.current.trim() !== "") previousRef.current = s;
     startSession(blankSession(sessionRef.current.status), "", null, null);
   }, [startSession]);
 
@@ -539,6 +556,26 @@ export default function App() {
     },
     [allNotes, openNoteInCompose, startSession],
   );
+
+  /** What "← 前回" offers on a blank compose box, looked up in the live list
+   *  so a renamed note is followed and a deleted one drops out. */
+  const previousNote =
+    openFilename === null
+      ? (allNotes.find((n) => n.filename === previousRef.current.filename) ?? null)
+      : null;
+  const previousFilename = previousNote?.filename;
+  useEffect(() => {
+    if (!previousFilename) return;
+    try {
+      localStorage.setItem(LAST_NOTE_KEY, previousFilename);
+    } catch {
+      /* storage unavailable: just not remembered across restarts */
+    }
+  }, [previousFilename]);
+
+  const reopenPrevious = useCallback(() => {
+    if (previousNote) openNoteInCompose(previousNote);
+  }, [previousNote, openNoteInCompose]);
 
   // "← 参照元" under the open note: who links here with [[this title]].
   useEffect(() => {
@@ -816,6 +853,11 @@ export default function App() {
       setView((v) => (v === "settings" ? "compose" : "settings"));
       return;
     }
+    if (e.ctrlKey && e.shiftKey && (e.key === "t" || e.key === "T")) {
+      e.preventDefault();
+      if (view === "compose") reopenPrevious();
+      return;
+    }
     if (e.key === "F1") {
       e.preventDefault();
       setView((v) => (v === "tutorial" ? "compose" : "tutorial"));
@@ -869,6 +911,9 @@ export default function App() {
           backlinks={noteBacklinks}
           onOpenBacklink={openNoteInCompose}
           onOpenTutorial={() => setView("tutorial")}
+          previousTitle={previousNote?.title ?? null}
+          onReopenPrevious={reopenPrevious}
+          onNewNote={resetToBlank}
         />
       )}
 

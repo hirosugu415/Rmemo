@@ -50,6 +50,8 @@
 |---|---|
 | 入力窓を開く / 閉じる | `Ctrl+N`（設定で変更可） |
 | 保存して閉じる | `Ctrl+Enter` |
+| 新しいメモ | `Esc` |
+| 前回のメモに戻る | `Ctrl+Shift+T` |
 | Keep / Scratch を切り替え | `Ctrl+L` |
 | メモを検索 | `Ctrl+Shift+F` |
 | 設定 | `Ctrl+,` |

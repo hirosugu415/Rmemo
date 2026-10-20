@@ -6,6 +6,14 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-20
+
+### 追加
+
+- 新しいメモの画面に「← 前回: メモ名」を表示。クリックか `Ctrl+Shift+T` で、
+  直前まで開いていたメモに戻れる（アプリを再起動しても覚えている）。
+- メモを開いているときに「＋ 新規」ボタンを表示（`Esc` と同じく、新しいメモに切り替える）。
+
 ## [1.0.0] - 2026-10-20
 
 最初の公開版です。
@@ -37,5 +45,6 @@
 - **スマホ用の閲覧アプリ（PWA、ベータ版）**: Google ドライブに同期したメモを
   スマホのブラウザから読める。読み取り専用。
 
-[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/hirosugu415/Rmemo/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/hirosugu415/Rmemo/releases/tag/v1.0.0

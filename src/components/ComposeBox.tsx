@@ -67,6 +67,11 @@ interface Props {
   backlinks: NoteSummary[];
   onOpenBacklink: (note: NoteSummary) => void;
   onOpenTutorial: () => void;
+  /** Title of the note that was open before this blank one, if any. */
+  previousTitle: string | null;
+  onReopenPrevious: () => void;
+  /** Closes the open note into a blank one (the same as Esc). */
+  onNewNote: () => void;
   handleRef?: React.MutableRefObject<ComposeHandle | null>;
 }
 
@@ -234,6 +239,9 @@ export default function ComposeBox({
   backlinks,
   onOpenBacklink,
   onOpenTutorial,
+  previousTitle,
+  onReopenPrevious,
+  onNewNote,
   handleRef,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -930,6 +938,30 @@ export default function ComposeBox({
         <span className="compose-open-title-text">
           {openTitle ? `編集中: ${openTitle}` : "新規メモ"}
         </span>
+        {openTitle ? (
+          <button
+            type="button"
+            className="compose-title-action"
+            title="このメモを閉じて新しいメモを書く (Esc)"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={onNewNote}
+          >
+            ＋ 新規
+          </button>
+        ) : (
+          previousTitle && (
+            <button
+              type="button"
+              className="compose-title-action compose-title-previous"
+              title="前回のメモに戻る (Ctrl+Shift+T)"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={onReopenPrevious}
+            >
+              ← 前回: {previousTitle}
+            </button>
+          )
+        )}
+        <span className="compose-title-spacer" />
         {wideToc ? (
           <div className="format-bar" role="toolbar" aria-label="見出し">
             {HEADING_BUTTONS.map((b) => (
@@ -1281,7 +1313,7 @@ export default function ComposeBox({
             : `${totalChars.toLocaleString()}字`}
         </span>
         <span className="compose-hint">
-          Ctrl+F ノート内検索 ・ Ctrl+H 置換 ・ Ctrl+Shift+F 検索 ・ Ctrl+L 切替 ・ Ctrl+, 設定 ・
+          Ctrl+F ノート内検索 ・ Ctrl+H 置換 ・ Ctrl+Shift+F 検索 ・ Ctrl+Shift+T 前回のメモ ・ Ctrl+L 切替 ・ Ctrl+, 設定 ・
           F1 使い方 ・ Ctrl+Alt+0〜4 見出し ・ Ctrl+; 日付 ・ Ctrl+B/I/E 太字/斜体/コード ・ Ctrl+K リンク ・ Alt+クリック/Ctrl+D 複数カーソル ・
           Ctrl+クリック リンク/タグ ・ Ctrl+]/[ インデント ・ Alt+↑/↓
           行移動 ・ Shift+Alt+↑/↓ 行複製
