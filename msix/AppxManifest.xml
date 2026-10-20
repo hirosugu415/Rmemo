@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   MSIX manifest for the Microsoft Store build, filled in by
-  scripts/build-msix.ps1. The {{...}} values come from Partner Center
-  (アプリの管理 → 製品 ID → パッケージ ID / 発行元) — see msix/README.md.
+  scripts/build-msix.ps1. The {{...}} values come from msix/identity.json,
+  which holds Partner Center's 製品 ID → パッケージ ID / 発行元.
 -->
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"

@@ -3,8 +3,8 @@
 #   powershell -ExecutionPolicy Bypass -File scripts/build-msix.ps1
 #
 # Needs the Windows 10/11 SDK (for makeappx.exe) and the identity values from
-# Partner Center in msix/identity.json — see msix/README.md. The package is
-# unsigned: the Store signs it on submission.
+# Partner Center (製品 ID → パッケージ ID / 発行元) in msix/identity.json.
+# The package is unsigned: the Store signs it on submission.
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot

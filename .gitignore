@@ -32,3 +32,7 @@ dist-msix
 
 # Original screen recordings and Store screenshots (large, not published)
 media-src
+
+# Personal how-to notes for the maintainer (kept locally, not published)
+msix/README.md
+msix/STORE-LISTING.md
