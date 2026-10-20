@@ -35,8 +35,8 @@
 
 <!-- Microsoft Store のリンクができたらここに追加 -->
 
-[Releases](https://github.com/hirosugu415/Rmemo/releases/latest) から
-`Rmemo_x.y.z_x64-setup.exe` をダウンロードして実行してください。
+**[Rmemo-setup.exe をダウンロード](https://github.com/hirosugu415/Rmemo/releases/latest/download/Rmemo-setup.exe)** して実行してください
+（過去のバージョンは [Releases](https://github.com/hirosugu415/Rmemo/releases) にあります）。
 
 > [!NOTE]
 > 初めて実行するときに「Windows によって PC が保護されました」と表示されることがあります。

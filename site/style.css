@@ -176,6 +176,10 @@ img {
   color: var(--muted);
 }
 
+.cta-note + .cta-note {
+  margin-top: 4px;
+}
+
 /* Screen recordings and screenshots. */
 
 .shot {

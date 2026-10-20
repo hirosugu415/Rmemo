@@ -44,3 +44,12 @@ jobs:
           releaseBody: 変更点は [CHANGELOG.md](https://github.com/hirosugu415/Rmemo/blob/main/CHANGELOG.md) を見てください。
           releaseDraft: true
           includeUpdaterJson: true
+      # A version-less copy, so the website's download button can link to
+      # releases/latest/download/Rmemo-setup.exe and never needs updating.
+      - name: Upload Rmemo-setup.exe
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp src-tauri/target/release/bundle/nsis/Rmemo_*_x64-setup.exe Rmemo-setup.exe
+          gh release upload "${{ github.ref_name }}" Rmemo-setup.exe --clobber
