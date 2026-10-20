@@ -44,7 +44,8 @@ Add-AppxPackage -Register dist-msix\stage\AppxManifest.xml
 
 ## 提出する
 
-Partner Center の製品ページ →「申請の開始」で次を埋める。
+Partner Center の製品ページ →「申請の開始」で次を埋める。説明文などの貼り付け用の文章は
+[STORE-LISTING.md](STORE-LISTING.md) にある。
 
 - **パッケージ**: 作った `.msix` をアップロード
 - **ストア登録情報**（日本語）: 説明文、スクリーンショット（1366×768 以上の PNG を 1 枚以上）、
