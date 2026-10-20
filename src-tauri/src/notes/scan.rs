@@ -1,0 +1,115 @@
+//! Scans `keep/` and `scratch/` into `Note`s. No recursion — storage is
+//! deliberately flat, so this is one `read_dir` per status.
+
+use super::naming::TIMESTAMP_FORMAT;
+use super::{tags, Note};
+use crate::config::{Settings, Status};
+use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
+use std::path::{Path, PathBuf};
+
+/// Byte length of a formatted `TIMESTAMP_FORMAT` stamp — `"2026-08-26_1430"`,
+/// always ASCII so bytes and chars agree.
+const STAMP_LEN: usize = 15;
+
+/// Parses the `YYYY-MM-DD_HHmm` prefix Rmemo itself writes. Anything that
+/// doesn't match — a file the user dropped in or renamed by hand — falls
+/// through to filesystem metadata in `scan_one`, which is the whole point of
+/// keeping notes as plain, ordinary `.md` files.
+fn parse_filename_timestamp(filename: &str) -> Option<DateTime<Local>> {
+    let stem = filename.strip_suffix(".md")?;
+    let stamp = stem.get(0..STAMP_LEN)?;
+    let naive = NaiveDateTime::parse_from_str(stamp, TIMESTAMP_FORMAT).ok()?;
+    Local.from_local_datetime(&naive).single()
+}
+
+/// The note's display title: always its first non-empty line, re-derived on
+/// every scan so it tracks edits to that line. The filename slug is frozen at
+/// creation and deliberately *not* used here — otherwise a note whose first
+/// line changed later (or one first saved while that line was just `#`) would
+/// keep a stale title forever.
+fn title_of(body: &str) -> String {
+    super::title_text(body).unwrap_or_else(|| "(無題)".to_string())
+}
+
+/// Whether a scratch note created at `created_at` has passed `expiry_days`.
+/// Also recomputed at list time (see `refresh_expiry`), since the app runs
+/// for weeks from autostart and a value frozen at scan time goes stale.
+fn is_expiring(status: Status, created_at: &DateTime<Local>, expiry_days: u32) -> bool {
+    status == Status::Scratch
+        && Local::now().signed_duration_since(*created_at).num_days() >= expiry_days as i64
+}
+
+/// Re-derives `is_expiring` on list results against the current clock.
+pub fn refresh_expiry(summaries: &mut [super::NoteSummary], expiry_days: u32) {
+    for s in summaries {
+        if let Ok(t) = DateTime::parse_from_rfc3339(&s.created_at) {
+            s.is_expiring = is_expiring(s.status, &t.with_timezone(&Local), expiry_days);
+        }
+    }
+}
+
+pub(crate) fn scan_one(path: &Path, status: Status, expiry_days: u32) -> std::io::Result<Note> {
+    let filename = path.file_name().and_then(|n| n.to_str()).unwrap_or_default().to_string();
+    let body = std::fs::read_to_string(path)?;
+    let meta = std::fs::metadata(path)?;
+
+    // created_at: filename timestamp first (survives copies/backups, unlike
+    // NTFS creation time — see the module doc), then fs created(), then
+    // fs modified(), so this never has nothing to fall back on.
+    let created_at = parse_filename_timestamp(&filename)
+        .or_else(|| meta.created().ok().map(DateTime::<Local>::from))
+        .or_else(|| meta.modified().ok().map(DateTime::<Local>::from))
+        .unwrap_or_else(Local::now);
+    let modified_at = meta.modified().ok().map(DateTime::<Local>::from).unwrap_or(created_at);
+
+    let tags = tags::extract(&body);
+    let is_expiring = is_expiring(status, &created_at, expiry_days);
+
+    Ok(Note {
+        title: title_of(&body),
+        // Newlines don't count — "how long is this note" means its text.
+        char_count: super::char_count(&body),
+        filename,
+        status,
+        body,
+        tags,
+        created_at: created_at.to_rfc3339(),
+        modified_at: modified_at.to_rfc3339(),
+        is_expiring,
+    })
+}
+
+fn scan_dir(dir: &Path, status: Status, expiry_days: u32) -> Vec<Note> {
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return Vec::new();
+    };
+    entries
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension().and_then(|x| x.to_str()) == Some("md"))
+        .filter_map(|e| match scan_one(&e.path(), status, expiry_days) {
+            Ok(note) => Some(note),
+            Err(err) => {
+                eprintln!("[scan] skipping {:?}: {err}", e.path());
+                None
+            }
+        })
+        .collect()
+}
+
+pub fn status_dir(settings: &Settings, status: Status) -> PathBuf {
+    settings.notes_dir.join(status.dirname())
+}
+
+/// Full scan of both folders, newest first. Creates the folders on a first
+/// run (or after the notes directory setting changes).
+pub fn scan_all(settings: &Settings) -> Vec<Note> {
+    let keep_dir = status_dir(settings, Status::Keep);
+    let scratch_dir = status_dir(settings, Status::Scratch);
+    let _ = std::fs::create_dir_all(&keep_dir);
+    let _ = std::fs::create_dir_all(&scratch_dir);
+
+    let mut notes = scan_dir(&keep_dir, Status::Keep, settings.expiry_days);
+    notes.extend(scan_dir(&scratch_dir, Status::Scratch, settings.expiry_days));
+    super::sort_newest(&mut notes);
+    notes
+}

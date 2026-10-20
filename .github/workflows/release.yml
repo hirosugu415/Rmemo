@@ -1,0 +1,46 @@
+# Builds the Windows installer and publishes it as a GitHub Release, together
+# with the signed `latest.json` the in-app updater reads.
+#
+# To release: bump the version in package.json, src-tauri/tauri.conf.json and
+# src-tauri/Cargo.toml, add a CHANGELOG entry, then
+#   git tag v1.2.3 && git push origin v1.2.3
+# The release is created as a draft — check it on GitHub and press "Publish".
+#
+# One-time setup on GitHub (Settings → Secrets and variables → Actions → Secrets):
+#   TAURI_SIGNING_PRIVATE_KEY = contents of ~/.tauri/rmemo.key
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - run: npm test
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Rmemo ${{ github.ref_name }}
+          releaseBody: 変更点は [CHANGELOG.md](https://github.com/hirosugu415/Rmemo/blob/main/CHANGELOG.md) を見てください。
+          releaseDraft: true
+          includeUpdaterJson: true

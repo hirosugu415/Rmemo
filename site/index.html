@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rmemo — ホットキーひとつで書きとめる Windows メモアプリ</title>
+    <meta name="description" content="Rmemo は、思いついた瞬間に Ctrl+N で呼び出して書きとめる Windows 用のメモアプリです。メモは Markdown のテキストファイルとして保存されます。無料・オープンソース。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Rmemo — ホットキーひとつで書きとめる Windows メモアプリ" />
+    <meta property="og:description" content="思いついた瞬間に Ctrl+N。書いたそばから整って見える、Windows 用のすばやいメモアプリ。" />
+    <meta property="og:url" content="https://hirosugu415.github.io/Rmemo/" />
+    <meta property="og:image" content="https://hirosugu415.github.io/Rmemo/images/icon.png" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/png" href="images/favicon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./"><img src="images/icon.png" alt="" />Rmemo</a>
+        <nav>
+          <a class="optional" href="#features">特徴</a>
+          <a class="optional" href="#faq">よくある質問</a>
+          <a href="https://github.com/hirosugu415/Rmemo">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div class="wrap">
+          <div>
+            <h1>思いついたら、<br /><kbd>Ctrl</kbd> + <kbd>N</kbd>。</h1>
+            <p class="lead">
+              Rmemo は、どの画面からでもホットキーひとつで呼び出せる Windows 用のメモアプリです。
+              書いたそばから見出しやリストが整い、閉じれば元の作業にすぐ戻れます。
+            </p>
+            <div class="cta">
+              <!-- Microsoft Store の公開後に追加:
+              <a class="btn btn-primary" href="https://apps.microsoft.com/detail/XXXXXXXXXXXX">Microsoft Store から入手</a>
+              -->
+              <a class="btn btn-primary" href="https://github.com/hirosugu415/Rmemo/releases/latest">無料でダウンロード</a>
+              <a class="btn btn-ghost" href="#features">特徴を見る</a>
+            </div>
+            <p class="cta-note">Windows 10 / 11（64 ビット）・無料・オープンソース（MIT ライセンス）</p>
+          </div>
+
+          <!-- GIF ができたら、この .mock を <img src="images/demo.gif" alt="…"> に置き換える -->
+          <div class="mock" role="img" aria-label="Rmemo の入力画面。見出し・チェックボックス・タグを含むメモを書いているところ">
+            <div class="mock-bar">
+              <span class="mock-switch"><span class="on">Scratch</span><span>Keep</span></span>
+              <span class="grow"></span>
+              <span>自動保存済み</span>
+            </div>
+            <div class="mock-body">
+              <h3>来週の旅行メモ</h3>
+              <ul>
+                <li class="done">新幹線の予約</li>
+                <li>宿にチェックイン時間を確認</li>
+                <li>モバイルバッテリーを充電</li>
+              </ul>
+              <h4>行きたいところ</h4>
+              <div>朝市 → 美術館 → <span class="mock-link">📄 おすすめの店</span></div>
+              <div>集合は <code>8:30</code> 駅の中央口</div>
+              <div><span class="mock-tag">#旅行</span> <span class="mock-tag">#やること</span><span class="mock-caret"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="alt" id="features">
+        <div class="wrap">
+          <h2>書くことだけに集中できる</h2>
+          <p class="section-lead">アプリを探して、開いて、保存場所を選ぶ。そういう手間をなくしました。</p>
+          <div class="features">
+            <div class="feature">
+              <h3><span class="mark"></span>どこからでもすぐ開く</h3>
+              <p><kbd>Ctrl</kbd>+<kbd>N</kbd> で、今の作業の上に小さな入力窓が開きます。キーは設定で変えられます。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>保存を気にしなくていい</h3>
+              <p>書いている途中も自動で保存されます。<kbd>Ctrl</kbd>+<kbd>Enter</kbd> で保存して閉じれば、元の画面に戻ります。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>書いたそばから整う</h3>
+              <p>見出し・リスト・チェックボックス・コードブロックを、Markdown で打ったその場できれいに表示。日本語入力のままでも使えます。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>画像も貼れる</h3>
+              <p>スクリーンショットは <kbd>Ctrl</kbd>+<kbd>V</kbd> で貼るだけ。大きさもドラッグで変えられます。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>メモ同士をつなぐ</h3>
+              <p><code>[[メモ名]]</code> で別のメモにリンク。<code>#タグ</code> で分類して、検索画面で絞り込めます。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>エディタとしても本格的</h3>
+              <p>複数カーソル、行の移動、見出しの折りたたみ、目次、検索・置換。VS Code に慣れた手でもそのまま使えます。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <h2>残すメモと、使い捨てのメモ</h2>
+          <p class="section-lead">
+            ちょっとしたメモが積もって一覧が埋まる、という悩みを、メモを 2 つに分けて解決します。
+            <kbd>Ctrl</kbd>+<kbd>L</kbd> でいつでも切り替えられます。
+          </p>
+          <div class="split">
+            <div class="lane lane-scratch">
+              <h3>Scratch</h3>
+              <p>電話番号、買い物リスト、一時的なコピー。とりあえず書く場所です。古くなると印が付き、整理画面で 1 件ずつ「残す / 捨てる」を決められます。</p>
+            </div>
+            <div class="lane lane-keep">
+              <h3>Keep</h3>
+              <p>あとで読み返したいメモ。手順書、アイデア、調べたことのまとめ。ピン留めでよく使うメモを一番上に置けます。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="alt">
+        <div class="wrap">
+          <h2>メモは、ただのテキストファイル</h2>
+          <p class="section-lead">
+            メモは <code>Documents\Rmemo</code> に、1 メモ = 1 つの <code>.md</code> ファイルとして保存されます。
+            独自の形式やデータベースはありません。
+          </p>
+          <div class="features">
+            <div class="feature">
+              <h3><span class="mark"></span>アプリがなくても読める</h3>
+              <p>メモ帳でも VS Code でも開けます。Rmemo をやめても、メモはそのまま残ります。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>複数の PC で同期</h3>
+              <p>保存フォルダを Google ドライブなどに置けば、別の PC でも同じメモを使えます。
+                <a href="https://github.com/hirosugu415/Rmemo/blob/main/GOOGLE-DRIVE-SYNC.md">設定方法</a></p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>外部に送信しない</h3>
+              <p>アカウント登録は不要です。メモはあなたの PC の中だけに保存されます。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <h2>よく使うキー</h2>
+          <p class="section-lead">すべての機能と操作は、アプリの中で <kbd>F1</kbd> を押すと確認できます。</p>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th>やりたいこと</th><th>キー</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>入力窓を開く / 閉じる</td><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td></tr>
+                <tr><td>保存して閉じる</td><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td></tr>
+                <tr><td>Scratch / Keep を切り替え</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
+                <tr><td>メモを探す</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td></tr>
+                <tr><td>リンクを付ける</td><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td></tr>
+                <tr><td>同じ語を次々に選ぶ</td><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td></tr>
+                <tr><td>今日の日付を入れる</td><td><kbd>Ctrl</kbd>+<kbd>;</kbd></td></tr>
+                <tr><td>設定</td><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="alt" id="faq">
+        <div class="wrap">
+          <h2>よくある質問</h2>
+          <details>
+            <summary>無料ですか？</summary>
+            <p>はい、無料です。広告もありません。ソースコードは MIT ライセンスで <a href="https://github.com/hirosugu415/Rmemo">GitHub</a> に公開しています。</p>
+          </details>
+          <details>
+            <summary>インストール時に「Windows によって PC が保護されました」と出ます</summary>
+            <p>GitHub からダウンロードした場合に表示されることがあります。「詳細情報」→「実行」でインストールできます。Microsoft Store 版ではこの表示は出ません。</p>
+          </details>
+          <details>
+            <summary>窓が閉じてしまいます。どこにいますか？</summary>
+            <p>Rmemo はタスクトレイに常駐しています。<kbd>Ctrl</kbd>+<kbd>N</kbd> か、トレイのアイコンをクリックすると開きます。</p>
+          </details>
+          <details>
+            <summary>アンインストールするとメモは消えますか？</summary>
+            <p>消えません。メモのフォルダ（既定では <code>Documents\Rmemo</code>）はそのまま残ります。</p>
+          </details>
+          <details>
+            <summary>スマホでメモを見られますか？</summary>
+            <p>メモを Google ドライブで同期している場合は、<a href="app/">閲覧アプリ（ベータ版）</a>でスマホのブラウザから読めます。読み取り専用です。</p>
+          </details>
+          <details>
+            <summary>不具合の報告や要望はどこに送ればいいですか？</summary>
+            <p><a href="https://github.com/hirosugu415/Rmemo/issues">GitHub の Issues</a> にお願いします。</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <span>© 2026 hirosugu415</span>
+        <nav>
+          <a href="privacy.html">プライバシーポリシー</a>
+          <a href="https://github.com/hirosugu415/Rmemo/blob/main/CHANGELOG.md">変更履歴</a>
+          <a href="https://github.com/hirosugu415/Rmemo/blob/main/LICENSE">ライセンス</a>
+          <a href="https://github.com/hirosugu415/Rmemo">GitHub</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

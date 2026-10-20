@@ -1,0 +1,1842 @@
+:root {
+  --bg: #f6f6f7;
+  --panel: #ffffff;
+  --text: #16181d;
+  --muted: #6b7280;
+  --line: #e3e5ea;
+  --selected: #e8effc;
+  --selected-line: #3b82f6;
+  --accent: #2563eb;
+  --danger: #dc2626;
+  --expiring: #b45309;
+  --expiring-bg: #fef3c7;
+
+  /* Editor (Markdown live preview) */
+  --editor-selection: rgba(37, 99, 235, 0.2);
+  --selection-match: rgba(250, 204, 21, 0.3);
+  --code-bg: rgba(15, 23, 42, 0.055);
+  --code-border: rgba(15, 23, 42, 0.08);
+  --quote-line: #c9cdd6;
+  --link: #1d4ed8;
+  --tok-keyword: #a626a4;
+  --tok-string: #50a14f;
+  --tok-number: #b76b01;
+  --tok-comment: #8a8f98;
+  --tok-function: #4078f2;
+  --tok-type: #c18401;
+  --tok-property: #e45649;
+  --tok-def: #0184bc;
+
+  /* Keep/Scratch chrome tint — deep, desaturated "fine stationery" tones
+     rather than a flat/bright red-blue, so the compose screen reads as
+     unmistakably one or the other without looking like a warning label. */
+  --keep-accent: #8c3f4c;
+  --keep-wash: rgba(140, 63, 76, 0.07);
+  --scratch-accent: #3a4f72;
+  --scratch-wash: rgba(58, 79, 114, 0.06);
+
+  color-scheme: light dark;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17181c;
+    --panel: #1e2026;
+    --text: #e8e9ec;
+    --muted: #9299a5;
+    --line: #2c2f37;
+    --selected: #26324a;
+    --selected-line: #60a5fa;
+    --accent: #60a5fa;
+    --danger: #f87171;
+    --expiring: #fbbf24;
+    --expiring-bg: #3f2d0a;
+
+    --editor-selection: rgba(96, 165, 250, 0.28);
+    --selection-match: rgba(250, 204, 21, 0.18);
+    --code-bg: rgba(255, 255, 255, 0.055);
+    --code-border: rgba(255, 255, 255, 0.08);
+    --quote-line: #4a4f5c;
+    --link: #7cb4ff;
+    --tok-keyword: #c678dd;
+    --tok-string: #98c379;
+    --tok-number: #d19a66;
+    --tok-comment: #7f8693;
+    --tok-function: #61afef;
+    --tok-type: #e5c07b;
+    --tok-property: #e06c75;
+    --tok-def: #56b6c2;
+
+    --keep-accent: #d38a95;
+    --keep-wash: rgba(211, 138, 149, 0.1);
+    --scratch-accent: #8fa8d6;
+    --scratch-wash: rgba(143, 168, 214, 0.1);
+  }
+}
+
+/* Resolves to whichever status is live on the compose screen; anywhere else
+   (search, settings) these fall back to the neutral --accent/--line. */
+.app[data-status="keep"] {
+  --status-accent: var(--keep-accent);
+  --status-wash: var(--keep-wash);
+}
+
+.app[data-status="scratch"] {
+  --status-accent: var(--scratch-accent);
+  --status-wash: var(--scratch-wash);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  /* The window is transparent and undecorated; the panel below paints
+     everything, which is what gives it rounded corners. */
+  background: transparent;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--status-accent, var(--line));
+  border-left-width: 4px;
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  transition: border-color 200ms ease;
+}
+
+/* ---------- compose (default, full-screen) ---------- */
+
+.compose {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 14px;
+  min-height: 0;
+  /* The soft status wash sits behind the (transparent) textarea, so the
+     writing surface itself is visibly tinted without touching text color
+     or contrast. */
+  background: var(--status-wash, transparent);
+  transition: background-color 200ms ease;
+}
+
+.compose-open-title {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--status-accent, var(--muted));
+  letter-spacing: 0.02em;
+  /* Doubles as the window's drag handle (`data-drag-region`, see App.tsx)
+     — give it a little height and the cursor to match. */
+  padding: 3px 0 5px;
+  cursor: grab;
+}
+
+.compose-open-title-text {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Heading buttons (本文 / H1–H4), Word-style. */
+.format-bar {
+  flex: none;
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.format-btn {
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  min-width: 30px;
+  padding: 2px 8px;
+  border: none;
+  border-left: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.format-btn:first-child {
+  border-left: none;
+  font-weight: 500;
+}
+
+.format-btn:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+
+.format-btn-active,
+.format-btn-active:hover {
+  color: white;
+  background: var(--status-accent, var(--accent));
+}
+
+/* The search/settings counterpart of `.compose-open-title`: the strip along
+   the top that is the only place the window can be dragged from. */
+.view-title {
+  flex: none;
+  padding: 6px 14px 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  cursor: grab;
+  user-select: none;
+}
+
+.compose-editor {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
+
+.compose-editor-host {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+/* Room for the TOC rail so text never runs under it. */
+.compose-editor.has-toc .cm-content {
+  padding-right: 26px;
+}
+
+.compose-find {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--status-accent, var(--line));
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.compose-find-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.compose-find-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.compose-find-count {
+  flex: none;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.compose-find-toggle,
+.compose-find-close {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.compose-find-close {
+  font-size: 15px;
+}
+
+.compose-find-toggle:hover,
+.compose-find-close:hover {
+  background: var(--panel);
+  color: var(--text);
+}
+
+.compose-find-btn {
+  flex: none;
+  font: inherit;
+  font-size: 11.5px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 4px 9px;
+  cursor: pointer;
+}
+
+.compose-find-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.compose-find-btn:disabled {
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.6;
+}
+
+.compose-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--status-accent, var(--line));
+  flex-wrap: wrap;
+}
+
+.compose-hint {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compose-actions {
+  flex: none;
+  display: flex;
+  gap: 6px;
+}
+
+.compose-save-primary {
+  border-color: var(--status-accent, var(--accent));
+  color: var(--status-accent, var(--accent));
+}
+
+.switch {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.switch-btn {
+  font: inherit;
+  font-size: 12px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.switch-btn-active {
+  background: var(--status-accent, var(--accent));
+  color: white;
+}
+
+.compose-save {
+  font: inherit;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.compose-save:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------- search screen ---------- */
+
+.search-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.searchbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.search {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  padding: 6px 0;
+}
+
+.search::placeholder {
+  color: var(--muted);
+}
+
+.chips {
+  flex: none;
+  display: flex;
+  gap: 4px;
+}
+
+.chip {
+  font: inherit;
+  font-size: 11.5px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+
+.chip-active {
+  background: var(--selected);
+  border-color: var(--selected-line);
+  color: var(--text);
+}
+
+.gear {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 5px 7px;
+}
+
+.gear:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ---------- note list ---------- */
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.note-row {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  cursor: default;
+}
+
+.note-row:hover {
+  background: var(--bg);
+}
+
+.note-row-selected {
+  background: var(--selected);
+}
+
+.note-row-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.note-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-when {
+  flex: none;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.badge {
+  flex: none;
+  font-size: 10.5px;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.badge-expiring {
+  background: var(--expiring-bg);
+  color: var(--expiring);
+}
+
+/* Search terms inside result titles/snippets. */
+.note-row mark {
+  color: inherit;
+  background: rgba(250, 204, 21, 0.35);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.note-snippet {
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+.note-tags {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-pill {
+  font: inherit;
+  font-size: 10.5px;
+  color: var(--accent);
+  background: var(--selected);
+  border: none;
+  border-radius: 999px;
+  padding: 1px 7px;
+  cursor: pointer;
+}
+
+.tag-pill:hover {
+  background: var(--selected-line);
+  color: white;
+}
+
+/* ---------- tag browser (search screen, empty query) ---------- */
+
+.tag-cloud {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tag-cloud-pill {
+  font-size: 11.5px;
+  padding: 3px 9px;
+}
+
+.tag-count {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tag-cloud-pill:hover .tag-count {
+  color: inherit;
+}
+
+.tag-cloud-more {
+  font: inherit;
+  font-size: 11.5px;
+  padding: 3px 9px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tag-cloud-more:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+.tag-cloud-edit {
+  margin-left: auto;
+}
+
+.tag-cloud-editing .tag-cloud-pill {
+  outline: 1px dashed var(--selected-line);
+}
+
+.tag-edit-mark {
+  opacity: 0.7;
+}
+
+.tag-rename {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+}
+
+.tag-rename-hash {
+  color: var(--accent);
+}
+
+.tag-rename-input {
+  font: inherit;
+  width: 10em;
+  padding: 2px 6px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--selected-line);
+  border-radius: 999px;
+  outline: none;
+}
+
+.tag-rename-hint {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.tag-rename-error {
+  color: var(--danger);
+}
+
+/* ---------- link URL box (Ctrl+L) ---------- */
+
+.link-prompt {
+  position: absolute;
+  z-index: 11;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--panel);
+  border: 1px solid var(--status-accent, var(--line));
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.link-prompt-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.link-prompt-input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 4px 6px;
+  outline: none;
+}
+
+.link-prompt-input:focus {
+  border-color: var(--accent);
+}
+
+/* ---------- `#` completion popup (compose) ---------- */
+
+.compose {
+  position: relative;
+}
+
+.tag-suggest {
+  position: absolute;
+  z-index: 10;
+  min-width: 160px;
+  max-width: 280px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--panel);
+  border: 1px solid var(--status-accent, var(--line));
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.tag-suggest-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12.5px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tag-suggest-item-active {
+  background: var(--selected);
+  color: var(--accent);
+}
+
+.tag-suggest-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-row-actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+}
+
+.row-action {
+  font: inherit;
+  font-size: 11px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.row-action:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.row-action-danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ---------- status bar ---------- */
+
+.status {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.status-right {
+  white-space: nowrap;
+}
+
+.status-update {
+  margin-left: auto;
+  padding: 0 8px;
+  font: inherit;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.status-update:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* ---------- settings ---------- */
+
+.settings {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings label > span {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.settings small {
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.settings code {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 3px;
+  font-size: 11px;
+}
+
+.settings input[type="text"],
+.settings input[type="number"] {
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.settings input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.settings-inline {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+}
+
+.settings-inline input[type="number"] {
+  width: 90px;
+  margin-left: auto;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.settings-actions button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.settings-actions button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.settings-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.settings-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+/* ---------- scratch triage ---------- */
+
+.triage-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.triage-open-count {
+  min-width: 16px;
+  padding: 0 5px;
+  font-size: 10.5px;
+  line-height: 16px;
+  text-align: center;
+  color: var(--expiring);
+  background: var(--expiring-bg);
+  border-radius: 999px;
+}
+
+.triage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  outline: none;
+  background: var(--status-wash, transparent);
+}
+
+.triage-title {
+  display: flex;
+  justify-content: space-between;
+  color: var(--status-accent, var(--muted));
+}
+
+.triage-progress {
+  font-variant-numeric: tabular-nums;
+}
+
+.triage-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 14px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.triage-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+  padding: 12px 14px 8px;
+}
+
+.triage-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.triage-card-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.triage-meta {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.triage-body {
+  flex: 1;
+  min-height: 0;
+  margin-top: 6px;
+  /* A read-only CodeMirror (MarkdownView) fills it and does its own scrolling. */
+  padding: 4px 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.triage-message {
+  flex: none;
+  padding: 0 14px 6px;
+  font-size: 11.5px;
+  color: var(--expiring);
+}
+
+.triage-actions {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 14px 10px;
+  border-top: 1px solid var(--line);
+}
+
+.triage-btn {
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 10px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.triage-btn:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+
+.triage-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.triage-btn kbd {
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 0 4px;
+  margin-right: 3px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+}
+
+.triage-keep {
+  color: var(--keep-accent);
+  border-color: var(--keep-accent);
+}
+
+.triage-trash {
+  color: var(--danger);
+}
+
+.triage-done {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.triage-done-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.triage-done-counts {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.triage-done .triage-actions {
+  border-top: none;
+  justify-content: center;
+}
+
+/* ---------- editor: Markdown live preview (CodeMirror) ---------- */
+
+.cm-md-mark {
+  color: var(--muted);
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+.cm-line.cm-h {
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.cm-line.cm-h1 {
+  font-size: 1.75em;
+  padding-top: 0.45em;
+  padding-bottom: 0.1em;
+}
+
+.cm-line.cm-h2 {
+  font-size: 1.45em;
+  padding-top: 0.4em;
+  padding-bottom: 0.05em;
+}
+
+.cm-line.cm-h3 {
+  font-size: 1.22em;
+  padding-top: 0.3em;
+}
+
+.cm-line.cm-h4 {
+  font-size: 1.08em;
+  padding-top: 0.2em;
+}
+
+.cm-strong {
+  font-weight: 700;
+}
+
+.cm-em {
+  font-style: italic;
+}
+
+.cm-strike {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.cm-inline-code {
+  font-family: "Cascadia Mono", Consolas, "BIZ UDGothic", monospace;
+  font-size: 0.9em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+}
+
+.cm-line.cm-codeblock {
+  font-family: "Cascadia Mono", Consolas, "BIZ UDGothic", monospace;
+  font-size: 12.5px;
+  background: var(--code-bg);
+  padding: 0 12px;
+}
+
+.cm-line.cm-codeblock-first {
+  position: relative;
+  border-radius: 6px 6px 0 0;
+  padding-top: 4px;
+}
+
+.cm-line.cm-codeblock-last {
+  border-radius: 0 0 6px 6px;
+  padding-bottom: 4px;
+}
+
+.cm-line.cm-codeblock-first.cm-codeblock-last {
+  border-radius: 6px;
+}
+
+.cm-line.cm-codeblock-open {
+  font-size: 11px;
+  line-height: 1.5;
+  min-height: 22px;
+}
+
+.cm-code-lang {
+  color: var(--muted);
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+}
+
+.cm-code-lang-editable {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 3px;
+  margin-left: -3px;
+}
+
+.cm-code-lang-editable:hover {
+  color: var(--accent);
+  background: var(--selected);
+}
+
+/* Lists: `-` drawn as a bullet, `- [ ]` as a real checkbox. */
+.cm-bullet {
+  display: inline-block;
+  width: 0.9em;
+  color: var(--status-accent, var(--accent));
+  font-weight: 700;
+  text-align: center;
+}
+
+.cm-list-num {
+  color: var(--status-accent, var(--accent));
+  font-variant-numeric: tabular-nums;
+}
+
+.cm-task-box {
+  width: 14px;
+  height: 14px;
+  margin: 0 6px 0 1px;
+  vertical-align: -2px;
+  accent-color: var(--status-accent, var(--accent));
+  cursor: pointer;
+}
+
+.cm-task-box:disabled {
+  cursor: default;
+}
+
+.cm-task-done {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+/* The closing ``` is hidden; its line is only the block's bottom padding. */
+.cm-line.cm-codeblock-close {
+  font-size: 4px;
+  line-height: 1;
+}
+
+.cm-code-copy {
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 1px 8px;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.cm-code-copy:hover {
+  opacity: 1;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.cm-code-copy-done,
+.cm-code-copy-done:hover {
+  opacity: 1;
+  color: var(--tok-string);
+  border-color: var(--tok-string);
+}
+
+.cm-line.cm-quote {
+  border-left: 3px solid var(--quote-line);
+  padding-left: 12px;
+  color: var(--muted);
+}
+
+.cm-hr {
+  display: inline-block;
+  width: 100%;
+  vertical-align: middle;
+  border-top: 1px solid var(--quote-line);
+}
+
+.cm-link {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 120ms ease;
+}
+
+.cm-link:hover {
+  text-decoration-color: currentColor;
+  background: var(--selected);
+  border-radius: 3px;
+}
+
+.cm-tag {
+  color: var(--accent);
+}
+
+.cm-ctrl-held .cm-link,
+.cm-ctrl-held .cm-tag {
+  cursor: pointer;
+}
+
+.cm-ctrl-held .cm-tag:hover {
+  text-decoration: underline;
+}
+
+/* Code-block syntax colours (see codeHighlight in editor/setup.ts). */
+.tok-keyword { color: var(--tok-keyword); }
+.tok-string { color: var(--tok-string); }
+.tok-number { color: var(--tok-number); }
+.tok-comment { color: var(--tok-comment); font-style: italic; }
+.tok-function { color: var(--tok-function); }
+.tok-type { color: var(--tok-type); }
+.tok-property { color: var(--tok-property); }
+.tok-def { color: var(--tok-def); }
+.tok-meta { color: var(--muted); }
+
+/* ---------- table of contents (note.com style) ---------- */
+
+.toc-mode-rail {
+  position: absolute;
+  top: 6px;
+  right: 2px;
+  z-index: 5;
+}
+
+/* Wide editor: an always-visible column on the right, titles wrapping. */
+.toc-mode-panel {
+  flex: none;
+  width: clamp(130px, 24%, 200px);
+  margin-left: 10px;
+  padding: 2px 0 8px 8px;
+  border-left: 1px solid var(--line);
+  overflow-y: auto;
+}
+
+.toc-mode-panel .toc-item {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.toc-mode-panel .toc-panel-title {
+  padding-left: 8px;
+}
+
+.toc-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 6px 4px;
+  max-height: 60vh;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.toc-bar {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--muted);
+  opacity: 0.45;
+  transition: opacity 120ms ease;
+}
+
+.toc-bar-active {
+  background: var(--status-accent, var(--accent));
+  opacity: 1;
+}
+
+.toc-panel {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 230px;
+  max-height: min(360px, 70vh);
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+.toc-mode-rail:hover .toc-panel {
+  display: block;
+}
+
+/* ---------- note links, backlinks, counts, help ---------- */
+
+/* A note link is a chip — 📄 + title, plain text colour, boxed — so it never
+   looks like a web link (blue text). Clicking it opens the note. */
+.cm-wikilink-icon,
+.cm-wikilink {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.cm-wikilink-icon {
+  font-size: 0.8em;
+  padding: 0 1px 0 4px;
+  border-right: none;
+  border-radius: 5px 0 0 5px;
+}
+
+.cm-wikilink {
+  color: var(--text);
+  font-weight: 600;
+  padding: 0 5px 0 2px;
+  border-left: none;
+  border-radius: 0 5px 5px 0;
+}
+
+.cm-wikilink:hover,
+.cm-wikilink-icon:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Not written yet: dashed and dimmed; a click starts the note. */
+.cm-wikilink-missing,
+.cm-wikilink-icon-missing {
+  border-style: dashed;
+  background: transparent;
+}
+
+.cm-wikilink-missing {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.cm-wikilink-icon-missing {
+  opacity: 0.6;
+}
+
+.note-backlinks {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.note-backlinks-label {
+  color: var(--muted);
+  margin-right: 2px;
+}
+
+.backlink-pill {
+  font: inherit;
+  font-size: 11px;
+  color: var(--link);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 8px;
+  cursor: pointer;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.backlink-pill:hover {
+  border-color: var(--link);
+}
+
+.compose-count {
+  flex: none;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.format-help {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.format-help:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.note-chars {
+  flex: none;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.toc-panel-title {
+  padding: 2px 8px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.4;
+  padding: 4px 8px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toc-item:hover {
+  background: var(--bg);
+}
+
+.toc-item-active {
+  color: var(--status-accent, var(--accent));
+  font-weight: 600;
+}
+
+/* ---------- editor tutorial (F1) ---------- */
+
+.tutorial {
+  outline: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tutorial-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tutorial-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 14px 20px;
+}
+
+.tutorial-lead {
+  margin: 4px 0 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.tutorial-section h2 {
+  margin: 16px 0 6px;
+  font-size: 14px;
+  color: var(--status-accent, var(--accent));
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 4px;
+}
+
+.tutorial-item {
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.tutorial-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.tutorial-cols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tutorial-col {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.tutorial-col-wide {
+  flex: 1.3 1 220px;
+}
+
+.tutorial-col-label {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.tutorial-input {
+  margin: 0;
+  padding: 6px 8px;
+  font-family: "Cascadia Mono", Consolas, "BIZ UDGothic", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+.tutorial-preview {
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--panel);
+}
+
+.tutorial-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.tutorial-keys kbd {
+  font: inherit;
+  font-size: 11px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--bg);
+}
+
+.tutorial-note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.tutorial-preview .cm-content {
+  padding: 2px 0;
+}
+
+/* ---------- images (pasted / dropped, `![](../assets/…)`) ---------- */
+
+.cm-image {
+  display: inline-block;
+  max-width: 100%;
+  margin: 4px 0;
+  vertical-align: top;
+}
+
+.cm-image img {
+  display: block;
+  max-width: 100%;
+  max-height: 420px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--code-bg);
+}
+
+.cm-image-missing {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+}
+
+/* Resizing: an explicit width (`![|300](…)`) lifts the height cap; hover
+   shows the 小/中/大/原寸 presets and a drag handle. */
+.cm-image {
+  position: relative;
+}
+
+.cm-image-sized img {
+  max-height: none;
+}
+
+.cm-image-sizes {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: none;
+  gap: 2px;
+  padding: 2px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.cm-image-sizes button {
+  font: inherit;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 1px 7px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cm-image-sizes button:hover {
+  color: var(--accent);
+  background: var(--selected);
+}
+
+.cm-image-handle {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 14px;
+  height: 14px;
+  display: none;
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  border-radius: 3px;
+  cursor: nwse-resize;
+}
+
+.cm-image:hover .cm-image-sizes,
+.cm-image-resizing .cm-image-sizes {
+  display: inline-flex;
+}
+
+.cm-image:hover .cm-image-handle,
+.cm-image-resizing .cm-image-handle {
+  display: block;
+}
+
+.cm-image-resizing img {
+  outline: 2px solid var(--accent);
+}
+
+.cm-image-badge {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  font-size: 11px;
+  padding: 1px 6px;
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Narrow window: heading buttons folded into one dropdown. */
+.format-menu {
+  position: relative;
+  flex: none;
+}
+
+.format-menu-toggle {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  white-space: nowrap;
+}
+
+.format-menu-list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 90px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.format-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.format-menu-item:hover {
+  background: var(--bg);
+}
+
+.format-menu-item-active {
+  color: var(--status-accent, var(--accent));
+}
+
+/* ---------- pinned notes ---------- */
+
+.note-pin {
+  flex: none;
+  font-size: 11px;
+}
+
+.row-action-pinned {
+  border-color: var(--status-accent, var(--accent));
+  color: var(--status-accent, var(--accent));
+}
+
+/* ---------- heading folds ---------- */
+
+/* Room in the left margin for the ▾ / ▸ beside headings. The editor reaches
+   back into most of .compose's own padding for it, so the text itself sits
+   only a little further in than the rest of the window's content. */
+.compose .compose-editor-host {
+  margin-left: -12px;
+}
+
+.compose .cm-content {
+  padding-left: 14px;
+}
+
+.cm-line.cm-h {
+  position: relative;
+}
+
+.cm-fold-toggle {
+  position: absolute;
+  left: -14px;
+  width: 14px;
+  text-align: center;
+  /* Scales with the heading; font-size × line-height = the heading's own
+     line box (1.35em), so the arrow sits centred on the heading text. */
+  font-size: 0.75em;
+  font-weight: 400;
+  line-height: 1.8;
+  color: var(--muted);
+  opacity: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 120ms ease;
+}
+
+.cm-line.cm-h:hover .cm-fold-toggle {
+  opacity: 0.7;
+}
+
+.cm-fold-toggle:hover {
+  opacity: 1 !important;
+  color: var(--accent);
+}
+
+/* A folded heading keeps its ▸ visible, so hidden text is never a surprise. */
+.cm-fold-toggle-folded {
+  opacity: 0.9;
+  color: var(--status-accent, var(--accent));
+}
+

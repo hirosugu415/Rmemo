@@ -1,0 +1,64 @@
+# Publishes the website to GitHub Pages:
+#   https://hirosugu415.github.io/Rmemo/      ← landing page (site/)
+#   https://hirosugu415.github.io/Rmemo/app/  ← read-only web viewer (web/)
+#
+# One-time setup on GitHub:
+#   Settings → Pages → Build and deployment → Source: "GitHub Actions"
+#   Settings → Secrets and variables → Actions → Variables →
+#     GOOGLE_CLIENT_ID = <the OAuth client ID from Google Cloud>
+name: Deploy website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "web/**"
+      - "src/**"
+      - "fixtures/**"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.web.config.ts"
+      - "tsconfig.json"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:web
+        env:
+          # Public by nature (it's sent to every browser); a repository
+          # *variable*, not a secret.
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+      - run: cp -r site/. dist-web/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

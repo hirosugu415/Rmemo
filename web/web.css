@@ -1,0 +1,228 @@
+/* Web viewer: the desktop styles (src/styles.css), adapted for a full
+   browser page / phone instead of a small floating window. */
+
+html,
+body,
+#root {
+  background: var(--panel);
+}
+
+.web-app {
+  height: 100dvh;
+  border: none;
+  border-top: 3px solid var(--status-accent, transparent);
+  border-radius: 0;
+  font-size: 15px;
+}
+
+/* ---------- header / banners ---------- */
+
+.web-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: calc(6px + env(safe-area-inset-top)) 10px 6px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.web-brand {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--status-accent, var(--text));
+}
+
+.web-header-sub {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.web-icon-btn {
+  flex: none;
+  min-width: 36px;
+  height: 36px;
+  font: inherit;
+  font-size: 18px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.web-icon-btn:active,
+.web-icon-btn:hover {
+  background: var(--bg);
+}
+
+.web-icon-btn:disabled {
+  opacity: 0.4;
+}
+
+.web-banner {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.web-banner-error {
+  color: var(--danger);
+}
+
+.web-primary {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  color: white;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ---------- list ---------- */
+
+.web-list-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.web-search {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.web-search-input {
+  font: inherit;
+  font-size: 16px; /* 16px+: iOS doesn't zoom the page on focus */
+  padding: 8px 10px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  outline: none;
+}
+
+.web-search-input:focus {
+  border-color: var(--accent);
+}
+
+.web-app .list {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.web-app .note-row {
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.web-app .tag-pill {
+  font-size: 12px;
+  padding: 2px 9px;
+}
+
+/* ---------- one note ---------- */
+
+.web-note {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.web-note-meta {
+  flex: none;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 16px 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.web-status {
+  font-weight: 600;
+  color: white;
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
+.web-status-keep {
+  background: var(--keep-accent);
+}
+
+.web-status-scratch {
+  background: var(--scratch-accent);
+}
+
+.web-note-body {
+  flex: 1;
+  min-height: 0;
+  padding: 0 16px;
+}
+
+.web-note-body .cm-scroller {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.web-note-body .cm-content {
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+}
+
+.web-backlinks {
+  padding: 8px 16px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+}
+
+/* Read-only: links and tags open with a plain tap. */
+.web-note-body .cm-link,
+.web-note-body .cm-tag,
+.web-note-body .cm-wikilink {
+  cursor: pointer;
+}
+
+.cm-image-loading {
+  display: inline-block;
+  min-width: 120px;
+  min-height: 80px;
+  border-radius: 6px;
+  background: var(--code-bg);
+}
+
+/* ---------- settings ---------- */
+
+.web-settings input[type="text"] {
+  font-size: 16px;
+}
+
+.web-found {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.web-sep {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 4px 0;
+}

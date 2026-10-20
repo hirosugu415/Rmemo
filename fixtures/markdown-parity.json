@@ -1,0 +1,39 @@
+{
+  "_comment": "Shared by the Rust tests (src-tauri/src/notes/tags.rs) and the frontend tests (src/markdown.test.ts): both implementations of these rules must give exactly these answers.",
+  "tags": [
+    { "body": "todo #work and #仕事 stuff", "tags": ["work", "仕事"] },
+    { "body": "# not a tag, #dup #dup", "tags": ["dup"] },
+    { "body": "a#b #real", "tags": ["real"] },
+    { "body": "## 見出し #tag", "tags": ["tag"] },
+    { "body": "##タグ扱い", "tags": ["タグ扱い"] },
+    { "body": "#real\n```c\n#include <x>\n```\n`#inline` and [l](https://x.com/#anchor) https://y.jp/#frag #after", "tags": ["real", "after"] },
+    { "body": "~~~\n#nope", "tags": [] },
+    { "body": "``#a`` ``b`` `#c\n\n#d`", "tags": ["c", "d"] },
+    { "body": "    ```\n#indented-fence-is-not-a-fence", "tags": ["indented-fence-is-not-a-fence"] },
+    { "body": "```js `x`\n#inline-run-not-a-fence", "tags": ["inline-run-not-a-fence"] },
+    { "body": "#🍣 #𠮷野家 #a_b-c", "tags": ["𠮷野家", "a_b-c"] },
+    { "body": "[[#仕事 メモ]] と #本物 と [[ #x ]]", "tags": ["本物"] },
+    { "body": "`[[#コード内]]` #外 [[未完 #タグ", "tags": ["外", "タグ"] }
+  ],
+  "titles": [
+    { "body": "# 買い物\n牛乳", "title": "買い物" },
+    { "body": "#\n\n# Title\nbody", "title": "Title" },
+    { "body": "#tag line\nbody", "title": "#tag line" },
+    { "body": "# **大事** な[メモ](https://x)\n本文", "title": "大事 なメモ" },
+    { "body": "[[買い物メモ]] を見る", "title": "買い物メモ を見る" },
+    { "body": "\n\n", "title": "(無題)" },
+    { "body": "# **\n本文", "title": "(無題)" }
+  ],
+  "snippets": [
+    { "body": "#\n\n# Title\nbody text", "snippet": "body text" },
+    { "body": "# **大事** なメモ\n> 引用\n```rust\nfn main() {}\n```\n## 次", "snippet": "引用 fn main() {} 次" },
+    { "body": "t\n- [ ] 買う\n- [x] 済み\n1. 一つ目\n-not a list", "snippet": "買う 済み 一つ目 -not a list" },
+    { "body": "t\n図 ![構成図|300](../assets/a.webp) と [[リンク]]", "snippet": "図 構成図 と リンク" },
+    { "body": "タイトルだけ", "snippet": "" }
+  ],
+  "charCount": [
+    { "body": "", "count": 0 },
+    { "body": "ab\r\nc\n", "count": 3 },
+    { "body": "あい\nう🍣", "count": 4 }
+  ]
+}
