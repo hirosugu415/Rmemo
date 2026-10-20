@@ -55,14 +55,9 @@ img {
 }
 
 .wrap {
-  max-width: 1040px;
+  max-width: 1400px;
   margin: 0 auto;
   padding-inline: 20px;
-}
-
-/* Screen recordings and screenshots get more room than the text around them. */
-.wrap-wide {
-  max-width: 1400px;
 }
 
 /* ---------- header ---------- */
@@ -208,9 +203,11 @@ img {
   font-size: 14px;
 }
 
+/* Columns in proportion to each recording's aspect ratio (edit 1280×1133,
+   paste 1280×706), so both play at exactly the same height. */
 .media-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.13fr) minmax(0, 1.81fr);
   align-items: start;
   gap: 32px;
   margin-top: 48px;
@@ -252,7 +249,7 @@ h2 {
 
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 28px 36px;
 }
 
@@ -446,7 +443,8 @@ code {
   }
 
   .media-row,
-  .gallery {
+  .gallery,
+  .features {
     grid-template-columns: 1fr;
   }
 
