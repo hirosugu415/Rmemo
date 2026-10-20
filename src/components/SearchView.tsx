@@ -146,7 +146,7 @@ export default function SearchView({
           整理
           {expiringCount > 0 && <span className="triage-open-count">{expiringCount}</span>}
         </button>
-        <button className="gear" title="Settings (Ctrl+,)" onClick={onOpenSettings}>
+        <button className="gear" title="設定 (Ctrl+,)" onClick={onOpenSettings}>
           ⚙
         </button>
       </div>

@@ -224,10 +224,10 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let menu = Menu::with_items(
         app,
         &[
-            &MenuItem::with_id(app, "show", "Show Rmemo", true, None::<&str>)?,
-            &MenuItem::with_id(app, "open_folder", "Open notes folder", true, None::<&str>)?,
+            &MenuItem::with_id(app, "show", "Rmemo を開く", true, None::<&str>)?,
+            &MenuItem::with_id(app, "open_folder", "メモのフォルダを開く", true, None::<&str>)?,
             &PredefinedMenuItem::separator(app)?,
-            &MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?,
+            &MenuItem::with_id(app, "quit", "終了", true, None::<&str>)?,
         ],
     )?;
 
