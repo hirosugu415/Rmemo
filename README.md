@@ -9,7 +9,7 @@
   Windows 用のすばやいメモアプリ。
 </p>
 
-<!-- <p align="center"><img src="site/images/demo.gif" alt="Rmemo のデモ"></p> -->
+<p align="center"><img src="site/images/demo.gif" alt="Wikipedia を読みながら Ctrl+N で Rmemo を呼び出してメモする様子" width="720"></p>
 
 ## 特徴
 

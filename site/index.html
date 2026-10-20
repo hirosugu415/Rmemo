@@ -9,8 +9,8 @@
     <meta property="og:title" content="Rmemo — ホットキーひとつで書きとめる Windows メモアプリ" />
     <meta property="og:description" content="思いついた瞬間に Ctrl+N。書いたそばから整って見える、Windows 用のすばやいメモアプリ。" />
     <meta property="og:url" content="https://hirosugu415.github.io/Rmemo/" />
-    <meta property="og:image" content="https://hirosugu415.github.io/Rmemo/images/icon.png" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content="https://hirosugu415.github.io/Rmemo/images/demo-poster.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/png" href="images/favicon.png" />
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -45,26 +45,10 @@
             <p class="cta-note">Windows 10 / 11（64 ビット）・無料・オープンソース（MIT ライセンス）</p>
           </div>
 
-          <!-- GIF ができたら、この .mock を <img src="images/demo.gif" alt="…"> に置き換える -->
-          <div class="mock" role="img" aria-label="Rmemo の入力画面。見出し・チェックボックス・タグを含むメモを書いているところ">
-            <div class="mock-bar">
-              <span class="mock-switch"><span class="on">Scratch</span><span>Keep</span></span>
-              <span class="grow"></span>
-              <span>自動保存済み</span>
-            </div>
-            <div class="mock-body">
-              <h3>来週の旅行メモ</h3>
-              <ul>
-                <li class="done">新幹線の予約</li>
-                <li>宿にチェックイン時間を確認</li>
-                <li>モバイルバッテリーを充電</li>
-              </ul>
-              <h4>行きたいところ</h4>
-              <div>朝市 → 美術館 → <span class="mock-link">📄 おすすめの店</span></div>
-              <div>集合は <code>8:30</code> 駅の中央口</div>
-              <div><span class="mock-tag">#旅行</span> <span class="mock-tag">#やること</span><span class="mock-caret"></span></div>
-            </div>
-          </div>
+          <figure class="shot shot-hero">
+            <video class="demo-video" src="images/demo.mp4" poster="images/demo-poster.jpg" autoplay loop muted playsinline
+              aria-label="Wikipedia を読みながら Ctrl+N で Rmemo を呼び出し、文章を貼り付けて閉じる様子"></video>
+          </figure>
         </div>
       </div>
 
@@ -97,6 +81,19 @@
               <h3><span class="mark"></span>エディタとしても本格的</h3>
               <p>複数カーソル、行の移動、見出しの折りたたみ、目次、検索・置換。VS Code に慣れた手でもそのまま使えます。</p>
             </div>
+          </div>
+
+          <div class="media-row">
+            <figure class="shot">
+              <video class="demo-video" src="images/edit.mp4" poster="images/edit-poster.jpg" autoplay loop muted playsinline
+                aria-label="見出しやチェックボックスを入力すると、その場で整って表示される様子"></video>
+              <figcaption>Markdown で打つと、その場で見出しやチェックボックスになります。</figcaption>
+            </figure>
+            <figure class="shot">
+              <video class="demo-video" src="images/paste.mp4" poster="images/paste-poster.jpg" autoplay loop muted playsinline
+                aria-label="切り取ったスクリーンショットを Ctrl+V でメモに貼り付ける様子"></video>
+              <figcaption>切り取った画面を <kbd>Ctrl</kbd>+<kbd>V</kbd> で、そのままメモに。</figcaption>
+            </figure>
           </div>
         </div>
       </section>
@@ -148,6 +145,31 @@
 
       <section>
         <div class="wrap">
+          <h2>画面</h2>
+          <p class="section-lead">クリックすると大きく表示されます。</p>
+          <div class="gallery">
+            <figure class="shot">
+              <a href="images/compose.png"><img src="images/compose.png" alt="メモの編集画面。見出し・チェックボックス・メモへのリンク・目次が表示されている" loading="lazy" /></a>
+              <figcaption>編集画面。見出しから目次が自動でできます。</figcaption>
+            </figure>
+            <figure class="shot">
+              <a href="images/search.png"><img src="images/search.png" alt="メモの一覧と検索の画面。タグの一覧とピン留めしたメモが並んでいる" loading="lazy" /></a>
+              <figcaption>一覧・検索。タグで絞り込み、よく使うメモはピン留め。</figcaption>
+            </figure>
+            <figure class="shot">
+              <a href="images/triage.png"><img src="images/triage.png" alt="Scratch の整理画面。古いメモを 1 件ずつ残すか捨てるか選ぶ" loading="lazy" /></a>
+              <figcaption>整理画面。古い Scratch を 1 件ずつ片づけます。</figcaption>
+            </figure>
+            <figure class="shot">
+              <a href="images/tutorial.png"><img src="images/tutorial.png" alt="使い方ページ。入力例と表示結果が並んでいる" loading="lazy" /></a>
+              <figcaption>使い方ページ（<kbd>F1</kbd>）。入力例つきで全機能を確認できます。</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="alt">
+        <div class="wrap">
           <h2>よく使うキー</h2>
           <p class="section-lead">すべての機能と操作は、アプリの中で <kbd>F1</kbd> を押すと確認できます。</p>
           <div class="table-scroll">
@@ -171,7 +193,7 @@
         </div>
       </section>
 
-      <section class="alt" id="faq">
+      <section id="faq">
         <div class="wrap">
           <h2>よくある質問</h2>
           <details>
@@ -213,5 +235,15 @@
         </nav>
       </div>
     </footer>
+    <script>
+      // Respect "reduce motion": show the first frame with controls instead of autoplaying.
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        for (const v of document.querySelectorAll(".demo-video")) {
+          v.removeAttribute("autoplay");
+          v.pause();
+          v.controls = true;
+        }
+      }
+    </script>
   </body>
 </html>
