@@ -60,6 +60,11 @@ img {
   padding-inline: 20px;
 }
 
+/* Screen recordings and screenshots get more room than the text around them. */
+.wrap-wide {
+  max-width: 1400px;
+}
+
 /* ---------- header ---------- */
 
 .site-header {
@@ -111,8 +116,8 @@ img {
 
 .hero .wrap {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: 48px;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+  gap: 56px;
   align-items: center;
 }
 
