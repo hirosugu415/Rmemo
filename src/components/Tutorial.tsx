@@ -102,7 +102,7 @@ const SECTIONS: Section[] = [
       { name: "前回のメモに戻る", keys: ["上の ← 前回", "Ctrl+Shift+T"], note: "新しいメモの画面から、直前まで開いていたメモをすぐ開き直せます。アプリを再起動しても覚えています。" },
       { name: "ピン留め", keys: ["検索画面の「ピン留め」"], note: "よく使うメモを一覧の一番上に固定します。ピンはメモフォルダに保存されるので、Drive で他のPCにも同期されます。" },
       { name: "メモ名の変更とリンク", note: "メモのタイトルを変えると、他のメモの [[古い名前]] のリンクも、そのメモを閉じたときに新しい名前へ書き換わります。" },
-      { name: "メモを探す", keys: ["Ctrl+Shift+F 検索画面", "Ctrl+, 設定", "F1 この画面"], note: "" },
+      { name: "メモを探す", keys: ["上の 一覧", "Ctrl+Shift+F 検索画面", "Ctrl+, 設定", "F1 この画面"], note: "" },
     ],
   },
 ];
@@ -120,7 +120,7 @@ export default function Tutorial({ onClose }: Props) {
   useEffect(() => rootRef.current?.focus(), []);
   return (
     <div className="tutorial" ref={rootRef} tabIndex={-1}>
-      <div className="view-title tutorial-head" data-drag-region>
+      <div className="view-title view-title-row" data-drag-region>
         <span>エディタの使い方</span>
         <button type="button" className="compose-find-btn" onClick={onClose}>
           閉じる (Esc)

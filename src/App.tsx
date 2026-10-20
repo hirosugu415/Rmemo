@@ -135,14 +135,14 @@ export default function App() {
   // Compose state — rendered copies of what `sessionRef` and
   // `composeBodyRef` hold authoritatively for the async save path.
   const [composeBody, setComposeBody] = useState("");
-  const [composeStatus, setComposeStatus] = useState<Status>("scratch");
+  const [composeStatus, setComposeStatus] = useState<Status>("keep");
   const [openFilename, setOpenFilename] = useState<string | null>(null);
   const [openTitle, setOpenTitle] = useState<string | null>(null);
   const [loadToken, setLoadToken] = useState(0);
   const [pendingSelection, setPendingSelection] = useState<{ start: number; end: number } | null>(
     null,
   );
-  const sessionRef = useRef<ComposeSession>(blankSession("scratch"));
+  const sessionRef = useRef<ComposeSession>(blankSession("keep"));
   /** The session that was open when the compose box last went blank. Kept as
    *  the session object, not its filename: the save still in flight can
    *  rename the file (title change), and `commitSave` updates this object. */
@@ -911,6 +911,7 @@ export default function App() {
           backlinks={noteBacklinks}
           onOpenBacklink={openNoteInCompose}
           onOpenTutorial={() => setView("tutorial")}
+          onOpenSearch={() => setView("search")}
           previousTitle={previousNote?.title ?? null}
           onReopenPrevious={reopenPrevious}
           onNewNote={resetToBlank}
@@ -926,6 +927,7 @@ export default function App() {
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
           onOpenSettings={() => setView("settings")}
+          onClose={() => setView("compose")}
           expiringCount={expiringCount}
           onOpenTriage={() => setView("triage")}
           onOpenNote={openNoteInCompose}

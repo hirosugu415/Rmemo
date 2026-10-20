@@ -12,6 +12,8 @@ interface Props {
   statusFilter: Status | "all";
   onStatusFilterChange: (status: Status | "all") => void;
   onOpenSettings: () => void;
+  /** Back to the compose box (the same as Esc). */
+  onClose: () => void;
   /** Expiring scratch notes — shown on the triage button. */
   expiringCount: number;
   onOpenTriage: () => void;
@@ -30,6 +32,7 @@ export default function SearchView({
   statusFilter,
   onStatusFilterChange,
   onOpenSettings,
+  onClose,
   expiringCount,
   onOpenTriage,
   onOpenNote,
@@ -106,8 +109,11 @@ export default function SearchView({
 
   return (
     <div className="search-view" onKeyDown={onKeyDown}>
-      <div className="view-title" data-drag-region>
-        検索
+      <div className="view-title view-title-row" data-drag-region>
+        <span>メモの一覧・検索</span>
+        <button type="button" className="compose-find-btn" onClick={onClose}>
+          メモに戻る (Esc)
+        </button>
       </div>
       <div className="searchbar">
         <input

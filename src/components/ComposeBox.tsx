@@ -67,6 +67,7 @@ interface Props {
   backlinks: NoteSummary[];
   onOpenBacklink: (note: NoteSummary) => void;
   onOpenTutorial: () => void;
+  onOpenSearch: () => void;
   /** Title of the note that was open before this blank one, if any. */
   previousTitle: string | null;
   onReopenPrevious: () => void;
@@ -239,6 +240,7 @@ export default function ComposeBox({
   backlinks,
   onOpenBacklink,
   onOpenTutorial,
+  onOpenSearch,
   previousTitle,
   onReopenPrevious,
   onNewNote,
@@ -1020,6 +1022,19 @@ export default function ComposeBox({
             )}
           </div>
         )}
+        <button
+          type="button"
+          className="compose-search-btn"
+          title="メモの一覧・検索 (Ctrl+Shift+F)"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={onOpenSearch}
+        >
+          <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+            <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+            <path d="M10.4 10.4 14 14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+          一覧
+        </button>
         <button
           type="button"
           className="format-help"

@@ -68,7 +68,7 @@ impl Default for Settings {
             hotkey: "Ctrl+N".into(),
             hide_on_blur: true,
             expiry_days: 14,
-            last_status: Status::Scratch,
+            last_status: Status::Keep,
             api_enabled: true,
             api_port: DEFAULT_API_PORT,
             indent_width: 4,

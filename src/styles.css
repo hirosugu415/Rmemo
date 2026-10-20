@@ -1484,6 +1484,29 @@ body,
   cursor: pointer;
 }
 
+/* "🔍 一覧": the visible way into the search screen (Ctrl+Shift+F). */
+.compose-search-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 9px;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.compose-search-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 .format-help:hover {
   color: var(--accent);
   border-color: var(--accent);
@@ -1546,7 +1569,7 @@ body,
   min-height: 0;
 }
 
-.tutorial-head {
+.view-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
