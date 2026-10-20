@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-10-20
+
 ### 追加
 
 - エディタの上に「一覧」ボタンを追加。メモの一覧・検索画面（`Ctrl+Shift+F`）をボタンでも開けるようにした。
@@ -14,6 +16,7 @@
 ### 変更
 
 - 初めて起動したときのメモの種類を Scratch から Keep に変更。
+- ウィンドウ左側の太い色の帯をなくし、枠を細い線に統一。
 
 ## [1.0.1] - 2026-10-20
 
@@ -54,6 +57,7 @@
 - **スマホ用の閲覧アプリ（PWA、ベータ版）**: Google ドライブに同期したメモを
   スマホのブラウザから読める。読み取り専用。
 
-[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/hirosugu415/Rmemo/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/hirosugu415/Rmemo/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/hirosugu415/Rmemo/releases/tag/v1.0.0

@@ -108,7 +108,6 @@ body,
   height: 100%;
   overflow: hidden;
   border: 1px solid var(--status-accent, var(--line));
-  border-left-width: 4px;
   border-radius: 10px;
   background: var(--panel);
   color: var(--text);

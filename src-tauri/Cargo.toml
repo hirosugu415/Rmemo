@@ -1,6 +1,6 @@
 [package]
 name = "rmemo"
-version = "1.0.1"
+version = "1.0.2"
 description = "Quick-capture notes for Windows"
 authors = ["hirosugu415"]
 edition = "2021"
