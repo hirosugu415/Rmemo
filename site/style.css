@@ -170,6 +170,16 @@ img {
   border-color: var(--muted);
 }
 
+.store-badge {
+  display: inline-flex;
+}
+
+.store-badge img {
+  display: block;
+  height: 50px;
+  width: auto;
+}
+
 .cta-note {
   margin: 14px 0 0;
   font-size: 13px;

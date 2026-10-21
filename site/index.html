@@ -36,14 +36,16 @@
               書いたそばから見出しやリストが整い、閉じれば元の作業にすぐ戻れます。
             </p>
             <div class="cta">
-              <!-- Microsoft Store の公開後に追加:
-              <a class="btn btn-primary" href="https://apps.microsoft.com/detail/XXXXXXXXXXXX">Microsoft Store から入手</a>
-              -->
-              <a class="btn btn-primary" href="https://github.com/hirosugu415/Rmemo/releases/latest/download/Rmemo-setup.exe">無料でダウンロード</a>
-              <a class="btn btn-ghost" href="#features">特徴を見る</a>
+              <a class="store-badge" href="https://apps.microsoft.com/detail/9N2MDP1460W3">
+                <picture>
+                  <source srcset="https://get.microsoft.com/images/ja%20light.svg" media="(prefers-color-scheme: dark)" />
+                  <img src="https://get.microsoft.com/images/ja%20dark.svg" alt="Microsoft Store から入手" />
+                </picture>
+              </a>
+              <a class="btn btn-ghost" href="https://github.com/hirosugu415/Rmemo/releases/latest/download/Rmemo-setup.exe">インストーラー版（setup.exe）</a>
             </div>
             <p class="cta-note">Windows 10 / 11（64 ビット）・無料・オープンソース（MIT ライセンス）</p>
-            <p class="cta-note">インストール時に警告が出たときは → <a href="#faq">よくある質問</a></p>
+            <p class="cta-note">Store 版はアップデートも自動です。インストーラー版の違いは → <a href="#faq">よくある質問</a></p>
           </div>
 
           <figure class="shot shot-hero">
@@ -202,8 +204,16 @@
             <p>はい、無料です。広告もありません。ソースコードは MIT ライセンスで <a href="https://github.com/hirosugu415/Rmemo">GitHub</a> に公開しています。</p>
           </details>
           <details>
-            <summary>インストール時に「Windows によって PC が保護されました」と出ます</summary>
-            <p>GitHub からダウンロードした場合に表示されることがあります。「詳細情報」→「実行」でインストールできます。Microsoft Store 版ではこの表示は出ません。</p>
+            <summary>Microsoft Store 版とインストーラー版（setup.exe）の違いは？</summary>
+            <p>機能は同じです。Store 版は <a href="https://apps.microsoft.com/detail/9N2MDP1460W3">Microsoft Store</a> からインストールでき、アップデートも Store が自動で行います。インストーラー版は、アプリの中に出る「更新」ボタンでアップデートします。迷ったら Store 版がおすすめです。</p>
+          </details>
+          <details>
+            <summary>インストーラー版で「Windows によって PC が保護されました」と出ます</summary>
+            <p>インストーラー版をダウンロードした場合に表示されることがあります。「詳細情報」→「実行」でインストールできます。Microsoft Store 版ではこの表示は出ません。</p>
+          </details>
+          <details>
+            <summary>インストーラー版から Store 版に乗り換えるには？</summary>
+            <p>「設定」→「アプリ」からインストーラー版の Rmemo をアンインストールしてから、Store 版をインストールしてください。両方を入れると、片方しか起動しません。メモのフォルダはアンインストールしても消えないので、Store 版でもそのまま使えます。</p>
           </details>
           <details>
             <summary>窓が閉じてしまいます。どこにいますか？</summary>

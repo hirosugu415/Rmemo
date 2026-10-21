@@ -33,13 +33,13 @@
 
 ## インストール
 
-<!-- Microsoft Store のリンクができたらここに追加 -->
+**[Microsoft Store から入手](https://apps.microsoft.com/detail/9N2MDP1460W3)**（おすすめ。アップデートも Store が自動で行います）
 
-**[Rmemo-setup.exe をダウンロード](https://github.com/hirosugu415/Rmemo/releases/latest/download/Rmemo-setup.exe)** して実行してください
+インストーラー版を使う場合は、**[Rmemo-setup.exe をダウンロード](https://github.com/hirosugu415/Rmemo/releases/latest/download/Rmemo-setup.exe)** して実行してください
 （過去のバージョンは [Releases](https://github.com/hirosugu415/Rmemo/releases) にあります）。
 
 > [!NOTE]
-> 初めて実行するときに「Windows によって PC が保護されました」と表示されることがあります。
+> インストーラー版を初めて実行するときに「Windows によって PC が保護されました」と表示されることがあります。
 > 「詳細情報」→「実行」を選ぶとインストールできます。
 
 インストール後はタスクトレイに常駐します。`Ctrl+N` で入力窓が開きます。
