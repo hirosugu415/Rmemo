@@ -49,6 +49,9 @@ jobs:
           # *variable*, not a secret.
           VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
       - run: cp -r site/. dist-web/
+      # Pages lets browsers cache files for 10 minutes; a per-deploy query
+      # string makes every deploy fetch the new stylesheet with its HTML.
+      - run: sed -i "s#href=\"style.css\"#href=\"style.css?v=${GITHUB_SHA::7}\"#" dist-web/*.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist-web
