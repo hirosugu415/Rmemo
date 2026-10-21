@@ -34,7 +34,8 @@ export function codeMask(s: string): Uint8Array {
   while (lineStart <= s.length) {
     const nl = s.indexOf("\n", lineStart);
     const lineEnd = nl === -1 ? s.length : nl;
-    const line = s.slice(lineStart, lineEnd);
+    // A CRLF note keeps its "\r" here; it must not stop a fence from closing.
+    const line = s.slice(lineStart, lineEnd).replace(/\r$/, "");
 
     if (fence) {
       mask.fill(1, lineStart, lineEnd);
@@ -246,7 +247,7 @@ export function outlineOf(s: string, mask: Uint8Array = codeMask(s)): OutlineIte
     const nl = s.indexOf("\n", lineStart);
     const lineEnd = nl === -1 ? s.length : nl;
     if (!mask[lineStart]) {
-      const line = s.slice(lineStart, lineEnd);
+      const line = s.slice(lineStart, lineEnd).replace(/\r$/, "");
       const m = HEADING_PREFIX.exec(line);
       if (m) {
         const text = stripInline(line.slice(m[0].length).replace(/[ \t]+#+[ \t]*$/, "")).trim();

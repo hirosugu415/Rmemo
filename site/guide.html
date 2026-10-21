@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>使い方ガイド — Rmemo</title>
+    <meta name="description" content="Rmemo の使い方ガイド。メモの書き方から、一覧・検索、Scratch の整理、設定、ファイルの保存場所と同期まで、すべての画面の使い方を説明します。" />
+    <link rel="icon" type="image/png" href="images/favicon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./"><img src="images/icon.png" alt="" />Rmemo</a>
+        <nav>
+          <a class="optional" href="./#features">特徴</a>
+          <a href="guide.html">使い方</a>
+          <a class="optional" href="./#faq">よくある質問</a>
+          <a href="https://github.com/hirosugu415/Rmemo">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap guide">
+      <div class="guide-hero">
+        <h1>使い方ガイド</h1>
+        <p class="lead">
+          Rmemo のすべての画面の使い方をまとめたページです。アプリの中でも <kbd>F1</kbd> でエディタの使い方を見られますが、
+          ここでは一覧・検索や整理画面、設定まで詳しく説明します。
+        </p>
+      </div>
+
+      <div class="guide-layout">
+        <nav class="guide-toc" aria-label="目次">
+          <p class="guide-toc-title">目次</p>
+          <ol>
+            <li><a href="#qa">困ったときは（Q&amp;A）</a></li>
+            <li>
+              <a href="#basics">基本の使い方</a>
+              <ol>
+                <li><a href="#window">呼び出す・隠す</a></li>
+                <li><a href="#screens">画面の種類</a></li>
+                <li><a href="#tray">タスクトレイ</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#editor">メモを書く（エディタ）</a>
+              <ol>
+                <li><a href="#save">保存のしくみ</a></li>
+                <li><a href="#new-note">新しいメモ・前回のメモ</a></li>
+                <li><a href="#keep-scratch">Keep と Scratch</a></li>
+                <li><a href="#headings">見出し</a></li>
+                <li><a href="#heading-vs-tag">見出しとタグの違い</a></li>
+                <li><a href="#inline">文字の飾り</a></li>
+                <li><a href="#lists">リスト・チェックボックス</a></li>
+                <li><a href="#blocks">引用・区切り線・コード</a></li>
+                <li><a href="#images">画像</a></li>
+                <li><a href="#links">Web へのリンク</a></li>
+                <li><a href="#wiki-links">メモ同士のリンク</a></li>
+                <li><a href="#tags">タグ</a></li>
+                <li><a href="#toc">目次</a></li>
+                <li><a href="#editing">便利な編集機能</a></li>
+                <li><a href="#zoom">文字の大きさ</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#search">メモを探す（一覧・検索）</a>
+              <ol>
+                <li><a href="#search-open">開き方と検索</a></li>
+                <li><a href="#list-row">一覧の見方</a></li>
+                <li><a href="#pin">ピン留め</a></li>
+                <li><a href="#move">Keep / Scratch の移動</a></li>
+                <li><a href="#delete">削除と復元</a></li>
+                <li><a href="#tag-cloud">タグの一覧と名前の変更</a></li>
+              </ol>
+            </li>
+            <li><a href="#triage">Scratch を整理する</a></li>
+            <li><a href="#settings">設定</a></li>
+            <li>
+              <a href="#files">メモのファイルと同期</a>
+              <ol>
+                <li><a href="#folder">保存場所</a></li>
+                <li><a href="#other-apps">ほかのアプリで編集する</a></li>
+                <li><a href="#sync">複数の PC で同期する</a></li>
+              </ol>
+            </li>
+            <li><a href="#update">アップデート・アンインストール</a></li>
+            <li><a href="#shortcuts">ショートカット一覧</a></li>
+          </ol>
+        </nav>
+
+        <div class="guide-content">
+          <!-- ======================= Q&A ======================= -->
+          <section id="qa">
+            <h2>困ったときは（Q&amp;A）</h2>
+            <p>よくある困りごとをまとめました。くわしい説明は、それぞれの「詳しくは」から読めます。</p>
+
+            <dl class="qa">
+              <div class="qa-item">
+                <dt>窓が消えてしまいました。どこに行きましたか？</dt>
+                <dd>
+                  終了したのではなく、隠れているだけです。<kbd>Ctrl</kbd>+<kbd>N</kbd> を押すか、タスクトレイの Rmemo のアイコンをクリックすると出てきます。
+                  ほかの画面をクリックすると自動で隠れるのは、設定で止められます。
+                  <a class="qa-more" href="#window">詳しくは「呼び出す・隠す」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>保存ボタンはどこですか？ちゃんと保存されていますか？</dt>
+                <dd>
+                  書いている途中も、手を止めると自動で保存されます。保存場所やファイル名を決める必要はありません。
+                  書き終えたら <kbd>Ctrl</kbd>+<kbd>Enter</kbd> で保存して、新しいメモに切り替えられます。
+                  <a class="qa-more" href="#save">詳しくは「保存のしくみ」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>前に書いたメモを開くには？</dt>
+                <dd>
+                  エディタ上部の「<span class="ui">一覧</span>」ボタン（または <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>）でメモの一覧が開きます。
+                  直前まで開いていたメモなら、新しいメモの画面の「<span class="ui">← 前回</span>」（<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd>）で戻れます。
+                  <a class="qa-more" href="#search-open">詳しくは「開き方と検索」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>今のメモを閉じて、新しいメモを書きたい</dt>
+                <dd>
+                  エディタ上部の「<span class="ui">＋ 新規</span>」を押すか、<kbd>Esc</kbd> を押します。開いていたメモは保存されています。
+                  <a class="qa-more" href="#new-note">詳しくは「新しいメモ・前回のメモ」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>Keep と Scratch は何が違いますか？</dt>
+                <dd>
+                  あとで読み返すメモは Keep（残す）、電話番号や一時的なコピーのような使い捨てのメモは Scratch です。<kbd>Ctrl</kbd>+<kbd>L</kbd> で切り替えます。
+                  <a class="qa-more" href="#keep-scratch">詳しくは「Keep と Scratch」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>「まもなく期限切れ」と出ました。メモは消えてしまいますか？</dt>
+                <dd>
+                  消えません。古くなった Scratch に付く印です。一覧の「<span class="ui">整理</span>」ボタンから、1 件ずつ残すか捨てるかを決められます。
+                  <a class="qa-more" href="#triage">詳しくは「Scratch を整理する」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>メモを消してしまいました。元に戻せますか？</dt>
+                <dd>
+                  Rmemo で削除したメモは、Windows のごみ箱に入ります。ごみ箱から「元に戻す」で復元できます。
+                  <a class="qa-more" href="#delete">詳しくは「削除と復元」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt><kbd>Ctrl</kbd>+<kbd>N</kbd> がほかのアプリの操作とかぶります</dt>
+                <dd>
+                  設定（<kbd>Ctrl</kbd>+<kbd>,</kbd>）の「ホットキー」で、呼び出すキーを変えられます。
+                  <a class="qa-more" href="#settings">詳しくは「設定」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>見出しにしたいのに、タグになってしまいます</dt>
+                <dd>
+                  <code>#</code> のあとに空白を入れると見出し、空白を入れずに続けるとタグになります。<code># 見出し</code> と <code>#タグ</code> の違いです。
+                  <a class="qa-more" href="#heading-vs-tag">詳しくは「見出しとタグの違い」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>メモのファイルはどこに保存されていますか？</dt>
+                <dd>
+                  <code>ドキュメント\Rmemo</code> の中の <code>keep</code> と <code>scratch</code> フォルダに、1 メモ = 1 つの <code>.md</code> ファイルで保存されています。
+                  <a class="qa-more" href="#folder">詳しくは「保存場所」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>ほかの PC と同じメモを使いたい</dt>
+                <dd>
+                  メモの保存フォルダを Google ドライブなどのクラウドの中にすると、複数の PC で同期できます。
+                  <a class="qa-more" href="#sync">詳しくは「複数の PC で同期する」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>文字が小さくて読みにくい</dt>
+                <dd>
+                  <kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>Ctrl</kbd>+<kbd>-</kbd>、または <kbd>Ctrl</kbd>+マウスホイールで大きさを変えられます。
+                  <a class="qa-more" href="#zoom">詳しくは「文字の大きさ」へ</a>
+                </dd>
+              </div>
+            </dl>
+          </section>
+
+          <!-- ======================= 基本 ======================= -->
+          <section id="basics">
+            <h2>基本の使い方</h2>
+
+            <h3 id="window">呼び出す・隠す</h3>
+            <p>
+              Rmemo はタスクトレイに常駐していて、どの画面にいても <kbd>Ctrl</kbd>+<kbd>N</kbd> で入力窓が開きます。
+              もう一度 <kbd>Ctrl</kbd>+<kbd>N</kbd> を押すと隠れます。
+            </p>
+            <ul>
+              <li><strong>隠れるタイミング</strong>：<kbd>Ctrl</kbd>+<kbd>N</kbd> を押したとき、新しいメモの画面で <kbd>Esc</kbd> を押したとき、ほかの画面をクリックしたとき。</li>
+              <li><strong>ほかの画面をクリックしても隠したくない</strong>ときは、設定の「フォーカスを外したら自動で隠す」をオフにします。調べものをしながら書きたいときに便利です。</li>
+              <li><strong>窓を動かす</strong>：エディタの一番上の帯（「新規メモ」「編集中: …」と書いてあるところ）をドラッグします。</li>
+              <li><strong>窓の大きさを変える</strong>：窓のふちをドラッグします。位置と大きさは次回も覚えています。</li>
+              <li>窓は、ほかのアプリの上に常に表示されます。</li>
+            </ul>
+            <p class="note">隠れている間もアプリは動いています。完全に終了したいときは、タスクトレイのメニューから「終了」を選びます。</p>
+
+            <h3 id="screens">画面の種類</h3>
+            <p>Rmemo には、次の 5 つの画面があります。エディタ以外の画面では、<kbd>Esc</kbd> で 1 つ前の画面に戻れます。</p>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th>画面</th><th>開き方</th><th>できること</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><a href="#editor">エディタ</a></td><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>メモを書く・編集する</td></tr>
+                  <tr><td><a href="#search">一覧・検索</a></td><td>「一覧」ボタン / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td><td>メモを探す・開く・ピン留め・削除</td></tr>
+                  <tr><td><a href="#triage">Scratch 整理</a></td><td>一覧・検索の「整理」ボタン</td><td>古い Scratch を 1 件ずつ片づける</td></tr>
+                  <tr><td><a href="#settings">設定</a></td><td>一覧・検索の ⚙ / <kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>ホットキーや保存フォルダの変更</td></tr>
+                  <tr><td>使い方</td><td>エディタの「?」ボタン / <kbd>F1</kbd></td><td>エディタの機能を入力例つきで確認</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 id="tray">タスクトレイ</h3>
+            <p>画面右下のタスクトレイに Rmemo のアイコンがあります（隠れている場合は「^」を押すと出てきます）。</p>
+            <ul>
+              <li><strong>左クリック</strong>：窓を出す・隠す</li>
+              <li><strong>右クリック</strong>：メニューが開きます
+                <ul>
+                  <li>「Rmemo を開く」：窓を出す</li>
+                  <li>「メモのフォルダを開く」：メモの保存フォルダをエクスプローラーで開く</li>
+                  <li>「終了」：Rmemo を完全に終了する</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+
+          <!-- ======================= エディタ ======================= -->
+          <section id="editor">
+            <h2>メモを書く（エディタ）</h2>
+            <p>
+              エディタでは、Markdown（マークダウン）という書き方で、見出しやリストを書いたそばから整えて表示します。
+              ファイルにはいつでも、入力した文字のまま保存されます。
+            </p>
+
+            <h3 id="save">保存のしくみ</h3>
+            <ul>
+              <li><strong>自動保存</strong>：書いている途中も、手を止めると自動で保存されます。保存場所やファイル名を決める必要はありません。</li>
+              <li><kbd>Ctrl</kbd>+<kbd>S</kbd>：その場で一時保存します（画面下に「一時保存しました」と出ます）。</li>
+              <li><kbd>Ctrl</kbd>+<kbd>Enter</kbd>：保存して、新しいメモに切り替えます（窓は開いたままです）。続けて次のメモを書けます。</li>
+              <li><strong>タイトルとファイル名</strong>：1 行目がメモのタイトルになり、そのままファイル名になります。タイトルを書き換えると、ファイル名も自動で変わります。</li>
+              <li>何も書かずに閉じたメモは保存されません。書いたメモを全部消すと、そのメモはなくなります。</li>
+            </ul>
+
+            <h3 id="new-note">新しいメモ・前回のメモ</h3>
+            <ul>
+              <li><strong>新しいメモを書く</strong>：エディタ上部の「<span class="ui">＋ 新規</span>」を押すか、<kbd>Esc</kbd> を押します。開いていたメモは保存されてから閉じます。</li>
+              <li><strong>前回のメモに戻る</strong>：新しいメモの画面では、上部に「<span class="ui">← 前回: メモの名前</span>」が出ます。クリックするか <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> で、直前まで開いていたメモに戻れます。アプリを再起動しても覚えています。</li>
+            </ul>
+
+            <h3 id="keep-scratch">Keep と Scratch</h3>
+            <p>メモは 2 種類に分けて保存されます。画面下の「Keep / Scratch」スイッチか、<kbd>Ctrl</kbd>+<kbd>L</kbd> で切り替えます。</p>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th></th><th>向いているメモ</th><th>古くなると</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Keep</strong>（残す）</td><td>手順書、アイデア、調べたことのまとめなど、あとで読み返すメモ</td><td>何も起きません</td></tr>
+                  <tr><td><strong>Scratch</strong>（使い捨て）</td><td>電話番号、買い物リスト、一時的なコピーなど、すぐいらなくなるメモ</td><td>「まもなく期限切れ」の印が付きます（消えはしません）</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              今どちらのメモを書いているかは、上部のタイトルの色でも分かります。前回選んだほうを覚えているので、普段使うほうを選んでおけば、毎回切り替える必要はありません。
+              古くなった Scratch は <a href="#triage">整理画面</a> でまとめて片づけられます。
+            </p>
+
+            <h3 id="headings">見出し</h3>
+            <ul>
+              <li>行頭で <code>#</code> と空白を打つと見出し 1、<code>##</code> で見出し 2… と、<code>#</code> の数で大きさが変わります（4 つまで）。</li>
+              <li>エディタ上部の「<span class="ui">本文 / H1〜H4</span>」ボタン、または <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>〜<kbd>4</kbd> でも変えられます。<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>0</kbd> か、見出しの先頭で <kbd>Backspace</kbd> を押すと本文に戻ります。窓の幅が狭いときは、ボタンが 1 つのプルダウンにまとまります。</li>
+              <li><strong>日本語入力のままでも OK</strong>：<code>＃＃　</code>（全角の ＃ と全角スペース）と打つと、自動で <code>## </code> に直って見出しになります。</li>
+              <li><strong>見出しで折りたたむ</strong>：見出しにマウスを乗せると左に ▾ が出ます。クリックすると、その見出しの下（次の同じ大きさ以上の見出しまで）を隠せます。<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>[</kbd> / <kbd>]</kbd> でたたむ・開く、<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>[</kbd> / <kbd>]</kbd> で全部をたたむ・開くこともできます。</li>
+            </ul>
+
+            <h3 id="heading-vs-tag">見出しとタグの違い</h3>
+            <p><code>#</code> のすぐあとに空白があるかどうかで、見出しになるかタグになるかが決まります。</p>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th>入力</th><th>結果</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code># 買い物</code>（# のあとに空白）</td><td>見出し</td></tr>
+                  <tr><td><code>#買い物</code>（空白なし）</td><td>タグ</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 id="inline">文字の飾り</h3>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th>飾り</th><th>入力</th><th>キー</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>太字</td><td><code>**太字**</code></td><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td></tr>
+                  <tr><td>斜体</td><td><code>*斜体*</code></td><td><kbd>Ctrl</kbd>+<kbd>I</kbd></td></tr>
+                  <tr><td>インラインコード</td><td><code>`npm install`</code></td><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td></tr>
+                  <tr><td>取り消し線</td><td><code>~~取り消し~~</code></td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>文字を選んでキーを押すと飾りが付き、もう一度押すと外れます。何も選ばずに押すと、その飾りで打ち始められます。</p>
+
+            <h3 id="lists">リスト・チェックボックス</h3>
+            <ul>
+              <li><strong>箇条書き</strong>：行頭で <code>-</code> と空白を打ちます。<kbd>Enter</kbd> で次の項目、空の項目で <kbd>Enter</kbd> を押すとリストが終わります。</li>
+              <li><strong>番号付き</strong>：<code>1.</code> と空白で始めます。<kbd>Enter</kbd> で次の番号が自動で入ります。</li>
+              <li><strong>チェックボックス</strong>：<code>- [ ]</code> で始めます。チェックボックスをクリックすると完了になり、取り消し線が付きます。</li>
+              <li><strong>字下げ</strong>：リストの中で <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> を押すと、入れ子にしたり戻したりできます。</li>
+            </ul>
+
+            <h3 id="blocks">引用・区切り線・コード</h3>
+            <ul>
+              <li><strong>引用</strong>：行頭で <code>&gt;</code> と空白。<kbd>Enter</kbd> で引用が続き、空の行で <kbd>Enter</kbd> を押すと終わります。</li>
+              <li><strong>区切り線</strong>：行に <code>---</code> と打ちます。</li>
+              <li>
+                <strong>コードブロック</strong>：<code>```</code> のあとに言語名（<code>js</code>、<code>python</code> など）を書くと、色分けして表示します。
+                言語名を書かずに閉じると、中身から言語を推測して自動で付けます。右上の「コピー」で中身をコピーでき、言語名をクリックすると言語を変えられます。
+              </li>
+            </ul>
+
+            <h3 id="images">画像</h3>
+            <ul>
+              <li><strong>貼り付け</strong>：スクリーンショットを <kbd>Ctrl</kbd>+<kbd>V</kbd> で貼るか、画像ファイルをドラッグ＆ドロップします。</li>
+              <li><strong>大きさを変える</strong>：画像の右下の □ をドラッグするか、右上の「小・中・大・原寸」を押します。ダブルクリックで原寸に戻ります。</li>
+              <li><strong>消す</strong>：画像の行で <kbd>Backspace</kbd> を 1 回押すと、画像ごと消えます。</li>
+              <li>画像はメモの保存フォルダの <code>assets</code> に WebP 形式で保存されます。メモから消した画像は、しばらくすると自動でごみ箱に移ります。</li>
+            </ul>
+
+            <h3 id="links">Web へのリンク</h3>
+            <ul>
+              <li><strong>リンクを付ける</strong>：文字を選んで <kbd>Ctrl</kbd>+<kbd>K</kbd>（またはエディタ上部の「<span class="ui">リンク</span>」）を押し、URL を入力します。</li>
+              <li><strong>URL を貼ってリンクにする</strong>：文字を選んだ状態で URL を <kbd>Ctrl</kbd>+<kbd>V</kbd> すると、選んだ文字がそのままリンクになります。</li>
+              <li><strong>リンクを開く</strong>：<kbd>Ctrl</kbd>+クリックでブラウザが開きます。<code>https://…</code> をそのまま書いた場合も同じです。</li>
+              <li><strong>直す・外す</strong>：リンクの上で <kbd>Ctrl</kbd>+<kbd>K</kbd> を押すと、URL を変えたり、リンクを外したりできます。</li>
+            </ul>
+
+            <h3 id="wiki-links">メモ同士のリンク</h3>
+            <ul>
+              <li><code>[[</code> と打つと、ほかのメモのタイトルの候補が出ます。選ぶと <code>[[メモの名前]]</code> が入り、📄 付きの囲みで表示されます。</li>
+              <li>クリックすると、そのメモが開きます。まだないメモの名前は点線で表示され、クリックするとそのタイトルで新しいメモを作れます。</li>
+              <li><strong>参照元</strong>：ほかのメモからリンクされているメモには、下に「← 参照元」としてリンク元のメモが表示されます。</li>
+              <li><strong>名前を変えてもリンクが切れない</strong>：メモのタイトルを変えると、ほかのメモの <code>[[古い名前]]</code> も、そのメモを閉じたときに新しい名前へ書き換わります。</li>
+            </ul>
+
+            <h3 id="tags">タグ</h3>
+            <ul>
+              <li>メモの中に <code>#仕事</code> のように書くと、そのメモにタグが付きます。1 つのメモに複数のタグを付けられます。</li>
+              <li><code>#</code> を打つと、今までに使ったタグの候補が出ます。</li>
+              <li>タグを <kbd>Ctrl</kbd>+クリックすると、そのタグのメモを一覧・検索画面で探せます。</li>
+              <li>タグの一覧や名前の変更は、<a href="#tag-cloud">一覧・検索画面</a> でできます。</li>
+            </ul>
+            <p class="note">1 行目にタグを並べて <code>#用語集 #Rust</code> のように書いておくと、一覧でもひと目で分類が分かって便利です。</p>
+
+            <h3 id="toc">目次</h3>
+            <p>
+              メモに見出しを作ると、右側に目次が出ます。クリックするとその見出しへ移動します。
+              窓の幅が狭いときは細い線になり、マウスを乗せると開きます。
+            </p>
+
+            <h3 id="editing">便利な編集機能</h3>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th>やりたいこと</th><th>キー</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>カーソルを追加する</td><td><kbd>Alt</kbd>+クリック</td></tr>
+                  <tr><td>同じ語を次々に選ぶ</td><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td></tr>
+                  <tr><td>同じ語をすべて選ぶ</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></td></tr>
+                  <tr><td>縦に選ぶ</td><td><kbd>Shift</kbd>+<kbd>Alt</kbd>+ドラッグ</td></tr>
+                  <tr><td>カーソルを 1 つに戻す</td><td><kbd>Esc</kbd></td></tr>
+                  <tr><td>行を上下に移動</td><td><kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd></td></tr>
+                  <tr><td>行を上下に複製</td><td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd></td></tr>
+                  <tr><td>字下げ・字上げ</td><td><kbd>Ctrl</kbd>+<kbd>]</kbd> / <kbd>Ctrl</kbd>+<kbd>[</kbd></td></tr>
+                  <tr><td>今日の日付を入れる</td><td><kbd>Ctrl</kbd>+<kbd>:</kbd>（例: 2026-10-21）</td></tr>
+                  <tr><td>日付と時刻を入れる</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>:</kbd>（例: 2026-10-21 14:05）</td></tr>
+                  <tr><td>メモの中を検索</td><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td></tr>
+                  <tr><td>メモの中で置換</td><td><kbd>Ctrl</kbd>+<kbd>H</kbd></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>複数カーソルのときは、行の移動や字下げもすべての行に効きます。画面下には文字数（改行は数えません）が出て、文字を選ぶと選択中の文字数も出ます。</p>
+
+            <h3 id="zoom">文字の大きさ</h3>
+            <p>
+              <kbd>Ctrl</kbd>+<kbd>+</kbd> で大きく、<kbd>Ctrl</kbd>+<kbd>-</kbd> で小さく、<kbd>Ctrl</kbd>+<kbd>0</kbd> で元の大きさに戻ります。
+              <kbd>Ctrl</kbd>+マウスホイールでも変えられます。大きさは次回も覚えています。
+            </p>
+          </section>
+
+          <!-- ======================= 一覧・検索 ======================= -->
+          <section id="search">
+            <h2>メモを探す（一覧・検索）</h2>
+
+            <figure class="guide-shot">
+              <img src="images/search.png" alt="一覧・検索画面。上に検索欄と絞り込みボタン、その下にタグの一覧とメモの一覧が並んでいる" loading="lazy" />
+            </figure>
+
+            <h3 id="search-open">開き方と検索</h3>
+            <ul>
+              <li><strong>開く</strong>：エディタ上部の「<span class="ui">一覧</span>」ボタンか、<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>。もう一度 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> か、右上の「<span class="ui">メモに戻る</span>」、<kbd>Esc</kbd> でエディタに戻ります。</li>
+              <li><strong>検索</strong>：上の検索欄に入力すると、1 文字打つごとに絞り込まれます。タイトルだけでなく、<strong>本文の中身（リストの奥に書いた言葉も）すべて</strong>が対象です。</li>
+              <li><strong>複数の言葉で探す</strong>：空白で区切ると、すべての言葉を含むメモだけに絞り込みます（例: <code>会議 予算</code>）。</li>
+              <li><strong>タグで探す</strong>：<code>#仕事</code> のように入力すると、そのタグのメモが見つかります。</li>
+              <li>見つかった言葉は、タイトルと本文の抜粋で色付きで表示されます。</li>
+              <li><strong>絞り込み</strong>：右上の「<span class="ui">All / Keep / Scratch</span>」で、表示するメモの種類を選べます。</li>
+              <li>画面の一番下に、表示中のメモの件数が出ます。</li>
+            </ul>
+            <p><strong>キーボードだけでも操作できます。</strong></p>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th>キー</th><th>動作</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>選ぶメモを移動</td></tr>
+                  <tr><td><kbd>Enter</kbd></td><td>選んでいるメモを開く</td></tr>
+                  <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>選んでいるメモを Keep ⇔ Scratch に移動</td></tr>
+                  <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>検索欄に戻る</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 id="list-row">一覧の見方</h3>
+            <p>メモ 1 件ごとに、次の情報が表示されます。クリックするとそのメモが開きます。</p>
+            <ul>
+              <li><strong>📌</strong>：ピン留めしたメモ（一覧の一番上に並びます）</li>
+              <li><strong>タイトル</strong>：メモの 1 行目</li>
+              <li><strong>まもなく期限切れ</strong>：古くなった Scratch に付く印（<a href="#triage">整理する</a>）</li>
+              <li><strong>文字数・更新日時</strong>：右上に表示（「now」は 1 分以内、「6m」は 6 分前、「3h」は 3 時間前、「2d」は 2 日前。1 週間より前は日付）</li>
+              <li><strong>本文の抜粋</strong>：検索中は、見つかった言葉のまわりが表示されます</li>
+              <li><strong>タグ</strong>：クリックするとそのタグで絞り込みます</li>
+              <li><strong>ボタン</strong>：「ピン留め」「→ Scratch（または → Keep）」「削除」</li>
+            </ul>
+
+            <h3 id="pin">ピン留め</h3>
+            <p>
+              よく使うメモは「<span class="ui">ピン留め</span>」を押すと、一覧の一番上に固定されます。外すときは「<span class="ui">ピン解除</span>」です。
+              ピン留めの情報はメモの保存フォルダに保存されるので、<a href="#sync">同期</a> している別の PC にも反映されます。
+            </p>
+
+            <h3 id="move">Keep / Scratch の移動</h3>
+            <p>「<span class="ui">→ Scratch</span>」「<span class="ui">→ Keep</span>」で、メモの種類をあとから変えられます。メモを開かなくても、一覧からそのまま移動できます。</p>
+
+            <h3 id="delete">削除と復元</h3>
+            <ul>
+              <li>「<span class="ui">削除</span>」を押すと「もう一度クリックでゴミ箱へ」に変わります。3 秒以内にもう一度押すと削除されます（押し間違いを防ぐためです）。</li>
+              <li>削除したメモは <strong>Windows のごみ箱</strong> に入ります。デスクトップのごみ箱を開き、メモのファイルを右クリックして「元に戻す」を選ぶと復元できます。</li>
+            </ul>
+
+            <h3 id="tag-cloud">タグの一覧と名前の変更</h3>
+            <ul>
+              <li>検索欄が空のとき、検索欄の下にすべてのタグが使われている数の多い順に並びます。クリックすると、そのタグのメモに絞り込みます。</li>
+              <li>最初はよく使う 10 個だけが表示されます。「<span class="ui">+数字</span>」で全部表示、「<span class="ui">たたむ</span>」で戻ります。</li>
+              <li>
+                <strong>タグの名前を変える</strong>：右端の「<span class="ui">編集</span>」を押してからタグをクリックし、新しい名前を入れて <kbd>Enter</kbd>。
+                そのタグが付いたすべてのメモが書き換わります。すでにあるタグの名前にすると、2 つのタグが 1 つにまとまります。
+                <kbd>Esc</kbd> でやめられます。
+              </li>
+            </ul>
+          </section>
+
+          <!-- ======================= 整理 ======================= -->
+          <section id="triage">
+            <h2>Scratch を整理する</h2>
+            <p>
+              古くなった Scratch を 1 件ずつ表示して、残すか捨てるかを決めていく画面です。
+              Scratch はいつのまにか溜まりがちなので、ときどきここで片づけると一覧がすっきりします。
+            </p>
+
+            <figure class="guide-shot">
+              <img src="images/triage.png" alt="Scratch 整理画面。メモの本文が大きく表示され、下に Keep に残す・ゴミ箱へ・あとで・開いて編集・戻るのボタンが並んでいる" loading="lazy" />
+            </figure>
+
+            <h3>開き方</h3>
+            <p>
+              <a href="#search">一覧・検索画面</a> の右上にある「<span class="ui">整理</span>」ボタンを押します。
+              ボタンの横の数字は、期限切れの Scratch の件数です。
+            </p>
+
+            <h3>「期限切れ」とは</h3>
+            <p>
+              作ってから一定の日数（はじめは 14 日）がたった Scratch に「期限切れ」の印が付きます。日数は <a href="#settings">設定</a> の「期限切れの目安（日数）」で変えられます。
+              <strong>印が付くだけで、メモが勝手に消えることはありません。</strong>
+            </p>
+
+            <h3>操作</h3>
+            <p>画面上部の「<span class="ui">期限切れ</span>」「<span class="ui">すべての Scratch</span>」で、整理する範囲を選びます（期限切れのメモがなければ、すべての Scratch が対象になります）。期限切れのものから、作った日が古い順に表示されます。</p>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th>ボタン</th><th>キー</th><th>動作</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Keep に残す</td><td><kbd>K</kbd></td><td>Keep に移して、次のメモへ</td></tr>
+                  <tr><td>ゴミ箱へ</td><td><kbd>D</kbd> / <kbd>Delete</kbd></td><td>Windows のごみ箱に送って、次のメモへ</td></tr>
+                  <tr><td>あとで</td><td><kbd>S</kbd> / <kbd>→</kbd></td><td>今は決めずに、次のメモへ</td></tr>
+                  <tr><td>開いて編集</td><td><kbd>E</kbd> / <kbd>Enter</kbd></td><td>そのメモをエディタで開く</td></tr>
+                  <tr><td>戻る</td><td><kbd>←</kbd></td><td>1 つ前のメモに戻る（「Keep に残す」は取り消されます）</td></tr>
+                  <tr><td>終了</td><td><kbd>Esc</kbd></td><td>一覧・検索画面に戻る</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="note">ゴミ箱に送ったメモは、この画面の「戻る」では戻せません。Windows のごみ箱から復元してください。</p>
+            <p>最後まで終わると「整理完了」と、Keep・ゴミ箱・あとでの件数が出ます。「<span class="ui">「あとで」の◯件をもう一度</span>」で、保留にしたメモだけをもう一度整理できます。</p>
+          </section>
+
+          <!-- ======================= 設定 ======================= -->
+          <section id="settings">
+            <h2>設定</h2>
+            <p>一覧・検索画面の右上の ⚙ か、<kbd>Ctrl</kbd>+<kbd>,</kbd> で開きます。変更したら「<span class="ui">保存</span>」を押してください。</p>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th>項目</th><th>説明</th><th>はじめの値</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>ホットキー</td><td>Rmemo を呼び出すキー。<code>Ctrl+Shift+M</code> のように入力します</td><td><code>Ctrl+N</code></td></tr>
+                  <tr><td>メモの保存フォルダ</td><td>メモを保存する場所。変えると、新しいフォルダに <code>keep</code> と <code>scratch</code> が作られます（今までのメモは自動では移動しません）</td><td><code>ドキュメント\Rmemo</code></td></tr>
+                  <tr><td>期限切れの目安（日数）</td><td>作ってから何日たった Scratch に「期限切れ」の印を付けるか</td><td>14 日</td></tr>
+                  <tr><td>Windows の起動時に自動で起動する</td><td>PC にサインインしたとき、タスクトレイに常駐した状態で起動します</td><td>オン</td></tr>
+                  <tr><td>フォーカスを外したら自動で隠す</td><td>ほかの画面をクリックしたときに Rmemo を隠すかどうか</td><td>オン</td></tr>
+                  <tr><td>インデント幅</td><td><kbd>Ctrl</kbd>+<kbd>]</kbd> / <kbd>Ctrl</kbd>+<kbd>[</kbd> で増減する空白の数</td><td>4</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>「<span class="ui">エクスプローラーで開く</span>」を押すと、メモの保存フォルダが開きます。</p>
+          </section>
+
+          <!-- ======================= ファイルと同期 ======================= -->
+          <section id="files">
+            <h2>メモのファイルと同期</h2>
+
+            <h3 id="folder">保存場所</h3>
+            <p>メモは、はじめは次のフォルダに保存されます。</p>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr><th>場所</th><th>中身</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>ドキュメント\Rmemo\keep</code></td><td>Keep のメモ</td></tr>
+                  <tr><td><code>ドキュメント\Rmemo\scratch</code></td><td>Scratch のメモ</td></tr>
+                  <tr><td><code>ドキュメント\Rmemo\assets</code></td><td>メモに貼った画像</td></tr>
+                  <tr><td><code>ドキュメント\Rmemo\.rmemo</code></td><td>ピン留めの情報</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              メモは 1 件ごとに、<code>タイトル.md</code> という名前のテキストファイルです。同じタイトルのメモがあると、<code>タイトル (2).md</code> のように番号が付きます。
+              アンインストールしても、このフォルダは消えません。
+            </p>
+
+            <h3 id="other-apps">ほかのアプリで編集する</h3>
+            <p>
+              メモはただのテキストファイルなので、メモ帳や VS Code でも開いて編集できます。ほかのアプリで書き換えたり、フォルダに <code>.md</code> ファイルを追加したりすると、Rmemo の一覧にも自動で反映されます。
+            </p>
+            <p class="note">
+              Rmemo で開いて編集中のメモが、ほかのアプリでも書き換えられた場合は、どちらの内容も失われないように、ほかのアプリ側の内容を別のメモとして残します。
+            </p>
+
+            <h3 id="sync">複数の PC で同期する</h3>
+            <p>Rmemo 自体には同期の機能はありませんが、メモの保存フォルダをクラウドの中にすれば、複数の PC で同じメモを使えます。Google ドライブの場合の手順です。</p>
+            <ol>
+              <li>それぞれの PC に「Google ドライブ パソコン版」をインストールし、同じアカウントでログインします。</li>
+              <li>Google ドライブの設定で、マイドライブの同期を「<strong>ファイルをミラーリングする</strong>」にします（「ストリーミング」だと、ほかの PC の変更に気づきにくくなります）。</li>
+              <li><code>マイドライブ</code> の中に <code>Rmemo</code> フォルダを作ります。</li>
+              <li>Rmemo の <a href="#settings">設定</a> で、「メモの保存フォルダ」をそのフォルダ（例: <code>G:\マイドライブ\Rmemo</code>）にして保存します。</li>
+              <li>今までのメモを使いたい場合は、元のフォルダの <code>keep</code> と <code>scratch</code> の中身を、新しいフォルダの同じ名前のフォルダにコピーして、Rmemo を再起動します。</li>
+            </ol>
+            <p>
+              2 台目以降の PC でも、同じフォルダを「メモの保存フォルダ」に設定するだけです。くわしい手順や、2 台で同時に同じメモを編集したときの動きは
+              <a href="https://github.com/hirosugu415/Rmemo/blob/main/GOOGLE-DRIVE-SYNC.md">同期の手順書</a> にあります。
+            </p>
+          </section>
+
+          <!-- ======================= アップデート ======================= -->
+          <section id="update">
+            <h2>アップデート・アンインストール</h2>
+            <ul>
+              <li><strong>Microsoft Store 版</strong>：アップデートは Store が自動で行います。</li>
+              <li><strong>インストーラー版（setup.exe）</strong>：新しいバージョンが出ると、画面の一番下に「<span class="ui">v◯.◯.◯ に更新</span>」ボタンが出ます。押すと、ダウンロードからインストール、再起動まで自動で進みます。</li>
+              <li><strong>アンインストール</strong>：Windows の「設定」→「アプリ」から Rmemo をアンインストールします。メモのフォルダは消えずに残ります。</li>
+              <li>インストーラー版と Store 版を両方入れると、片方しか起動しません。乗り換えるときは、先に使っていたほうをアンインストールしてください。</li>
+            </ul>
+          </section>
+
+          <!-- ======================= ショートカット ======================= -->
+          <section id="shortcuts">
+            <h2>ショートカット一覧</h2>
+            <p>よく使うショートカットを、VS Code や Notion などおなじみのアプリに合わせています。</p>
+
+            <h3>どこでも</h3>
+            <div class="table-scroll">
+              <table>
+                <tbody>
+                  <tr><td>Rmemo を出す・隠す</td><td><kbd>Ctrl</kbd>+<kbd>N</kbd>（設定で変更可）</td></tr>
+                  <tr><td>一覧・検索</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td></tr>
+                  <tr><td>設定</td><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td></tr>
+                  <tr><td>使い方</td><td><kbd>F1</kbd></td></tr>
+                  <tr><td>前の画面に戻る</td><td><kbd>Esc</kbd></td></tr>
+                  <tr><td>文字の大きさ</td><td><kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd>、<kbd>Ctrl</kbd>+ホイール</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>エディタ</h3>
+            <div class="table-scroll">
+              <table>
+                <tbody>
+                  <tr><td>一時保存</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td></tr>
+                  <tr><td>保存して新しいメモへ</td><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td></tr>
+                  <tr><td>新しいメモ</td><td><kbd>Esc</kbd></td></tr>
+                  <tr><td>前回のメモに戻る</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td></tr>
+                  <tr><td>Keep / Scratch を切り替え</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
+                  <tr><td>見出し 1〜4 / 本文</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>〜<kbd>4</kbd> / <kbd>0</kbd></td></tr>
+                  <tr><td>太字・斜体・インラインコード</td><td><kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>E</kbd></td></tr>
+                  <tr><td>リンク</td><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td></tr>
+                  <tr><td>リンク・タグを開く</td><td><kbd>Ctrl</kbd>+クリック</td></tr>
+                  <tr><td>見出しをたたむ・開く</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>[</kbd> / <kbd>]</kbd></td></tr>
+                  <tr><td>全部たたむ・開く</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>[</kbd> / <kbd>]</kbd></td></tr>
+                  <tr><td>カーソルを追加</td><td><kbd>Alt</kbd>+クリック</td></tr>
+                  <tr><td>同じ語を次々に選ぶ / すべて選ぶ</td><td><kbd>Ctrl</kbd>+<kbd>D</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></td></tr>
+                  <tr><td>行を移動 / 複製</td><td><kbd>Alt</kbd>+<kbd>↑↓</kbd> / <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>↑↓</kbd></td></tr>
+                  <tr><td>字下げ・字上げ</td><td><kbd>Ctrl</kbd>+<kbd>]</kbd> / <kbd>[</kbd>（リストでは <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd>）</td></tr>
+                  <tr><td>日付 / 日付と時刻</td><td><kbd>Ctrl</kbd>+<kbd>:</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>:</kbd></td></tr>
+                  <tr><td>メモ内の検索 / 置換</td><td><kbd>Ctrl</kbd>+<kbd>F</kbd> / <kbd>Ctrl</kbd>+<kbd>H</kbd></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>一覧・検索</h3>
+            <div class="table-scroll">
+              <table>
+                <tbody>
+                  <tr><td>選ぶメモを移動 / 開く</td><td><kbd>↑</kbd> <kbd>↓</kbd> / <kbd>Enter</kbd></td></tr>
+                  <tr><td>Keep ⇔ Scratch に移動</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
+                  <tr><td>検索欄に戻る</td><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>Scratch 整理</h3>
+            <div class="table-scroll">
+              <table>
+                <tbody>
+                  <tr><td>Keep に残す / ゴミ箱へ / あとで</td><td><kbd>K</kbd> / <kbd>D</kbd> / <kbd>S</kbd></td></tr>
+                  <tr><td>開いて編集 / 戻る</td><td><kbd>E</kbd> / <kbd>←</kbd></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <p class="guide-back"><a href="#qa">↑ ページの先頭（Q&amp;A）に戻る</a></p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <span>© 2026 hirosugu415</span>
+        <nav>
+          <a href="./">トップ</a>
+          <a href="privacy.html">プライバシーポリシー</a>
+          <a href="https://github.com/hirosugu415/Rmemo/issues">不具合の報告・要望</a>
+          <a href="https://github.com/hirosugu415/Rmemo">GitHub</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

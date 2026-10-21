@@ -52,13 +52,15 @@ const TOAST_MS = 2500;
 /** One Ctrl +/- step of UI zoom. */
 const ZOOM_STEP = 0.1;
 
-/** Ctrl +/-/0 as a zoom action, or null. `=`/`;` cover the unshifted `+`
- *  key on US and JIS layouts respectively. */
+/** Ctrl +/-/0 as a zoom action, or null. Matched by character *and* by
+ *  physical key, because with Ctrl held WebView2 doesn't always report the
+ *  shifted character: on JIS, Ctrl++ is Ctrl+Shift+; and may arrive as `;`.
+ *  (`;` is free here — the date lives on the `:` key.) */
 function zoomAction(e: KeyboardEvent): "in" | "out" | "reset" | null {
   if (!e.ctrlKey || e.altKey) return null;
-  if (["+", "=", ";"].includes(e.key)) return "in";
-  if (e.key === "-" || e.key === "_") return "out";
-  if (e.key === "0") return "reset";
+  if (["+", "=", ";"].includes(e.key) || ["Semicolon", "Equal", "NumpadAdd"].includes(e.code)) return "in";
+  if (["-", "_"].includes(e.key) || ["Minus", "NumpadSubtract"].includes(e.code)) return "out";
+  if (e.key === "0" || e.code === "Digit0" || e.code === "Numpad0") return "reset";
   return null;
 }
 

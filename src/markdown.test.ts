@@ -55,6 +55,11 @@ describe("codeMask", () => {
     // Line breaks themselves are never masked — only the text on each line.
     expect(masked).toBe("`b`(d)https://e.f```h```");
   });
+
+  it("closes a fence in a CRLF note", () => {
+    const s = "```\r\n#a\r\n```\r\n#b";
+    expect(codeMask(s)[s.indexOf("#b")]).toBe(0);
+  });
 });
 
 describe("outlineOf / headingLevelOfLine", () => {
@@ -64,6 +69,14 @@ describe("outlineOf / headingLevelOfLine", () => {
       [1, "A"],
       [2, "B"],
       [3, "C"],
+    ]);
+  });
+
+  it("keeps the headings after a code block in a CRLF note", () => {
+    const s = "# A\r\n```\r\nx\r\n```\r\n## B ##\r\n";
+    expect(outlineOf(s).map((o) => [o.level, o.text])).toEqual([
+      [1, "A"],
+      [2, "B"],
     ]);
   });
 

@@ -563,9 +563,15 @@ function build(view: EditorView): { decorations: DecorationSet; atomic: Decorati
               deco.push(Decoration.mark({ class: "cm-task-done" }).range(end, lineEnd));
             }
           } else if (list.name === "BulletList") {
-            const bullet = Decoration.replace({ widget: new BulletWidget() }).range(node.from, node.to);
-            deco.push(bullet);
-            atomic.push(bullet);
+            // Only `- ` / `* ` turn into a bullet. A lone marker is an empty
+            // list item to Markdown, so typing `-` or `+` alone would flash a
+            // dot; and `+` is ordinary text far more often than a list.
+            const ch = state.sliceDoc(node.from, node.to);
+            if (ch !== "+" && /[ \t]/.test(state.sliceDoc(node.to, node.to + 1))) {
+              const bullet = Decoration.replace({ widget: new BulletWidget() }).range(node.from, node.to);
+              deco.push(bullet);
+              atomic.push(bullet);
+            }
           } else {
             deco.push(Decoration.mark({ class: "cm-list-num" }).range(node.from, node.to));
           }
@@ -989,6 +995,9 @@ export function toggleInline(view: EditorView, kind: InlineKind): boolean {
         const changes = state.changes(m.map((x) => ({ from: x.from, to: x.to })));
         return { changes, range: range.map(changes) };
       }
+      // On a blank line there's nothing to style — and `****` alone on a
+      // line is a horizontal rule in Markdown.
+      if (state.doc.lineAt(range.from).text.trim() === "") return { range };
       const changes = state.changes({ from: range.from, insert: mark + mark });
       return { changes, range: EditorSelection.cursor(range.from + mark.length) };
     }

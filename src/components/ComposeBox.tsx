@@ -214,7 +214,7 @@ const HEADING_BUTTONS = [
 
 /**
  * The whole point of this screen: writing. Enter is a plain newline — saving
- * is Ctrl+S (draft) or Ctrl+Enter (save and close) only. The draft is never
+ * is Ctrl+S (draft) or Ctrl+Enter (save and start a new note) only. The draft is never
  * cleared by anything other than App explicitly deciding to reset it; hiding
  * the window does not touch it (Tauri's `hide()` preserves DOM state).
  *
@@ -888,10 +888,13 @@ export default function ComposeBox({
       selectSelectionMatches(view);
       return true;
     }
-    // Ctrl+; today's date, Ctrl+Shift+; date and time (Excel's keys).
-    if (e.ctrlKey && !e.altKey && e.code === "Semicolon") {
+    // Ctrl+: today's date, Ctrl+Shift+: date and time. By the physical key
+    // (JIS `:` reports "Quote"), since Shift turns its character into `*`.
+    // The `;` key is left alone: on JIS, Ctrl+Shift+; is Ctrl++ (zoom).
+    if (e.ctrlKey && !e.altKey && (e.code === "Quote" || e.key === ":")) {
       e.preventDefault();
-      const stamp = formatNow(e.shiftKey);
+      // Where `:` sits elsewhere (US: Shift+;), Ctrl+: still gives the date.
+      const stamp = formatNow(e.code === "Quote" && e.shiftKey);
       view.dispatch(view.state.replaceSelection(stamp), { userEvent: "input", scrollIntoView: true });
       return true;
     }
@@ -1329,7 +1332,7 @@ export default function ComposeBox({
         </span>
         <span className="compose-hint">
           Ctrl+F ノート内検索 ・ Ctrl+H 置換 ・ Ctrl+Shift+F 検索 ・ Ctrl+Shift+T 前回のメモ ・ Ctrl+L 切替 ・ Ctrl+, 設定 ・
-          F1 使い方 ・ Ctrl+Alt+0〜4 見出し ・ Ctrl+; 日付 ・ Ctrl+B/I/E 太字/斜体/コード ・ Ctrl+K リンク ・ Alt+クリック/Ctrl+D 複数カーソル ・
+          F1 使い方 ・ Ctrl+Alt+0〜4 見出し ・ Ctrl+: 日付 ・ Ctrl+B/I/E 太字/斜体/コード ・ Ctrl+K リンク ・ Alt+クリック/Ctrl+D 複数カーソル ・
           Ctrl+クリック リンク/タグ ・ Ctrl+]/[ インデント ・ Alt+↑/↓
           行移動 ・ Shift+Alt+↑/↓ 行複製
         </span>
@@ -1338,7 +1341,7 @@ export default function ComposeBox({
             一時保存 (Ctrl+S)
           </button>
           <button type="button" className="compose-save compose-save-primary" onClick={onSaveAndClose}>
-            保存して閉じる (Ctrl+Enter)
+            保存して新規 (Ctrl+Enter)
           </button>
         </div>
       </div>

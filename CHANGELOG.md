@@ -6,6 +6,22 @@
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-10-21
+
+### 修正
+
+- 改行が CRLF（Windows 形式）のメモで、コードブロックより下の見出しが目次に出なかったのを修正。
+  同じ原因で、コードブロックより下のタグが数えられていなかったのも修正。
+- 日本語キーボードで `Ctrl++`（文字を大きくする）が効かなかったのを修正。
+
+### 変更
+
+- 日付を入れるキーを変更：今日の日付は `Ctrl+;` → `Ctrl+:`、日付と時刻は `Ctrl+Shift+;` → `Ctrl+Shift+:`。
+  `;` のキーは日本語キーボードの `Ctrl++`（拡大）と同じキーだったため。
+- 「保存して閉じる (Ctrl+Enter)」ボタンの表記を「保存して新規 (Ctrl+Enter)」に変更（動きは同じ）。
+- 行頭の `+` を点（箇条書き）に変えないように変更。`-` と `*` も、後ろに空白を打ったときだけ点になる。
+- 空の行で何も選ばずに `Ctrl+B` / `Ctrl+I` / `Ctrl+E` を押したときは、何もしないように変更（`Ctrl+B` で横線が入っていた）。
+
 ## [1.0.2] - 2026-10-20
 
 ### 追加
@@ -57,7 +73,8 @@
 - **スマホ用の閲覧アプリ（PWA、ベータ版）**: Google ドライブに同期したメモを
   スマホのブラウザから読める。読み取り専用。
 
-[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/hirosugu415/Rmemo/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/hirosugu415/Rmemo/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/hirosugu415/Rmemo/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/hirosugu415/Rmemo/releases/tag/v1.0.0

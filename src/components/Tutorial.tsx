@@ -87,7 +87,7 @@ const SECTIONS: Section[] = [
     items: [
       { name: "複数カーソル", keys: ["Alt+クリックで追加", "Ctrl+D 次の同じ語を追加", "Ctrl+Shift+L 同じ語をすべて", "Shift+Alt+ドラッグで縦に選択", "Esc で1つに戻す"], note: "複数の場所を同時に書き換えられます。" },
       { name: "行の操作", keys: ["Alt+↑/↓ 行を移動", "Shift+Alt+↑/↓ 行を複製", "Ctrl+] / Ctrl+[ インデント"], note: "複数カーソルのときは全部の行に効きます。" },
-      { name: "日付", keys: ["Ctrl+; 今日の日付", "Ctrl+Shift+; 日付と時刻"], note: "例: 2026-10-19 / 2026-10-19 14:05" },
+      { name: "日付", keys: ["Ctrl+: 今日の日付", "Ctrl+Shift+: 日付と時刻"], note: "例: 2026-10-19 / 2026-10-19 14:05" },
       { name: "メモ内の検索・置換", keys: ["Ctrl+F", "Ctrl+H"], note: "" },
       { name: "目次", note: "見出しを作ると右側に目次が出ます。クリックでその見出しへ。幅が狭いときは細い線になり、マウスを乗せると開きます。" },
       { name: "文字数", note: "下に文字数（改行は数えない）。文字を選ぶと選択中の文字数も出ます。" },
@@ -96,7 +96,7 @@ const SECTIONS: Section[] = [
   {
     title: "保存と整理",
     items: [
-      { name: "保存", keys: ["Ctrl+S 一時保存", "Ctrl+Enter 保存して閉じる"], note: "書いている途中も自動で保存されます。" },
+      { name: "保存", keys: ["Ctrl+S 一時保存", "Ctrl+Enter 保存して新規"], note: "書いている途中も自動で保存されます。Ctrl+Enter は保存して、すぐ新しいメモに切り替えます（窓は開いたまま）。" },
       { name: "Keep / Scratch", keys: ["Ctrl+L 切り替え"], note: "残すメモは Keep、使い捨ては Scratch。" },
       { name: "新しいメモ", keys: ["上の ＋ 新規", "Esc"], note: "開いているメモを閉じて、新しいメモを書き始めます。閉じたメモは保存されています。" },
       { name: "前回のメモに戻る", keys: ["上の ← 前回", "Ctrl+Shift+T"], note: "新しいメモの画面から、直前まで開いていたメモをすぐ開き直せます。アプリを再起動しても覚えています。" },

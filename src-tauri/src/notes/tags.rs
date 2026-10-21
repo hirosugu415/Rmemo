@@ -116,7 +116,11 @@ pub(crate) fn code_mask(chars: &[char]) -> Vec<bool> {
             .iter()
             .position(|&c| c == '\n')
             .map_or(chars.len(), |p| line_start + p);
-        let line = &chars[line_start..line_end];
+        // A CRLF note keeps its '\r' here; it must not stop a fence from closing.
+        let line = match &chars[line_start..line_end] {
+            [rest @ .., '\r'] => rest,
+            whole => whole,
+        };
 
         if let Some((ch, len)) = fence {
             mask[line_start..line_end].fill(true);
@@ -290,6 +294,8 @@ mod tests {
         assert_eq!(extract("## 見出し #tag"), vec!["tag"]);
         // An unclosed fence runs to the end of the note.
         assert_eq!(extract("~~~\n#nope"), Vec::<String>::new());
+        // A CRLF note's fence still closes.
+        assert_eq!(extract("```\r\n#code\r\n```\r\n#after"), vec!["after"]);
         // Renaming leaves code alone.
         assert_eq!(rename_in_body("#a `#a`", "a", "b").as_deref(), Some("#b `#a`"));
     }

@@ -103,6 +103,12 @@ describe("toggleInline", () => {
     expect(text(v)).toBe("**line1**\n\n  **line2**  ");
   });
 
+  it("leaves a blank line alone at a bare caret (no `****` rule)", () => {
+    const v = view("a\n|\nb");
+    toggleInline(v, "bold");
+    expect(text(v)).toBe("a\n\nb");
+  });
+
   it("inserts an empty pair at a bare caret", () => {
     const v = view("a |b");
     toggleInline(v, "italic");
