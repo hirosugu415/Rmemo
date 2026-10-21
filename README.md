@@ -33,7 +33,7 @@
 
 ## インストール
 
-**[Microsoft Store から入手](https://apps.microsoft.com/detail/9N2MDP1460W3)**（おすすめ。アップデートも Store が自動で行います）
+**[Microsoft Store から入手](https://apps.microsoft.com/detail/9n2mdp1460w3?hl=ja-JP&gl=JP)**（おすすめ。アップデートも Store が自動で行います）
 
 インストーラー版を使う場合は、**[Rmemo-setup.exe をダウンロード](https://github.com/hirosugu415/Rmemo/releases/latest/download/Rmemo-setup.exe)** して実行してください
 （過去のバージョンは [Releases](https://github.com/hirosugu415/Rmemo/releases) にあります）。
