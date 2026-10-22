@@ -6,7 +6,7 @@
 
 import { deleteMarkupBackward, insertNewlineContinueMarkup } from "@codemirror/lang-markdown";
 import { foldable, foldedRanges, foldEffect, syntaxTree, unfoldEffect } from "@codemirror/language";
-import { EditorSelection, EditorState, type Range } from "@codemirror/state";
+import { EditorSelection, EditorState, findClusterBreak, type Range } from "@codemirror/state";
 import {
   Decoration,
   type DecorationSet,
@@ -36,6 +36,8 @@ export interface LivePreviewHandlers {
   noteExists?: (title: string) => boolean;
   /** The language label of the code block starting at `pos` was clicked. */
   onEditCodeLang?: (pos: number) => void;
+  /** A plain click on a `[label](url)` (the caret is now inside it). */
+  onLinkClick?: () => void;
 }
 
 /** Each view's handlers, for widgets (which are built without them). */
@@ -777,6 +779,17 @@ export function livePreview(handlers: () => LivePreviewHandlers) {
       );
       return true;
     },
+    // A plain click places the caret in a link, then offers to edit it.
+    click(e, view) {
+      if (e.button !== 0 || e.ctrlKey || e.shiftKey || e.altKey || view.state.readOnly) return false;
+      if ((e.target as HTMLElement | null)?.closest("[data-url]") && view.state.selection.main.empty) {
+        handlers().onLinkClick?.();
+      }
+      return false;
+    },
+    // Copying / cutting link text takes the link along (see linkAwareClipboard).
+    copy: (e, view) => linkClipboard(e, view, false),
+    cut: (e, view) => linkClipboard(e, view, true),
     // Image files dropped from Explorer / a browser land where they're dropped.
     drop(e, view) {
       const files = imageFiles(e.dataTransfer?.files);
@@ -1078,6 +1091,231 @@ function allInQuote(state: EditorState): boolean {
   return state.selection.ranges.every(
     (r) => r.empty && !inCode(state, r.head) && QUOTE_LINE.test(state.doc.lineAt(r.head).text),
   );
+}
+
+/** What Copy / Cut of the selection should put on the clipboard and (for
+ *  Cut) delete, keeping links: a link's markup is hidden, so a selection
+ *  of its visible text usually holds only the label. Each link the
+ *  selection reaches into is written as `[selected label](url)`; Cut takes
+ *  the whole link when its whole label is selected (no `[](url)` leftover).
+ *  Null when no link is involved — the ordinary copy applies. */
+export function linkAwareClipboard(state: EditorState): { text: string; cut: { from: number; to: number }[] } | null {
+  const ranges = state.selection.ranges.filter((r) => !r.empty);
+  if (!ranges.length) return null;
+  let touched = false;
+  const parts: string[] = [];
+  const cut: { from: number; to: number }[] = [];
+  for (const r of ranges) {
+    const links: { from: number; to: number; labelFrom: number; labelTo: number; url: string }[] = [];
+    syntaxTree(state).iterate({
+      from: r.from,
+      to: r.to,
+      enter: (n) => {
+        if (n.name !== "Link") return;
+        const url = n.node.getChild("URL");
+        const marks = n.node.getChildren("LinkMark");
+        if (url && marks.length >= 2 && n.to > r.from && n.from < r.to) {
+          links.push({
+            from: n.from,
+            to: n.to,
+            labelFrom: marks[0].to,
+            labelTo: marks[1].from,
+            url: state.sliceDoc(url.from, url.to),
+          });
+        }
+        return false;
+      },
+    });
+    let out = "";
+    let pos = r.from;
+    for (const l of links) {
+      const a = Math.max(r.from, l.labelFrom);
+      const b = Math.min(r.to, l.labelTo);
+      const segFrom = Math.max(r.from, l.from);
+      out += state.sliceDoc(pos, segFrom);
+      if (segFrom > pos) cut.push({ from: pos, to: segFrom });
+      if (b > a) out += `[${state.sliceDoc(a, b)}](${l.url})`;
+      // The whole label goes with its link; part of it leaves a shorter link.
+      if (a <= l.labelFrom && b >= l.labelTo) cut.push({ from: l.from, to: l.to });
+      else if (b > a) cut.push({ from: a, to: b });
+      pos = Math.min(r.to, l.to);
+      touched = true;
+    }
+    out += state.sliceDoc(pos, r.to);
+    if (r.to > pos) cut.push({ from: pos, to: r.to });
+    parts.push(out);
+  }
+  return touched ? { text: parts.join(state.lineBreak), cut } : null;
+}
+
+function linkClipboard(e: ClipboardEvent, view: EditorView, cut: boolean): boolean {
+  const out = linkAwareClipboard(view.state);
+  if (!out || !e.clipboardData) return false;
+  e.preventDefault();
+  e.clipboardData.clearData();
+  e.clipboardData.setData("text/plain", out.text);
+  if (cut && !view.state.readOnly) {
+    const pieces = [...out.cut].sort((a, b) => a.from - b.from);
+    const merged: { from: number; to: number }[] = [];
+    for (const p of pieces) {
+      const last = merged[merged.length - 1];
+      if (last && p.from <= last.to) last.to = Math.max(last.to, p.to);
+      else merged.push({ ...p });
+    }
+    view.dispatch({ changes: merged, userEvent: "delete.cut", scrollIntoView: true });
+  }
+  return true;
+}
+
+/** An inline construct shown as just its content, with hidden markers on
+ *  both sides: `[label](url)`, `**b**`, `*i*`, `~~s~~`, `` `c` ``, `[[note]]`. */
+interface Paired {
+  from: number;
+  to: number;
+  contentFrom: number;
+  contentTo: number;
+  /** `[[note]]`: its opener is a visible page icon, not hidden. */
+  wiki?: boolean;
+}
+
+const PAIRED_MARK: Record<string, string> = {
+  Link: "LinkMark",
+  Emphasis: "EmphasisMark",
+  StrongEmphasis: "EmphasisMark",
+  Strikethrough: "StrikethroughMark",
+  InlineCode: "CodeMark",
+};
+
+function pairedAt(state: EditorState, pos: number): Paired[] {
+  const out: Paired[] = [];
+  syntaxTree(state).iterate({
+    from: pos,
+    to: pos,
+    enter: (n) => {
+      const markName = PAIRED_MARK[n.name];
+      if (!markName) return;
+      const marks = n.node.getChildren(markName);
+      if (marks.length < 2 || (n.name === "Link" && !n.node.getChild("URL"))) return;
+      out.push({ from: n.from, to: n.to, contentFrom: marks[0].to, contentTo: marks[1].from });
+      if (n.name === "Link") return; // `](url)`: one hidden run, as drawn
+      out[out.length - 1].contentTo = marks[marks.length - 1].from;
+    },
+  });
+  for (const w of wikiHits(state)) {
+    if (w.from <= pos && w.to >= pos) out.push({ from: w.from, to: w.to, contentFrom: w.from + 2, contentTo: w.to - 2, wiki: true });
+  }
+  return out;
+}
+
+/** Length of the character (grapheme) before / after `pos`. */
+function charLen(state: EditorState, pos: number, forward: boolean): number {
+  const line = state.doc.lineAt(pos);
+  const at = pos - line.from;
+  if (forward ? at === line.length : at === 0) return 1; // the line break
+  return Math.abs(findClusterBreak(line.text, at, forward) - at);
+}
+
+/** Backspace / Delete next to a hidden marker. The marker is atomic, so
+ *  the plain commands would erase it whole and leave its partner behind
+ *  (`[label` without `](url)`, a lone `**`). Instead the key acts on what
+ *  the caret visibly touches:
+ *  - Backspace at the start of the content (just after a hidden opener)
+ *    deletes before the whole construct; Delete at the end of the content
+ *    deletes after it.
+ *  - Backspace just after the construct deletes its last character, Delete
+ *    just before it its first; when that empties it, the construct goes.
+ *  - The page icon of a `[[note]]` is visible: deleting it unlinks the
+ *    note, leaving its title as plain text.
+ *  Where the caret only had to move, the other commands (list markers,
+ *  plain delete) run from the new spot. */
+export function pairedMarkDelete(view: EditorView, forward: boolean): boolean {
+  const { state } = view;
+  const sel = state.selection;
+  if (state.readOnly || sel.ranges.length > 1 || !sel.main.empty) return false;
+  let pos = sel.main.head;
+  for (let guard = 0; guard < 20; guard++) {
+    const here = pairedAt(state, pos);
+    // Deleting the last character left inside: the construct goes with it.
+    const last = here.find((p) =>
+      forward
+        ? p.contentFrom === pos && pos + charLen(state, pos, true) >= p.contentTo
+        : p.contentTo === pos && pos - charLen(state, pos, false) <= p.contentFrom,
+    );
+    if (last) return removeWhole(view, last, forward);
+    // Caret at the content's edge facing out of the construct → step out.
+    const out = here.find((p) => (forward ? p.contentTo === pos : p.contentFrom === pos) && !(p.wiki && !forward));
+    if (out) {
+      pos = forward ? out.to : out.from;
+      continue;
+    }
+    // Caret just outside the construct, facing into it.
+    const into = here.find((p) => (forward ? p.from === pos : p.to === pos));
+    if (into) {
+      if (into.wiki && forward) return unlinkNote(view, into);
+      pos = forward ? into.contentFrom : into.contentTo;
+      continue;
+    }
+    break;
+  }
+  // Backspace right after a note's page icon.
+  const icon = !forward && pairedAt(state, pos).find((p) => p.wiki && p.contentFrom === pos);
+  if (icon) return unlinkNote(view, icon);
+  if (pos === sel.main.head) return false;
+  view.dispatch({ selection: EditorSelection.cursor(pos) });
+  return !forward && demoteHeadingOnBackspace(view);
+}
+
+function removeWhole(view: EditorView, p: Paired, forward: boolean): boolean {
+  // `[**a**](url)`: emptying the bold empties the link too.
+  for (let outer; (outer = pairedAt(view.state, p.from).find((o) => o.contentFrom === p.from && o.contentTo === p.to)); ) {
+    p = outer;
+  }
+  view.dispatch({
+    changes: { from: p.from, to: p.to },
+    selection: EditorSelection.cursor(p.from),
+    userEvent: forward ? "delete.forward" : "delete.backward",
+  });
+  return true;
+}
+
+function unlinkNote(view: EditorView, w: Paired): boolean {
+  view.dispatch({
+    changes: [
+      { from: w.from, to: w.contentFrom },
+      { from: w.contentTo, to: w.to },
+    ],
+    selection: EditorSelection.cursor(w.from),
+    userEvent: "delete.unlink",
+  });
+  return true;
+}
+
+/** End of the `[label](url)` whose hidden `](url)` starts at `pos`, if any. */
+function linkTailEnd(state: EditorState, pos: number): number | null {
+  for (let n: SyntaxNode | null = syntaxTree(state).resolveInner(pos, 1); n; n = n.parent) {
+    if (n.name !== "Link") continue;
+    const marks = n.getChildren("LinkMark");
+    return n.getChild("URL") && marks.length >= 2 && marks[1].from === pos ? n.to : null;
+  }
+  return null;
+}
+
+/** A caret just before a link's hidden `](url)` looks like it's after the
+ *  link — and it lands there by itself when the link ends the line (the
+ *  browser can't place the caret behind the hidden part). Enter there would
+ *  split `[label` from `](url)` and dissolve the link, so move the caret past
+ *  the link first and let the other Enter commands run from there. */
+export function linkTailEnter(view: EditorView): boolean {
+  const { state } = view;
+  let moved = false;
+  const ranges = state.selection.ranges.map((r) => {
+    const end = r.empty ? linkTailEnd(state, r.head) : null;
+    if (end == null) return r;
+    moved = true;
+    return EditorSelection.cursor(end);
+  });
+  if (moved) view.dispatch({ selection: EditorSelection.create(ranges, state.selection.mainIndex) });
+  return false;
 }
 
 /** Enter inside a list or a quote continues it (`- `, `2. `, `- [ ] `,

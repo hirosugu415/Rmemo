@@ -16,10 +16,12 @@ import {
   autoCodeLanguage,
   dedentClosingFence,
   fullwidthHeadings,
+  linkTailEnter,
   listBackspace,
   listEnter,
   livePreview,
   type LivePreviewHandlers,
+  pairedMarkDelete,
 } from "./livePreview";
 
 /** Token colours for code inside fenced blocks only. Markdown's own tokens
@@ -138,8 +140,11 @@ export function editorExtensions(handlers: () => LivePreviewHandlers, extraKeys:
     highlightSelectionMatches(),
     placeholder("なにか書く…"),
     keymap.of([
+      { key: "Enter", run: linkTailEnter },
       { key: "Enter", run: listEnter },
+      { key: "Backspace", run: (v) => pairedMarkDelete(v, false) },
       { key: "Backspace", run: listBackspace },
+      { key: "Delete", run: (v) => pairedMarkDelete(v, true) },
       ...foldKeymap,
       ...standardKeymap,
       ...historyKeymap,

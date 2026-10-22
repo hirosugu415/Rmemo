@@ -6,6 +6,25 @@
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-10-22
+
+### 追加
+
+- リンクをクリックすると「編集」の吹き出しが出るようにした。表示テキストと URL をあとから変えられる。
+  リンクの上で `Ctrl+K` を押したときも、表示テキストを変えられるようにした。
+- リンクの付いた文字をコピー・切り取りすると、`[文字](URL)` としてリンクごとクリップボードに入るようにした。
+
+### 修正
+
+- 行末のリンクの後で Enter を押すと、`[文字` と `](URL)` の間に改行が入ってリンクが崩れていたのを修正。
+- リンク・太字・斜体・取り消し線・インラインコード・`[[メモ名]]` の前後で Backspace / Delete を押すと、
+  隠れている記号の片方だけが消えて書式が崩れていたのを修正。見えている文字が消えるようにした。
+  `[[メモ名]]` のアイコンを消すと、リンクが外れてメモ名だけが残る。
+
+### 変更
+
+- リンクの編集画面の幅を広げた（320px → 480px）。
+
 ## [1.0.3] - 2026-10-21
 
 ### 修正
@@ -73,7 +92,8 @@
 - **スマホ用の閲覧アプリ（PWA、ベータ版）**: Google ドライブに同期したメモを
   スマホのブラウザから読める。読み取り専用。
 
-[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/hirosugu415/Rmemo/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/hirosugu415/Rmemo/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/hirosugu415/Rmemo/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/hirosugu415/Rmemo/compare/v1.0.0...v1.0.1

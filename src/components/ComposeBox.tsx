@@ -262,6 +262,7 @@ export default function ComposeBox({
   const titleSet = useMemo(() => new Set(noteTitles.map((t) => t.toLowerCase())), [noteTitles]);
   Object.assign(handlersRef.current as LivePreviewHandlers, {
     onEditCodeLang: (pos: number) => openLang(pos),
+    onLinkClick: () => openLinkTip(),
     onOpenNote,
     noteExists: (title: string) => titleSet.has(title.toLowerCase()),
   });
@@ -748,33 +749,69 @@ export default function ComposeBox({
   const linkUrlRef = useRef<HTMLInputElement>(null);
   const linkComposing = useRef(false);
 
+  /** Where a box under (or, near the bottom, over) the text at `at` goes. */
+  const boxPosAt = (view: EditorView, box: HTMLElement, at: number): React.CSSProperties => {
+    const c = view.coordsAtPos(at);
+    const b = box.getBoundingClientRect();
+    const left = c ? Math.max(8, Math.min(c.left - b.left, box.clientWidth - 490)) : 8;
+    const below = c ? c.bottom - b.top + 4 : 40;
+    return below + 90 <= box.clientHeight
+      ? { left, top: below }
+      : { left, bottom: box.clientHeight - (c ? c.top - b.top : 0) + 4 };
+  };
+
+  const openedWithNow = (view: EditorView) => {
+    const m = view.state.selection.main;
+    return { doc: view.state.doc.toString(), start: m.from, end: m.to };
+  };
+
   const openLink = () => {
     const view = viewRef.current;
     const box = containerRef.current;
     if (!view || !box) return;
+    setLinkTip(null);
     const target = linkTarget(view.state);
-    const c = view.coordsAtPos(target.from);
-    const b = box.getBoundingClientRect();
-    const left = c ? Math.max(8, Math.min(c.left - b.left, box.clientWidth - 330)) : 8;
-    const below = c ? c.bottom - b.top + 4 : 40;
-    const pos: React.CSSProperties =
-      below + 90 <= box.clientHeight
-        ? { left, top: below }
-        : { left, bottom: box.clientHeight - (c ? c.top - b.top : 0) + 4 };
-    const m = view.state.selection.main;
-    const openedWith = { doc: view.state.doc.toString(), start: m.from, end: m.to };
+    const pos = boxPosAt(view, box, target.from);
+    const openedWith = openedWithNow(view);
     setLinkEdit({ ...target, urlInput: target.url, labelInput: target.label, pos, openedWith });
     requestAnimationFrame(() => linkUrlRef.current?.select());
   };
 
+  // Clicking a link shows a small "編集" bubble under it; 編集 opens the
+  // Ctrl+K box on that link.
+  const [linkTip, setLinkTip] = useState<{
+    url: string;
+    pos: React.CSSProperties;
+    openedWith: { doc: string; start: number; end: number };
+  } | null>(null);
+
+  const openLinkTip = () => {
+    const view = viewRef.current;
+    const box = containerRef.current;
+    if (!view || !box) return;
+    const target = linkTarget(view.state);
+    if (!target.existing) return;
+    setLinkTip({ url: target.url, pos: boxPosAt(view, box, target.from), openedWith: openedWithNow(view) });
+  };
+
   // The text or caret moved under the box (clicked back into the editor,
   // kept typing): its target range may no longer be right, so drop it
-  // rather than apply it stale.
+  // rather than apply it stale. The bubble goes the same way.
   useEffect(() => {
-    if (!linkEdit) return;
-    const o = linkEdit.openedWith;
-    if (value !== o.doc || sel.start !== o.start || sel.end !== o.end) setLinkEdit(null);
-  }, [value, sel.start, sel.end, linkEdit]);
+    for (const [open, close] of [
+      [linkEdit, () => setLinkEdit(null)],
+      [linkTip, () => setLinkTip(null)],
+    ] as const) {
+      if (!open) continue;
+      const o = open.openedWith;
+      if (value !== o.doc || sel.start !== o.start || sel.end !== o.end) close();
+    }
+  }, [value, sel.start, sel.end, linkEdit, linkTip]);
+
+  // Clicking away from the editor closes the bubble.
+  useEffect(() => {
+    if (!focused) setLinkTip(null);
+  }, [focused]);
 
   const closeLink = () => {
     setLinkEdit(null);
@@ -1177,9 +1214,19 @@ export default function ComposeBox({
           )}
         </div>
       )}
+      {linkTip && !linkEdit && (
+        <div className="link-tip" style={linkTip.pos} onMouseDown={(e) => e.preventDefault()}>
+          <span className="link-tip-url" title={linkTip.url}>
+            {linkTip.url}
+          </span>
+          <button type="button" className="compose-find-btn" onClick={openLink}>
+            編集
+          </button>
+        </div>
+      )}
       {linkEdit && (
         <div className="link-prompt" style={linkEdit.pos}>
-          {!linkEdit.existing && !linkEdit.label && (
+          {(linkEdit.existing || !linkEdit.label) && (
             <input
               type="text"
               className="link-prompt-input"

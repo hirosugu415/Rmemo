@@ -75,7 +75,7 @@ const SECTIONS: Section[] = [
   {
     title: "リンク・タグ",
     items: [
-      { name: "リンク", input: "[Rmemo の説明](https://example.com)", preview: true, keys: ["Ctrl+K", "上の リンク", "Ctrl+クリックで開く"], note: "文字を選んで Ctrl+K で URL を入力。リンクの上で Ctrl+K を押すと URL の変更・解除。" },
+      { name: "リンク", input: "[Rmemo の説明](https://example.com)", preview: true, keys: ["Ctrl+K", "上の リンク", "Ctrl+クリックで開く"], note: "文字を選んで Ctrl+K で URL を入力。リンクをクリックして出る「編集」（またはリンクの上で Ctrl+K）で、表示テキストと URL の変更・解除。" },
       { name: "URL を貼ってリンク化", keys: ["文字を選んで URL を Ctrl+V"], note: "選んだ文字がそのままリンクになります。" },
       { name: "URL そのまま", input: "https://example.com", preview: true, keys: ["Ctrl+クリックで開く"], note: "" },
       { name: "メモへのリンク", input: "[[買い物メモ]]", preview: true, keys: ["[[ で候補が出る", "クリックで開く", "文字を直すときは矢印キーで中へ"], note: "📄 付きの囲みで表示されます（青い文字の Web リンクとは別物）。まだないメモ名なら点線で、クリックすると新しく作れます。リンク先のタイトルにある #… はタグとして数えません。リンクされた側のメモには「← 参照元」が出ます。" },

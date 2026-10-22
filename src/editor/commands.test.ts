@@ -2,6 +2,7 @@
 // setup — only the view is faked (commands just read `state` and call
 // `dispatch`), so no DOM is needed.
 
+import { deleteCharBackward, deleteCharForward } from "@codemirror/commands";
 import { ensureSyntaxTree } from "@codemirror/language";
 import { EditorSelection, EditorState, type TransactionSpec } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
@@ -11,9 +12,12 @@ import {
   codeLangTarget,
   demoteHeadingOnBackspace,
   indentLines,
+  linkAwareClipboard,
   linkTarget,
+  linkTailEnter,
   listEnter,
   listIndent,
+  pairedMarkDelete,
   parseImageAlt,
   setCodeLang,
   setHeading,
@@ -175,6 +179,76 @@ describe("lists and quotes", () => {
     expect(text(v)).toBe("> 引用\n> ");
     listEnter(v);
     expect(text(v)).toBe("> 引用\n");
+  });
+
+  it("Enter at a link's hidden `](url)` moves past the link instead of splitting it", () => {
+    const v = view("見出し [記事|](https://example.com) あと");
+    expect(linkTailEnter(v)).toBe(false);
+    expect(v.state.selection.main.head).toBe("見出し [記事](https://example.com)".length);
+    const inList = view("- [記事|](https://example.com)");
+    linkTailEnter(inList);
+    listEnter(inList);
+    expect(text(inList)).toBe("- [記事](https://example.com)\n- ");
+    const mid = view("[記|事](https://example.com)");
+    linkTailEnter(mid);
+    expect(mid.state.selection.main.head).toBe(2);
+  });
+
+  it("copy / cut of link text carries the link along", () => {
+    const doc = "前 [記事](https://e.com) 後";
+    const lf = doc.indexOf("記");
+    // Just the visible label (the markup is hidden).
+    const label = fromState(doc, EditorSelection.single(lf, lf + 2));
+    expect(linkAwareClipboard(label.state)).toEqual({
+      text: "[記事](https://e.com)",
+      cut: [{ from: 2, to: doc.indexOf(" 後") }],
+    });
+    // Part of the label plus text before it: Cut keeps a shorter link.
+    const part = fromState(doc, EditorSelection.single(0, lf + 1));
+    const p = linkAwareClipboard(part.state)!;
+    expect(p.text).toBe("前 [記](https://e.com)");
+    expect(p.cut).toEqual([{ from: 0, to: 2 }, { from: lf, to: lf + 1 }]);
+    // Whole line: unchanged text.
+    expect(linkAwareClipboard(fromState(doc, EditorSelection.single(0, doc.length)).state)!.text).toBe(doc);
+    // No link involved → ordinary copy.
+    expect(linkAwareClipboard(fromState(doc, EditorSelection.single(0, 1)).state)).toBeNull();
+  });
+
+  it("Backspace / Delete next to hidden markers act on what's visible", () => {
+    const bs = (s: string) => {
+      const v = view(s);
+      if (!pairedMarkDelete(v, false)) deleteCharBackward(v);
+      return text(v);
+    };
+    const del = (s: string) => {
+      const v = view(s);
+      if (!pairedMarkDelete(v, true)) deleteCharForward(v);
+      return text(v);
+    };
+    // Start of a link label: the character before the link goes.
+    expect(bs("前 [|記事](https://e.com)")).toBe("前[記事](https://e.com)");
+    // Just after a link: its last character goes, then the whole link.
+    expect(bs("[記事](https://e.com)| 後")).toBe("[記](https://e.com) 後");
+    expect(bs("[記](https://e.com)| 後")).toBe(" 後");
+    // Delete mirrors it.
+    expect(del("前 |[記事](https://e.com)")).toBe("前 [事](https://e.com)");
+    expect(del("[記事|](https://e.com) 後")).toBe("[記事](https://e.com)後");
+    // Bold / italic / strike / code the same way.
+    expect(bs("a **|太字**")).toBe("a**太字**");
+    expect(bs("**太字**|")).toBe("**太**");
+    expect(del("|*斜*")).toBe("");
+    expect(del("前*|斜*")).toBe("前");
+    expect(bs("x ~~消~~|")).toBe("x ");
+    expect(bs("`code`|")).toBe("`cod`");
+    // Nested: through the bold into the link.
+    expect(bs("[**ab**](https://e.com)|")).toBe("[**a**](https://e.com)");
+    expect(bs("x [**a**](https://e.com)|")).toBe("x ");
+    // A note link's page icon: deleting it unlinks the note.
+    expect(bs("[[|メモ]]")).toBe("メモ");
+    expect(del("|[[メモ]]")).toBe("メモ");
+    expect(bs("[[メモ]]|")).toBe("[[メ]]");
+    // Plain text: not ours.
+    expect(pairedMarkDelete(view("ab|c"), false)).toBe(false);
   });
 
   it("leaves Enter alone in plain text", () => {
