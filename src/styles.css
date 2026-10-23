@@ -1618,6 +1618,20 @@ body,
   line-height: 1.6;
 }
 
+.tutorial-guide {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  background: var(--selected);
+  font-size: 12.5px;
+}
+
+.tutorial-guide a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .tutorial-section h2 {
   margin: 16px 0 6px;
   font-size: 14px;

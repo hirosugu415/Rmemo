@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
 import MarkdownView from "./MarkdownView";
+import { platform } from "../platform";
+
+/** The web guide's chapter on the editor — every feature, with the screens
+ *  around it (search, Scratch, settings, sync) that this page leaves out. */
+const GUIDE_URL = "https://hirosugu415.github.io/Rmemo/guide.html#editor";
 
 interface Item {
   name: string;
@@ -129,6 +134,18 @@ export default function Tutorial({ onClose }: Props) {
       <div className="tutorial-body">
         <p className="tutorial-lead">
           左の「入力」のように打つと、右の「見え方」になります。ファイルにはいつでも左の文字のまま（Markdown）保存されます。
+        </p>
+        <p className="tutorial-guide">
+          詳しい使い方はこちら：
+          <a
+            href={GUIDE_URL}
+            onClick={(e) => {
+              e.preventDefault();
+              platform().openUrl(GUIDE_URL);
+            }}
+          >
+            使い方ガイド（ブラウザで開きます）
+          </a>
         </p>
         {SECTIONS.map((sec) => (
           <section key={sec.title} className="tutorial-section">
