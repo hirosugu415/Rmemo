@@ -320,24 +320,28 @@ export function toggleSectionAt(view: EditorView, pos: number) {
   if (range) view.dispatch({ effects: foldEffect.of(range) });
 }
 
-/** The 📄 drawn in place of a note link's `[[`. Clicking it opens the
- *  note like the title does (it carries the same `data-note`). */
-class NoteIcon extends WidgetType {
+/** A whole `[[title]]` drawn as one chip: 📄 + title in a single box, so
+ *  the icon and the title can't drift apart (separate borders, a caret
+ *  between them, a line break between them). Clicking it opens the note. */
+class NoteChip extends WidgetType {
   constructor(
     readonly title: string,
     readonly missing: boolean,
   ) {
     super();
   }
-  eq(other: NoteIcon) {
+  eq(other: NoteChip) {
     return other.title === this.title && other.missing === this.missing;
   }
   toDOM() {
     const el = document.createElement("span");
-    el.className = this.missing ? "cm-wikilink-icon cm-wikilink-icon-missing" : "cm-wikilink-icon";
-    el.textContent = "📄";
+    el.className = this.missing ? "cm-wikilink cm-wikilink-missing" : "cm-wikilink";
     el.dataset.note = this.title;
-    el.title = this.missing ? `${this.title}（まだないメモ）\nクリックで作成` : `${this.title}\nクリックで開く`;
+    el.title = noteTooltip(this.title, this.missing);
+    const icon = document.createElement("span");
+    icon.className = "cm-wikilink-icon";
+    icon.textContent = "📄";
+    el.append(icon, this.title);
     return el;
   }
   ignoreEvent() {
@@ -400,6 +404,15 @@ export function toggleTaskAt(view: EditorView, pos: number) {
 
 const hidden = Decoration.replace({});
 const markMuted = Decoration.mark({ class: "cm-md-mark" });
+/** The title of a `[[note]]` being edited (the caret is at the link). A
+ *  click on it still opens the note, as on the chip. */
+const wikiEditing = (title: string, missing: boolean) =>
+  Decoration.mark({
+    class: "cm-wikilink-editing",
+    attributes: { "data-note": title, title: noteTooltip(title, missing) },
+  });
+const noteTooltip = (title: string, missing: boolean) =>
+  missing ? `${title}（まだないメモ）\nクリックで作成` : `${title}\nクリックで開く`;
 const lineDeco = (cls: string) => Decoration.line({ class: cls });
 const INLINE_PARENTS = new Set(["Emphasis", "StrongEmphasis", "Strikethrough", "InlineCode"]);
 const INLINE_STYLE: Record<string, string> = {
@@ -652,21 +665,20 @@ function build(view: EditorView): { decorations: DecorationSet; atomic: Decorati
   const exists = viewHandlers.get(view)?.().noteExists;
   for (const w of wikiHits(state)) {
     if (w.to < view.viewport.from || w.from > view.viewport.to) continue;
+    // While the caret touches the link (arrowed up to it, or inside it), it
+    // shows as `[[title]]` with muted brackets so the title can be edited.
+    // Otherwise the whole link is one chip, stepped over as one unit.
+    const editing = !state.readOnly && ranges.some((r) => r.from <= w.to && r.to >= w.from);
     const missing = exists ? !exists(w.title) : false;
-    // `[[` becomes a page icon, so a note link never reads as a web link.
-    const icon = Decoration.replace({ widget: new NoteIcon(w.title, missing) }).range(w.from, w.from + 2);
-    deco.push(icon);
-    atomic.push(icon);
-    deco.push(
-      Decoration.mark({
-        class: missing ? "cm-wikilink cm-wikilink-missing" : "cm-wikilink",
-        attributes: {
-          "data-note": w.title,
-          title: missing ? `${w.title}（まだないメモ）\nクリックで作成` : `${w.title}\nクリックで開く`,
-        },
-      }).range(w.from + 2, w.to - 2),
-    );
-    hide(w.to - 2, w.to);
+    if (editing) {
+      deco.push(markMuted.range(w.from, w.from + 2));
+      if (w.to - 2 > w.from + 2) deco.push(wikiEditing(w.title, missing).range(w.from + 2, w.to - 2));
+      deco.push(markMuted.range(w.to - 2, w.to));
+      continue;
+    }
+    const chip = Decoration.replace({ widget: new NoteChip(w.title, missing) }).range(w.from, w.to);
+    deco.push(chip);
+    atomic.push(chip);
   }
 
   for (const t of tagHits(state)) {
@@ -1174,7 +1186,8 @@ interface Paired {
   to: number;
   contentFrom: number;
   contentTo: number;
-  /** `[[note]]`: its opener is a visible page icon, not hidden. */
+  /** `[[note]]`: its opener is visible (the chip's page icon, or a muted
+   *  `[[` while the caret is at the link), not hidden. */
   wiki?: boolean;
 }
 
@@ -1224,8 +1237,9 @@ function charLen(state: EditorState, pos: number, forward: boolean): number {
  *    deletes after it.
  *  - Backspace just after the construct deletes its last character, Delete
  *    just before it its first; when that empties it, the construct goes.
- *  - The page icon of a `[[note]]` is visible: deleting it unlinks the
- *    note, leaving its title as plain text.
+ *  - The opener of a `[[note]]` is visible (as the page icon, or as a muted
+ *    `[[` while the caret is there): deleting it unlinks the note, leaving
+ *    its title as plain text.
  *  Where the caret only had to move, the other commands (list markers,
  *  plain delete) run from the new spot. */
 export function pairedMarkDelete(view: EditorView, forward: boolean): boolean {

@@ -1412,50 +1412,51 @@ body,
 
 /* ---------- note links, backlinks, counts, help ---------- */
 
-/* A note link is a chip — 📄 + title, plain text colour, boxed — so it never
-   looks like a web link (blue text). Clicking it opens the note. */
-.cm-wikilink-icon,
+/* A note link is a chip — 📄 + title in one box, plain text colour — so it
+   never looks like a web link (blue text). Clicking it opens the note.
+   It never breaks across lines, so the icon stays with its title. */
 .cm-wikilink {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0 5px 0 4px;
   background: var(--bg);
   border: 1px solid var(--line);
+  border-radius: 5px;
   cursor: pointer;
 }
 
 .cm-wikilink-icon {
   font-size: 0.8em;
-  padding: 0 1px 0 4px;
-  border-right: none;
-  border-radius: 5px 0 0 5px;
+  margin-right: 2px;
 }
 
-.cm-wikilink {
-  color: var(--text);
-  font-weight: 600;
-  padding: 0 5px 0 2px;
-  border-left: none;
-  border-radius: 0 5px 5px 0;
-}
-
-.cm-wikilink:hover,
-.cm-wikilink-icon:hover {
+.cm-wikilink:hover {
   color: var(--accent);
   border-color: var(--accent);
 }
 
 /* Not written yet: dashed and dimmed; a click starts the note. */
-.cm-wikilink-missing,
-.cm-wikilink-icon-missing {
+.cm-wikilink-missing {
+  color: var(--muted);
+  font-weight: 400;
   border-style: dashed;
   background: transparent;
 }
 
-.cm-wikilink-missing {
-  color: var(--muted);
-  font-weight: 400;
+.cm-wikilink-missing .cm-wikilink-icon {
+  opacity: 0.6;
 }
 
-.cm-wikilink-icon-missing {
-  opacity: 0.6;
+/* With the caret at the link, it shows as `[[title]]` to be edited; a
+   click on the title still opens the note. */
+.cm-wikilink-editing {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cm-wikilink-editing:hover {
+  color: var(--accent);
 }
 
 .note-backlinks {

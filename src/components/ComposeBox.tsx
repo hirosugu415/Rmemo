@@ -76,8 +76,9 @@ interface Props {
   handleRef?: React.MutableRefObject<ComposeHandle | null>;
 }
 
-/** Most completions shown at once. */
-const SUGGEST_LIMIT = 8;
+/** Every matching tag / note title is offered, but the popup draws them a
+ *  page at a time: the next page as the list scrolls near its end. */
+const SUGGEST_PAGE = 30;
 
 /** One row of the completion popup — a tag or a note title. */
 interface Suggestion {
@@ -541,7 +542,7 @@ export default function ComposeBox({
       if (lower.startsWith(p)) prefix.push(it);
       else if (lower.includes(p)) contains.push(it);
     }
-    const list = [...prefix, ...contains].slice(0, SUGGEST_LIMIT);
+    const list = [...prefix, ...contains];
     // Already typed in full and nothing longer to offer: nothing to say.
     if (list.length === 1 && list[0].value === trigger.partial) return [];
     // Caret resting in a finished link that already names an existing
@@ -558,8 +559,38 @@ export default function ComposeBox({
 
   const open = suggestions.length > 0;
 
+  // How many rows the popup draws so far (see SUGGEST_PAGE). Back to one
+  // page whenever the typed name changes.
+  const [suggestShown, setSuggestShown] = useState(SUGGEST_PAGE);
+  // The arrow keys may move past the drawn rows (or wrap to the last one):
+  // those rows are drawn too.
+  const drawnSuggestions = suggestions.slice(0, Math.max(suggestShown, suggestIndex + 1));
+  const onSuggestScroll = (e: React.UIEvent<HTMLUListElement>) => {
+    const list = e.currentTarget;
+    if (drawnSuggestions.length < suggestions.length && list.scrollTop + list.clientHeight >= list.scrollHeight - 48) {
+      setSuggestShown(drawnSuggestions.length + SUGGEST_PAGE);
+    }
+  };
+
+  // The popup scrolls; keep the highlighted row in view as the arrow keys
+  // move it. Only the popup scrolls — not the editor behind it, as
+  // scrollIntoView might.
+  const suggestListRef = useRef<HTMLUListElement>(null);
+  useLayoutEffect(() => {
+    const list = suggestListRef.current;
+    const row = list?.children[suggestIndex] as HTMLElement | undefined;
+    if (!list || !row) return;
+    const pad = 4; // the list's own padding
+    if (row.offsetTop < list.scrollTop + pad) {
+      list.scrollTop = row.offsetTop - pad;
+    } else if (row.offsetTop + row.offsetHeight > list.scrollTop + list.clientHeight - pad) {
+      list.scrollTop = row.offsetTop + row.offsetHeight - list.clientHeight + pad;
+    }
+  }, [suggestIndex, suggestions, popupPos]);
+
   useEffect(() => {
     setSuggestIndex(0);
+    setSuggestShown(SUGGEST_PAGE);
     if (dismissedHash !== null && trigger?.hash !== dismissedHash) setDismissedHash(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trigger?.hash, trigger?.partial]);
@@ -1309,8 +1340,8 @@ export default function ComposeBox({
         </div>
       )}
       {open && popupPos && (
-        <ul className="tag-suggest" style={popupPos} role="listbox">
-          {suggestions.map((t, i) => (
+        <ul ref={suggestListRef} className="tag-suggest" style={popupPos} role="listbox" onScroll={onSuggestScroll}>
+          {drawnSuggestions.map((t, i) => (
             <li
               key={t.value}
               role="option"
