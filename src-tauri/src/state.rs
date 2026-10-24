@@ -25,6 +25,9 @@ pub struct AppState {
     /// Our own window, so the focus-watch thread can tell whether the
     /// foreground window is us.
     pub our_hwnd: Arc<AtomicIsize>,
+    /// Set while a native dialog of ours is open: it takes the foreground,
+    /// and hide-on-blur must not hide the window it belongs to.
+    pub dialog_open: Arc<AtomicBool>,
 }
 
 impl AppState {
@@ -35,6 +38,7 @@ impl AppState {
             watch_generation: Arc::new(AtomicUsize::new(0)),
             focused: Arc::new(AtomicBool::new(true)),
             our_hwnd: Arc::new(AtomicIsize::new(0)),
+            dialog_open: Arc::new(AtomicBool::new(false)),
         }
     }
 }

@@ -69,6 +69,26 @@ pub fn update(
     scan::scan_one(&final_path, status, settings.expiry_days)
 }
 
+/// `update`, but the note keeps its modified time — for rewrites that aren't
+/// "edits" in the list's sense (the 整形 of an imported note), which must not
+/// lift a years-old note to the top as if written today.
+pub fn update_keeping_dates(
+    settings: &Settings,
+    filename: &str,
+    body: &str,
+    status: Status,
+) -> std::io::Result<super::Note> {
+    let dir = scan::status_dir(settings, status);
+    let modified = std::fs::metadata(dir.join(filename))?.modified()?;
+    let note = update(settings, filename, body, status)?;
+    let path = dir.join(&note.filename);
+    std::fs::OpenOptions::new()
+        .write(true)
+        .open(&path)?
+        .set_times(std::fs::FileTimes::new().set_modified(modified))?;
+    scan::scan_one(&path, status, settings.expiry_days)
+}
+
 /// Moves the file between `keep/` and `scratch/`, re-picking its name so it
 /// cannot land on (and, with `fs::rename`'s replace semantics on Windows,
 /// silently overwrite) a same-named note already in the other folder.
@@ -224,6 +244,22 @@ mod tests {
         // A real edit is written, keeping the file's CRLF.
         update(&s, &note.filename, "title\nbody\nmore\n", Status::Keep).unwrap();
         assert_eq!(std::fs::read_to_string(&path).unwrap(), "title\r\nbody\r\nmore\r\n");
+    }
+
+    #[test]
+    fn a_rewrite_keeping_dates_does_not_bump_the_modified_time() {
+        let s = settings("keep-dates");
+        let note = create(&s, "title
+body", Status::Keep).unwrap();
+        let path = scan::status_dir(&s, Status::Keep).join(&note.filename);
+        let old = std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_500_000_000);
+        std::fs::File::options().write(true).open(&path).unwrap()
+            .set_times(std::fs::FileTimes::new().set_modified(old)).unwrap();
+        let note = update_keeping_dates(&s, &note.filename, "new title
+body", Status::Keep).unwrap();
+        assert_eq!(note.filename, "new title.md");
+        let path = scan::status_dir(&s, Status::Keep).join("new title.md");
+        assert_eq!(std::fs::metadata(&path).unwrap().modified().unwrap(), old);
     }
 
     #[test]

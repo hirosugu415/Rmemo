@@ -5,6 +5,7 @@
 //! Explorer with the app not even running.
 
 pub mod images;
+pub mod import;
 pub mod links;
 pub mod naming;
 pub mod pins;

@@ -229,6 +229,18 @@ pub fn update_note(app: AppHandle, filename: String, body: String) -> Result<Not
     Ok(note)
 }
 
+/// `update_note` without bumping the modified time — the 整形 review's save,
+/// so an imported note keeps its place in time.
+#[tauri::command]
+pub fn rewrite_note(app: AppHandle, filename: String, body: String) -> Result<Note, String> {
+    let state = app.state::<AppState>();
+    let status = locate(&state, &filename)?;
+    let settings = state.config.read().clone();
+    let note = store::update_keeping_dates(&settings, &filename, &body, status).map_err(|e| e.to_string())?;
+    upsert(&state, &filename, &note);
+    Ok(note)
+}
+
 #[tauri::command]
 pub fn set_status(app: AppHandle, filename: String, status: Status) -> Result<Note, String> {
     let state = app.state::<AppState>();
@@ -265,6 +277,63 @@ pub fn open_notes_folder(app: AppHandle) -> Result<(), String> {
     app.opener()
         .open_path(notes_dir.to_string_lossy(), None::<&str>)
         .map_err(|e| e.to_string())
+}
+
+/// Asks for what to import — a folder (`files: false`, every `.txt` under
+/// it) or `.txt` files themselves — and lists it, so the UI can confirm
+/// before writing anything. `None` if cancelled. Async so the blocking
+/// dialog runs off the main thread.
+#[tauri::command]
+pub async fn pick_import(app: AppHandle, files: bool) -> Result<Option<crate::notes::import::ImportPreview>, String> {
+    use tauri_plugin_dialog::DialogExt;
+    let state = app.state::<AppState>();
+    let mut dialog = app.dialog().file();
+    if let Some(window) = app.get_webview_window("main") {
+        dialog = dialog.set_parent(&window);
+    }
+    state.dialog_open.store(true, Ordering::SeqCst);
+    let picked = if files {
+        dialog
+            .set_title("取り込むテキストファイルを選択")
+            .add_filter("テキストファイル", &["txt"])
+            .blocking_pick_files()
+            .map(|paths| (None, paths))
+    } else {
+        dialog.set_title("取り込むフォルダを選択").blocking_pick_folder().map(|dir| (Some(dir), Vec::new()))
+    };
+    state.dialog_open.store(false, Ordering::SeqCst);
+    let Some((dir, paths)) = picked else {
+        return Ok(None);
+    };
+    let dir = dir.map(|d| d.into_path()).transpose().map_err(|e| e.to_string())?;
+    let paths = paths.into_iter().map(|p| p.into_path()).collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
+    let notes_dir = state.config.read().notes_dir.clone();
+    Ok(Some(crate::notes::import::preview(dir.as_deref(), paths, &notes_dir)))
+}
+
+/// Imports `files` (from `pick_import`) as Keep notes (see `notes::import`).
+#[tauri::command]
+pub async fn import_txt(
+    app: AppHandle,
+    dir: Option<String>,
+    files: Vec<String>,
+    options: crate::notes::import::ImportOptions,
+) -> Result<crate::notes::import::ImportReport, String> {
+    let state = app.state::<AppState>();
+    let settings = state.config.read().clone();
+    let bodies: Vec<String> = state.notes.read().iter().map(|n| n.body.clone()).collect();
+    let files: Vec<std::path::PathBuf> = files.into_iter().map(Into::into).collect();
+    let report = crate::notes::import::import(
+        &settings,
+        dir.as_deref().map(std::path::Path::new),
+        &files,
+        options,
+        bodies.iter().map(String::as_str),
+    );
+    // Rescan rather than patch: the copied dates change each note's place.
+    *state.notes.write() = crate::notes::scan::scan_all(&settings);
+    let _ = tauri::Emitter::emit(&app, watcher::NOTES_CHANGED, ());
+    Ok(report)
 }
 
 #[tauri::command]

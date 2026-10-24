@@ -862,9 +862,22 @@ body,
   gap: 4px;
 }
 
-.settings label > span {
+.settings label > span,
+.settings-import > span {
   font-weight: 600;
   font-size: 12px;
+}
+
+.settings-import {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.settings-import .settings-note {
+  overflow-wrap: anywhere;
 }
 
 .settings small {
@@ -1936,3 +1949,79 @@ body,
   color: var(--status-accent, var(--accent));
 }
 
+
+/* ---------- 取り込みの整形 (FormatReview; layout shared with .triage) ---------- */
+
+.review-summary {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.review-diff {
+  position: relative; /* rows' offsetTop is measured from here */
+  flex: 1;
+  min-height: 0;
+  margin-top: 6px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* Each row is one block; both sides share its height, so they stay level. */
+.review-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.review-side {
+  padding: 0 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.review-side + .review-side {
+  border-left: 1px solid var(--line);
+}
+
+.format-before {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.format-after {
+  background: color-mix(in srgb, var(--tok-string) 16%, transparent);
+}
+
+.review-error {
+  max-width: 100%;
+  max-height: 40vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  text-align: left;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+}
+
+.review-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 14px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--expiring);
+  border-radius: 6px;
+  background: var(--expiring-bg);
+}
+
+.review-confirm-text {
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.review-confirm .triage-actions {
+  padding: 0;
+  border-top: none;
+}

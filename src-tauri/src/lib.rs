@@ -210,7 +210,11 @@ fn spawn_focus_watch(app: AppHandle) {
 
             // Suppressed in debug builds, where opening devtools would
             // otherwise hide the window being inspected.
-            if !focused && !cfg!(debug_assertions) && state.config.read().hide_on_blur {
+            if !focused
+                && !cfg!(debug_assertions)
+                && !state.dialog_open.load(Ordering::SeqCst)
+                && state.config.read().hide_on_blur
+            {
                 hide_window(&app);
             }
         }
@@ -284,6 +288,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(AppState::new(cfg, notes))
         .invoke_handler(tauri::generate_handler![
             commands::list_notes,
@@ -298,9 +303,12 @@ pub fn run() {
             commands::get_note,
             commands::create_note,
             commands::update_note,
+            commands::rewrite_note,
             commands::set_status,
             commands::delete_note,
             commands::open_notes_folder,
+            commands::pick_import,
+            commands::import_txt,
             commands::get_settings,
             commands::set_settings,
             commands::hide_window,

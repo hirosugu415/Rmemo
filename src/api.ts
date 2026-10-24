@@ -85,12 +85,56 @@ export const createNote = (body: string, status: Status) =>
 export const updateNote = (filename: string, body: string) =>
   invoke<Note>("update_note", { filename, body });
 
-export const setStatus = (filename: string, status: Status) =>
+/** `updateNote`, but the note keeps its modified time (the 整形 review). */
+export const rewriteNote = (filename: string, body: string) =>
+  invoke<Note>("rewrite_note", { filename, body });
+
+export const setStatus =(filename: string, status: Status) =>
   invoke<Note>("set_status", { filename, status });
 
 export const deleteNote = (filename: string) => invoke<void>("delete_note", { filename });
 
 export const openNotesFolder = () => invoke<void>("open_notes_folder");
+
+export interface ImportPreview {
+  /** The picked folder; null when files were picked. */
+  dir: string | null;
+  /** What will be imported: the `.txt` under `dir`, or the picked files. */
+  files: string[];
+  bytes: number;
+}
+
+export interface ImportedFile {
+  filename: string;
+  /** The `.txt` as it read, line endings as `\n`. */
+  original: string;
+}
+
+export interface ImportReport {
+  imported: number;
+  /** The new notes, in import order. */
+  files: ImportedFile[];
+  duplicates: number;
+  empty: number;
+  /** Imported, but with characters that couldn't be decoded. */
+  garbled: string[];
+  failed: string[];
+}
+
+/** Opens a folder picker (or with `files`, a `.txt` file picker); resolves
+ *  to what would be imported, or null if cancelled. */
+export const pickImport = (files: boolean) => invoke<ImportPreview | null>("pick_import", { files });
+
+export interface ImportOptions {
+  /** Tag each note with its folder names, the picked folder included. */
+  folderTags: boolean;
+  /** Tag each note `#取り込み`. */
+  importTag: boolean;
+}
+
+/** Imports a `pickImport` result as Keep notes. */
+export const importTxt = (preview: ImportPreview, options: ImportOptions) =>
+  invoke<ImportReport>("import_txt", { dir: preview.dir, files: preview.files, options });
 
 export const getSettings = () => invoke<Settings>("get_settings");
 

@@ -5,6 +5,7 @@ import type { Update } from "@tauri-apps/plugin-updater";
 import ComposeBox, { type ComposeHandle } from "./components/ComposeBox";
 import SearchView from "./components/SearchView";
 import SettingsPanel from "./components/SettingsPanel";
+import FormatReview from "./components/FormatReview";
 import TriageView from "./components/TriageView";
 import Tutorial from "./components/Tutorial";
 import { checkForUpdate, installUpdate, UPDATE_CHECK_INTERVAL_MS, UPDATES_ENABLED } from "./updater";
@@ -26,6 +27,7 @@ import {
   NOTE_GONE,
   setStatus,
   updateNote,
+  type ImportReport,
   type Note,
   type NoteSummary,
   type Settings,
@@ -33,7 +35,7 @@ import {
   type TagCount,
 } from "./api";
 
-type View = "compose" | "search" | "settings" | "triage" | "tutorial";
+type View = "compose" | "search" | "settings" | "triage" | "tutorial" | "review";
 
 /** A full note as the list-row shape (the triage screen deals in those). */
 const toSummary = (note: Note): NoteSummary => ({ ...note, snippet: "", pinned: false });
@@ -133,6 +135,8 @@ function readLastNote(): string | null {
 
 export default function App() {
   const [view, setView] = useState<View>("compose");
+  /** The import whose notes the 整形 review is walking. */
+  const [importReport, setImportReport] = useState<{ report: ImportReport; tagged: boolean } | null>(null);
 
   // Compose state — rendered copies of what `sessionRef` and
   // `composeBodyRef` hold authoritatively for the async save path.
@@ -538,6 +542,8 @@ export default function App() {
   );
 
   const noteTitles = useMemo(() => allNotes.map((n) => n.title), [allNotes]);
+  /** Characters across the notes the search list shows, for the status bar. */
+  const totalChars = useMemo(() => notes.reduce((sum, n) => sum + n.charCount, 0), [notes]);
 
   /** `[[title]]` Ctrl+clicked: open that note, or start a new one titled so
    *  (saved like any new note once something is written). */
@@ -869,7 +875,7 @@ export default function App() {
       e.preventDefault();
       if (view === "tutorial") {
         setView("compose");
-      } else if (view === "triage") {
+      } else if (view === "triage" || view === "review") {
         setView("search");
       } else if (view === "search" || view === "settings") {
         setView("compose");
@@ -889,7 +895,7 @@ export default function App() {
     // — there's no single "current status" while browsing.
     <div
       className="app"
-      data-status={view === "compose" ? composeStatus : view === "triage" ? "scratch" : undefined}
+      data-status={view === "compose" ? composeStatus : view === "triage" ? "scratch" : view === "review" ? "keep" : undefined}
       onKeyDown={onKeyDown}
       onMouseDown={onWindowMouseDown}
     >
@@ -952,9 +958,23 @@ export default function App() {
         />
       )}
 
+      {view === "review" && importReport && (
+        <FormatReview
+          report={importReport.report}
+          onOpen={(note) => openNoteInCompose(toSummary(note))}
+          // Imported notes keep their old dates, so they sit far down the
+          // list — open it on just them when they carry the import tag.
+          onExit={() => (importReport.tagged ? searchForTag("取り込み") : setView("search"))}
+        />
+      )}
+
       {view === "settings" && settings && (
         <SettingsPanel
           settings={settings}
+          onImported={(report, options) => {
+            setImportReport({ report, tagged: options.importTag });
+            setView("review");
+          }}
           onClose={() => setView("compose")}
           onSaved={(next) => {
             setSettingsState(next);
@@ -964,7 +984,11 @@ export default function App() {
       )}
 
       <div className="status">
-        <span>{view === "search" ? `${notes.length.toLocaleString()} 件` : ""}</span>
+        <span title={view === "search" ? "一覧に出ているメモの合計（改行は数えません）" : undefined}>
+          {view === "search"
+            ? `${notes.length.toLocaleString()} 件 ・ ${totalChars.toLocaleString()} 字`
+            : ""}
+        </span>
         {update && (
           <button type="button" className="status-update" onClick={startUpdate} disabled={installing}>
             {installing ? "更新中…" : `v${update.version} に更新`}
