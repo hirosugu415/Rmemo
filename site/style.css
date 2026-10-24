@@ -501,6 +501,18 @@ code {
   color: var(--muted);
 }
 
+/* Listing badges sit at the far end of the footer, wrapping under on phones. */
+.site-footer .listing-badge {
+  display: inline-flex;
+  margin-left: auto;
+}
+
+.site-footer .listing-badge img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
 /* ---------- prose pages (privacy) ---------- */
 
 .prose {
