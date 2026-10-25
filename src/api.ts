@@ -45,6 +45,10 @@ export interface Settings {
   zoom: number;
   /** Rebound shortcuts only, action id → combo (`""` = none); see keybindings.ts. */
   keybindings: Record<string, string>;
+  /** "light" / "dark"; empty until picked, which follows the OS. */
+  theme: string;
+  /** Keep/Scratch colour pair id — see PALETTES in theme.ts. */
+  palette: string;
 }
 
 export interface TagCount {

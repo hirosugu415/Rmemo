@@ -166,7 +166,7 @@ export default function TriageView({ onKeep, onUnkeep, onTrash, onOpen, onExit }
   return (
     <div className="triage" ref={rootRef} tabIndex={-1} onKeyDown={onKeyDown}>
       <div className="view-title triage-title" data-drag-region>
-        <span>Scratch 整理</span>
+        <span>一時のメモの整理</span>
         {queue && queue.length > 0 && (
           <span className="triage-progress">
             {Math.min(index + 1, queue.length)} / {queue.length}
@@ -185,7 +185,7 @@ export default function TriageView({ onKeep, onUnkeep, onTrash, onOpen, onExit }
                 rootRef.current?.focus();
               }}
             >
-              {s === "expiring" ? "期限切れ" : "すべての Scratch"}
+              {s === "expiring" ? "期限切れ" : "すべての一時メモ"}
             </button>
           ))}
         </div>
@@ -197,7 +197,7 @@ export default function TriageView({ onKeep, onUnkeep, onTrash, onOpen, onExit }
       {queue === null ? (
         <div className="empty">読み込み中…</div>
       ) : queue.length === 0 ? (
-        <div className="empty">Scratch は空です。整理するものはありません。</div>
+        <div className="empty">一時のメモはありません。整理するものはありません。</div>
       ) : item ? (
         <>
           <div className="triage-card">
@@ -215,7 +215,7 @@ export default function TriageView({ onKeep, onUnkeep, onTrash, onOpen, onExit }
           {message && <div className="triage-message">{message}</div>}
           <div className="triage-actions">
             <button type="button" className="triage-btn triage-keep" disabled={busy} onClick={() => act("keep")}>
-              <kbd>K</kbd> Keep に残す
+              <kbd>K</kbd> 保管に残す
             </button>
             <button type="button" className="triage-btn triage-trash" disabled={busy} onClick={() => act("trash")}>
               <kbd>D</kbd> ゴミ箱へ
@@ -235,7 +235,7 @@ export default function TriageView({ onKeep, onUnkeep, onTrash, onOpen, onExit }
         <div className="triage-done">
           <div className="triage-done-title">整理完了</div>
           <div className="triage-done-counts">
-            Keep {counts.keep}件 ・ ゴミ箱 {counts.trash}件 ・ あとで {counts.skip}件
+            保管 {counts.keep}件 ・ ゴミ箱 {counts.trash}件 ・ あとで {counts.skip}件
           </div>
           {message && <div className="triage-message">{message}</div>}
           <div className="triage-actions">

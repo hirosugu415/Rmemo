@@ -3,6 +3,11 @@ import ReactDOM from "react-dom/client";
 import "../src/styles.css";
 import "./web.css";
 import WebApp from "./WebApp";
+import { applyPalette, followTheme } from "../src/theme";
+
+// No settings here: light or dark with the device, default colours.
+followTheme(undefined);
+applyPalette(undefined);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

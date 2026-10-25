@@ -11,6 +11,7 @@ import Tutorial from "./components/Tutorial";
 import { checkForUpdate, installUpdate, UPDATE_CHECK_INTERVAL_MS, UPDATES_ENABLED } from "./updater";
 import { cleanupImages, setNotesDir } from "./images";
 import { actionFor, layoutReady, resolveKeymap } from "./keybindings";
+import { applyPalette, followTheme } from "./theme";
 import {
   backlinks as fetchBacklinks,
   createNote,
@@ -408,7 +409,7 @@ export default function App() {
       return;
     }
     commitSave(sessionRef.current, body).then((ok) => {
-      if (ok) flash("一時保存しました");
+      if (ok) flash("途中保存しました");
     });
   }, [commitSave, resetToBlank, flash]);
 
@@ -475,7 +476,7 @@ export default function App() {
         s.lastSaved = note.body;
         try {
           await createNote(note.body, "scratch");
-          flash("外部の変更と競合したため、外部版を別メモ(Scratch)に退避しました");
+          flash("外部の変更と競合したため、外部版を別メモ（一時）に退避しました");
         } catch (e) {
           flash(String(e));
         }
@@ -629,6 +630,14 @@ export default function App() {
       .filter((t) => t.count > 0)
       .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
   }, [tags, openFilename, loadToken]);
+
+  // Light/dark and the Keep/Scratch colours live on <html>, so
+  // `:root[data-…]` can restyle everything. The settings panel previews
+  // its picks over these while it's open.
+  const theme = settings?.theme;
+  useEffect(() => followTheme(theme), [theme]);
+  const palette = settings?.palette;
+  useEffect(() => applyPalette(palette), [palette]);
 
   // `../assets/…` image paths resolve against the notes folder.
   useEffect(() => {

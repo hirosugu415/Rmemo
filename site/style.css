@@ -1,31 +1,33 @@
 :root {
-  --bg: #f6f6f7;
-  --panel: #ffffff;
-  --text: #16181d;
-  --muted: #5f6672;
-  --line: #e3e5ea;
-  --accent: #2563eb;
-  --keep: #8c3f4c;
-  --keep-wash: rgba(140, 63, 76, 0.08);
-  --scratch: #3a4f72;
-  --scratch-wash: rgba(58, 79, 114, 0.08);
-  --code-bg: rgba(15, 23, 42, 0.055);
+  /* The app's own palette (src/styles.css): neutral greys, and 保管 / 一時
+     as rose / sky (on dark too, lifted a little). */
+  --bg: #f4f4f3;
+  --panel: #fdfdfc;
+  --text: #1d1d1f;
+  --muted: #646469;
+  --line: #e6e6e3;
+  --accent: #2f6feb;
+  --keep: #b4546a;
+  --keep-wash: rgba(180, 84, 106, 0.08);
+  --scratch: #2a8bd0;
+  --scratch-wash: rgba(42, 139, 208, 0.08);
+  --code-bg: rgba(0, 0, 0, 0.045);
   --shadow: 0 24px 60px -20px rgba(22, 24, 29, 0.28), 0 2px 6px rgba(22, 24, 29, 0.06);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #17181c;
-    --panel: #1e2026;
-    --text: #e8e9ec;
-    --muted: #9ca2ad;
-    --line: #2c2f37;
-    --accent: #60a5fa;
-    --keep: #d0808d;
-    --keep-wash: rgba(208, 128, 141, 0.1);
-    --scratch: #8ea6cf;
-    --scratch-wash: rgba(142, 166, 207, 0.1);
+    --bg: #171717;
+    --panel: #1f1f1f;
+    --text: #ececec;
+    --muted: #9a9a9f;
+    --line: #2a2a2a;
+    --accent: #6e9cf5;
+    --keep: #d0708a;
+    --keep-wash: rgba(208, 112, 138, 0.1);
+    --scratch: #7cc4f5;
+    --scratch-wash: rgba(124, 196, 245, 0.08);
     --code-bg: rgba(255, 255, 255, 0.07);
     --shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.3);
     color-scheme: dark;
@@ -372,7 +374,7 @@ h2 {
   background: var(--keep);
 }
 
-/* Keep / Scratch */
+/* 保管 / 一時 */
 
 .split {
   display: grid;
@@ -383,7 +385,6 @@ h2 {
 .lane {
   padding: 22px 24px;
   border-radius: 12px;
-  border-left: 4px solid;
 }
 
 .lane h3 {
@@ -397,7 +398,6 @@ h2 {
 }
 
 .lane-scratch {
-  border-color: var(--scratch);
   background: var(--scratch-wash);
 }
 
@@ -406,7 +406,6 @@ h2 {
 }
 
 .lane-keep {
-  border-color: var(--keep);
   background: var(--keep-wash);
 }
 

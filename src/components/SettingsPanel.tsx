@@ -21,6 +21,7 @@ import {
   reservedFor,
   resolveKeymap,
 } from "../keybindings";
+import { applyPalette, applyTheme, DEFAULT_PALETTE, PALETTES, resolveTheme } from "../theme";
 
 interface Props {
   settings: Settings;
@@ -38,6 +39,9 @@ const TABS = [
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
+/** Unknown ids (settings from before palettes) read as the default. */
+const paletteOf = (s: Settings) => (PALETTES.some((p) => p.id === s.palette) ? s.palette : DEFAULT_PALETTE);
+
 /** Mirrors `config::Settings::default().hotkey`. */
 const DEFAULT_HOTKEY = "Ctrl+N";
 
@@ -47,6 +51,15 @@ export default function SettingsPanel({ settings, onClose, onSaved, onImported }
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const dirChanged = draft.notesDir !== settings.notesDir;
+
+  // Preview the picked colours live; leaving without saving puts the saved
+  // ones back (App re-applies them from the new settings after a save).
+  useEffect(() => applyPalette(draft.palette), [draft.palette]);
+  useEffect(() => () => applyPalette(settings.palette), [settings.palette]);
+  useEffect(() => applyTheme(draft.theme), [draft.theme]);
+  useEffect(() => () => applyTheme(settings.theme), [settings.theme]);
+  const mode = resolveTheme(draft.theme);
+  const dark = mode === "dark";
 
   const save = () => {
     setError(null);
@@ -127,6 +140,56 @@ export default function SettingsPanel({ settings, onClose, onSaved, onImported }
 
         {tab === "window" && (
           <>
+            <div className="settings-themes">
+              <span>テーマ</span>
+              <div className="settings-theme-list" role="radiogroup">
+                {(
+                  [
+                    { id: "light", label: "ライト", swatch: ["#fdfdfc", "#e6e6e3"] },
+                    { id: "dark", label: "ダーク", swatch: ["#171717", "#2a2a2a"] },
+                  ] as const
+                ).map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={mode === t.id}
+                    className={mode === t.id ? "settings-theme settings-theme-active" : "settings-theme"}
+                    onClick={() => setDraft({ ...draft, theme: t.id })}
+                  >
+                    <span className="settings-pair-swatch" style={{ background: t.swatch[0], borderColor: t.swatch[1] }} />
+                    <span className="settings-theme-name">{t.label}</span>
+                  </button>
+                ))}
+              </div>
+              {!draft.theme && <small>選ぶまでは Windows の設定に合わせています。</small>}
+            </div>
+
+            <div className="settings-themes">
+              <span>保管 / 一時 の色</span>
+              <div className="settings-theme-list" role="radiogroup">
+                {PALETTES.map((p) => {
+                  const [keep, scratch] = dark ? p.dark : p.light;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={paletteOf(draft) === p.id}
+                      className={paletteOf(draft) === p.id ? "settings-theme settings-theme-active" : "settings-theme"}
+                      onClick={() => setDraft({ ...draft, palette: p.id })}
+                    >
+                      <span className="settings-pair-swatch">
+                        <span style={{ background: keep }} />
+                        <span style={{ background: scratch }} />
+                      </span>
+                      <span className="settings-theme-name">{dark ? p.label : p.lightLabel}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <label className="settings-inline">
               <span>Windows の起動時に自動で起動する</span>
               <input
@@ -363,7 +426,7 @@ function ImportSection({
       <span>テキストファイルの取り込み</span>
       <small>
         選んだフォルダの中の <code>.txt</code>（サブフォルダも含めてすべて）か、選んだ <code>.txt</code>{" "}
-        ファイルを Keep のメモにします。ファイル名は見出しになります。取り込んだあと、1 件ずつ Markdown
+        ファイルを保管のメモにします。ファイル名は見出しになります。取り込んだあと、1 件ずつ Markdown
         への整形を確認できます。
       </small>
       <label className="settings-inline">
@@ -418,7 +481,7 @@ function ImportSection({
         <p className="settings-note">
           {report.imported.toLocaleString()} 件を取り込みました。
           {report.duplicates > 0 &&
-            ` 取り込み済みの ${report.duplicates} 件は飛ばしました（Keep にあります。元のファイルの日付で並ぶので、一覧では下のほうです）。`}
+            ` 取り込み済みの ${report.duplicates} 件は飛ばしました（保管にあります。元のファイルの日付で並ぶので、一覧では下のほうです）。`}
           {report.empty > 0 && ` 空のファイル ${report.empty} 件は飛ばしました。`}
           {report.garbled.length > 0 && (
             <>

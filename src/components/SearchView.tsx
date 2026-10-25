@@ -142,14 +142,14 @@ export default function SearchView({
               className={statusFilter === s ? "chip chip-active" : "chip"}
               onClick={() => onStatusFilterChange(s)}
             >
-              {s === "all" ? "All" : s === "keep" ? "Keep" : "Scratch"}
+              {s === "all" ? "すべて" : s === "keep" ? "保管" : "一時"}
             </button>
           ))}
         </div>
         <button
           type="button"
           className="chip triage-open"
-          title="Scratch を1件ずつ Keep / ゴミ箱 / あとで に振り分ける"
+          title="一時のメモを1件ずつ 保管 / ゴミ箱 / あとで に振り分ける"
           onClick={onOpenTriage}
         >
           整理

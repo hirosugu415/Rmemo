@@ -341,7 +341,7 @@ function Review({ report, onOpen, onExit }: Props) {
         <div className="triage-done">
           <div className="triage-done-title">整形完了</div>
           <div className="triage-done-counts">
-            取り込んだメモは Keep にあります。元のファイルの日付で並ぶので、一覧では下のほうに入ります。
+            取り込んだメモは保管にあります。元のファイルの日付で並ぶので、一覧では下のほうに入ります。
           </div>
           <div className="triage-done-counts">
             適用 {counts.applied}件 ・ 適用しない {counts.declined}件 ・ 変更なし {counts.clean}件

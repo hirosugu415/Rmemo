@@ -1389,20 +1389,20 @@ export default function ComposeBox({
         </div>
       )}
       <div className="compose-toolbar">
-        <div className="switch" role="group" aria-label="Keep or scratch">
+        <div className="switch" role="group" aria-label="保管 / 一時">
           <button
             type="button"
             className={status === "keep" ? "switch-btn switch-btn-active" : "switch-btn"}
             onClick={() => onStatusChange("keep")}
           >
-            Keep
+            保管
           </button>
           <button
             type="button"
             className={status === "scratch" ? "switch-btn switch-btn-active" : "switch-btn"}
             onClick={() => onStatusChange("scratch")}
           >
-            Scratch
+            一時
           </button>
         </div>
         <span className="compose-count" title="改行は数えません">
@@ -1413,7 +1413,7 @@ export default function ComposeBox({
         <span className="compose-hint">{hint(keymap)}</span>
         <div className="compose-actions">
           <button type="button" className="compose-save" onClick={onSaveDraft}>
-            {withKey("一時保存", keymap.saveDraft)}
+            {withKey("途中保存", keymap.saveDraft)}
           </button>
           <button type="button" className="compose-save compose-save-primary" onClick={onSaveAndClose}>
             {withKey("保存して新規", keymap.saveAndNew)}

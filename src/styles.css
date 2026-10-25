@@ -1,23 +1,31 @@
+/* ---------- light / dark and Keep/Scratch colours ----------
+   theme.ts sets `data-theme` (light or dark — the OS's until one is picked)
+   and `data-palette` (the Keep/Scratch pair), both from settings →
+   ウィンドウ, on <html>. Light is the
+   base and orange / aqua the base pair. Greys carry no blue cast, and controls
+   sit on nearly the panel's own colour rather than a darker well. */
+
+/* Light (Apple Notes-ish): near-white, crisp. */
 :root {
-  --bg: #f6f6f7;
-  --panel: #ffffff;
-  --text: #16181d;
-  --muted: #6b7280;
-  --line: #e3e5ea;
-  --selected: #e8effc;
-  --selected-line: #3b82f6;
-  --accent: #2563eb;
+  --bg: #f4f4f3;
+  --panel: #fdfdfc;
+  --text: #1d1d1f;
+  --muted: #75757a;
+  --line: #e6e6e3;
+  --selected: #eef2fb;
+  --selected-line: #2f6feb;
+  --accent: #2f6feb;
   --danger: #dc2626;
   --expiring: #b45309;
   --expiring-bg: #fef3c7;
 
   /* Editor (Markdown live preview) */
-  --editor-selection: rgba(37, 99, 235, 0.2);
+  --editor-selection: rgba(47, 111, 235, 0.18);
   --selection-match: rgba(250, 204, 21, 0.3);
-  --code-bg: rgba(15, 23, 42, 0.055);
-  --code-border: rgba(15, 23, 42, 0.08);
-  --quote-line: #c9cdd6;
-  --link: #1d4ed8;
+  --code-bg: rgba(0, 0, 0, 0.04);
+  --code-border: rgba(0, 0, 0, 0.06);
+  --quote-line: #d4d4d0;
+  --link: #2557c7;
   --tok-keyword: #a626a4;
   --tok-string: #50a14f;
   --tok-number: #b76b01;
@@ -27,53 +35,94 @@
   --tok-property: #e45649;
   --tok-def: #0184bc;
 
-  /* Keep/Scratch chrome tint — deep, desaturated "fine stationery" tones
-     rather than a flat/bright red-blue, so the compose screen reads as
-     unmistakably one or the other without looking like a warning label. */
-  --keep-accent: #8c3f4c;
-  --keep-wash: rgba(140, 63, 76, 0.07);
-  --scratch-accent: #3a4f72;
-  --scratch-wash: rgba(58, 79, 114, 0.06);
+  /* Keep/Scratch chrome tint, orange / aqua. On white the bright hues are
+     deepened so the title text and frame stay readable; --on-* is the text
+     colour on a filled button of that colour. */
+  --keep-accent: #d0703a;
+  --keep-wash: rgba(208, 112, 58, 0.04);
+  --on-keep: white;
+  --scratch-accent: #1d98a3;
+  --scratch-wash: rgba(29, 152, 163, 0.04);
+  --on-scratch: white;
 
-  color-scheme: light dark;
+  color-scheme: light;
   font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
   font-size: 14px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #17181c;
-    --panel: #1e2026;
-    --text: #e8e9ec;
-    --muted: #9299a5;
-    --line: #2c2f37;
-    --selected: #26324a;
-    --selected-line: #60a5fa;
-    --accent: #60a5fa;
-    --danger: #f87171;
-    --expiring: #fbbf24;
-    --expiring-bg: #3f2d0a;
+/* Dark: the light theme turned over — the same neutral greys and clear
+   blue, lifted for a dark ground. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1f1f1f;
+  --panel: #171717;
+  --text: #ececec;
+  --muted: #8e8e93;
+  --line: #2a2a2a;
+  --selected: #1d2534;
+  --selected-line: #3d79ee;
+  --accent: #3d79ee;
+  --danger: #f87171;
+  --expiring: #fbbf24;
+  --expiring-bg: #3a2c0c;
+  --editor-selection: rgba(61, 121, 238, 0.32);
+  --selection-match: rgba(250, 204, 21, 0.16);
+  --code-bg: rgba(255, 255, 255, 0.045);
+  --code-border: rgba(255, 255, 255, 0.07);
+  --quote-line: #3d3d3d;
+  --link: #6e9cf5;
+  --tok-keyword: #c678dd;
+  --tok-string: #98c379;
+  --tok-number: #d19a66;
+  --tok-comment: #7f848e;
+  --tok-function: #61afef;
+  --tok-type: #e5c07b;
+  --tok-property: #e06c75;
+  --tok-def: #56b6c2;
 
-    --editor-selection: rgba(96, 165, 250, 0.28);
-    --selection-match: rgba(250, 204, 21, 0.18);
-    --code-bg: rgba(255, 255, 255, 0.055);
-    --code-border: rgba(255, 255, 255, 0.08);
-    --quote-line: #4a4f5c;
-    --link: #7cb4ff;
-    --tok-keyword: #c678dd;
-    --tok-string: #98c379;
-    --tok-number: #d19a66;
-    --tok-comment: #7f8693;
-    --tok-function: #61afef;
-    --tok-type: #e5c07b;
-    --tok-property: #e06c75;
-    --tok-def: #56b6c2;
+  /* Bright on dark, with dark text on the fills. */
+  --keep-accent: #f4a77a;
+  --keep-wash: rgba(244, 167, 122, 0.05);
+  --on-keep: #16161a;
+  --scratch-accent: #62d0d8;
+  --scratch-wash: rgba(98, 208, 216, 0.05);
+  --on-scratch: #16161a;
+}
 
-    --keep-accent: #d38a95;
-    --keep-wash: rgba(211, 138, 149, 0.1);
-    --scratch-accent: #8fa8d6;
-    --scratch-wash: rgba(143, 168, 214, 0.1);
-  }
+/* The other pairs. Same hues in both modes — deepened on light, where
+   yellow (which no depth makes readable on white) becomes a deep rose.
+   Listed after the dark block so a light pair loses to its dark twin below. */
+:root[data-palette="orange-mint"] {
+  --scratch-accent: #1f9c72;
+  --scratch-wash: rgba(31, 156, 114, 0.04);
+}
+:root[data-palette="lemon-sky"] {
+  --keep-accent: #b4546a;
+  --keep-wash: rgba(180, 84, 106, 0.04);
+  --scratch-accent: #2a8bd0;
+  --scratch-wash: rgba(42, 139, 208, 0.04);
+}
+:root[data-palette="yellow-mint"] {
+  --keep-accent: #b4546a;
+  --keep-wash: rgba(180, 84, 106, 0.04);
+  --scratch-accent: #1f9c72;
+  --scratch-wash: rgba(31, 156, 114, 0.04);
+}
+:root[data-theme="dark"][data-palette="orange-mint"] {
+  --scratch-accent: #5fd3a8;
+  --scratch-wash: rgba(95, 211, 168, 0.05);
+}
+:root[data-theme="dark"][data-palette="lemon-sky"] {
+  --keep-accent: #f2d65c;
+  --keep-wash: rgba(242, 214, 92, 0.05);
+  --scratch-accent: #7cc4f5;
+  --scratch-wash: rgba(124, 196, 245, 0.05);
+}
+:root[data-theme="dark"][data-palette="yellow-mint"] {
+  --keep-accent: #ecc94b;
+  --keep-wash: rgba(236, 201, 75, 0.05);
+  --scratch-accent: #5fd3a8;
+  --scratch-wash: rgba(95, 211, 168, 0.05);
 }
 
 /* Resolves to whichever status is live on the compose screen; anywhere else
@@ -81,11 +130,14 @@
 .app[data-status="keep"] {
   --status-accent: var(--keep-accent);
   --status-wash: var(--keep-wash);
+  /* Text on a --status-accent fill: white unless the colour is too light. */
+  --status-on: var(--on-keep, white);
 }
 
 .app[data-status="scratch"] {
   --status-accent: var(--scratch-accent);
   --status-wash: var(--scratch-wash);
+  --status-on: var(--on-scratch, white);
 }
 
 * {
@@ -218,7 +270,7 @@ body,
 
 .format-btn-active,
 .format-btn-active:hover {
-  color: white;
+  color: var(--status-on, white);
   background: var(--status-accent, var(--accent));
 }
 
@@ -384,7 +436,7 @@ body,
 
 .switch-btn-active {
   background: var(--status-accent, var(--accent));
-  color: white;
+  color: var(--status-on, white);
 }
 
 .compose-save {
@@ -872,6 +924,63 @@ body,
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.settings-themes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.settings-themes > span {
+  font-weight: 600;
+  font-size: 12px;
+}
+.settings-theme-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+.settings-theme {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  align-items: center;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  cursor: pointer;
+}
+.settings-theme:hover {
+  border-color: var(--muted);
+}
+.settings-theme-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+/* Keep / Scratch colour pair, in the palette picker. */
+.settings-pair-swatch {
+  width: 26px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  display: flex;
+}
+.settings-pair-swatch > span {
+  flex: 1;
+}
+
+.settings-theme-name {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.settings-theme small {
+  font-size: 10.5px;
 }
 
 .settings-tabs {

@@ -133,7 +133,7 @@ export default function NoteListItem({
             onToggleStatus();
           }}
         >
-          {note.status === "keep" ? "→ Scratch" : "→ Keep"}
+          {note.status === "keep" ? "→ 一時" : "→ 保管"}
         </button>
         <button
           type="button"

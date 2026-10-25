@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>使い方ガイド — Rmemo</title>
-    <meta name="description" content="Rmemo の使い方ガイド。メモの書き方から、一覧・検索、Scratch の整理、設定、ファイルの保存場所と同期まで、すべての画面の使い方を説明します。" />
+    <meta name="description" content="Rmemo の使い方ガイド。メモの書き方から、一覧・検索、一時メモの整理、設定、ファイルの保存場所と同期まで、すべての画面の使い方を説明します。" />
     <link rel="icon" type="image/png" href="images/favicon.png" />
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -48,7 +48,7 @@
               <ol>
                 <li><a href="#save">保存のしくみ</a></li>
                 <li><a href="#new-note">新しいメモ・前回のメモ</a></li>
-                <li><a href="#keep-scratch">Keep と Scratch</a></li>
+                <li><a href="#keep-scratch">保管と一時</a></li>
                 <li><a href="#headings">見出し</a></li>
                 <li><a href="#heading-vs-tag">見出しとタグの違い</a></li>
                 <li><a href="#inline">文字の飾り</a></li>
@@ -69,12 +69,12 @@
                 <li><a href="#search-open">開き方と検索</a></li>
                 <li><a href="#list-row">一覧の見方</a></li>
                 <li><a href="#pin">ピン留め</a></li>
-                <li><a href="#move">Keep / Scratch の移動</a></li>
+                <li><a href="#move">保管 / 一時 の移動</a></li>
                 <li><a href="#delete">削除と復元</a></li>
                 <li><a href="#tag-cloud">タグの一覧と名前の変更</a></li>
               </ol>
             </li>
-            <li><a href="#triage">Scratch を整理する</a></li>
+            <li><a href="#triage">一時のメモを整理する</a></li>
             <li><a href="#settings">設定</a></li>
             <li>
               <a href="#files">メモのファイルと同期</a>
@@ -128,17 +128,17 @@
                 </dd>
               </div>
               <div class="qa-item">
-                <dt>Keep と Scratch は何が違いますか？</dt>
+                <dt>「保管」と「一時」は何が違いますか？</dt>
                 <dd>
-                  あとで読み返すメモは Keep（残す）、電話番号や一時的なコピーのような使い捨てのメモは Scratch です。<kbd>Ctrl</kbd>+<kbd>L</kbd> で切り替えます。
-                  <a class="qa-more" href="#keep-scratch">詳しくは「Keep と Scratch」へ</a>
+                  あとで読み返すメモは「保管」、電話番号や一時的なコピーのような使い捨てのメモは「一時」です。<kbd>Ctrl</kbd>+<kbd>L</kbd> で切り替えます。
+                  <a class="qa-more" href="#keep-scratch">詳しくは「保管と一時」へ</a>
                 </dd>
               </div>
               <div class="qa-item">
                 <dt>「まもなく期限切れ」と出ました。メモは消えてしまいますか？</dt>
                 <dd>
-                  消えません。古くなった Scratch に付く印です。一覧の「<span class="ui">整理</span>」ボタンから、1 件ずつ残すか捨てるかを決められます。
-                  <a class="qa-more" href="#triage">詳しくは「Scratch を整理する」へ</a>
+                  消えません。古くなった一時のメモに付く印です。一覧の「<span class="ui">整理</span>」ボタンから、1 件ずつ残すか捨てるかを決められます。
+                  <a class="qa-more" href="#triage">詳しくは「一時のメモを整理する」へ</a>
                 </dd>
               </div>
               <div class="qa-item">
@@ -165,8 +165,22 @@
               <div class="qa-item">
                 <dt>メモのファイルはどこに保存されていますか？</dt>
                 <dd>
-                  <code>ドキュメント\Rmemo</code> の中の <code>keep</code> と <code>scratch</code> フォルダに、1 メモ = 1 つの <code>.md</code> ファイルで保存されています。
+                  <code>ドキュメント\Rmemo</code> の中の <code>keep</code>（保管）と <code>scratch</code>（一時）フォルダに、1 メモ = 1 つの <code>.md</code> ファイルで保存されています。
                   <a class="qa-more" href="#folder">詳しくは「保存場所」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>今まで Windows のメモ帳で書いていたメモを移したい</dt>
+                <dd>
+                  設定（<kbd>Ctrl</kbd>+<kbd>,</kbd>）の「取り込み」タブで、<code>.txt</code> の入ったフォルダかファイルを選ぶと、まとめて Rmemo のメモにできます。文字化けせず、書いた頃の日付のまま一覧に並びます。元の <code>.txt</code> はそのまま残ります。
+                  <a class="qa-more" href="#settings">詳しくは「設定」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
+                <dt>画面を暗く（明るく）したい</dt>
+                <dd>
+                  設定の「ウィンドウ」タブの「テーマ」で、ライトとダークを選べます。選ぶまでは Windows の設定に合わせています。
+                  <a class="qa-more" href="#settings">詳しくは「設定」へ</a>
                 </dd>
               </div>
               <div class="qa-item">
@@ -214,8 +228,8 @@
                 <tbody>
                   <tr><td><a href="#editor">エディタ</a></td><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>メモを書く・編集する</td></tr>
                   <tr><td><a href="#search">一覧・検索</a></td><td>「一覧」ボタン / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td><td>メモを探す・開く・ピン留め・削除</td></tr>
-                  <tr><td><a href="#triage">Scratch 整理</a></td><td>一覧・検索の「整理」ボタン</td><td>古い Scratch を 1 件ずつ片づける</td></tr>
-                  <tr><td><a href="#settings">設定</a></td><td>右上の ⚙ / <kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>保存フォルダ・ウィンドウ・キー設定・テキストファイルの取り込み</td></tr>
+                  <tr><td><a href="#triage">一時のメモの整理</a></td><td>一覧・検索の「整理」ボタン</td><td>古い一時のメモを 1 件ずつ片づける</td></tr>
+                  <tr><td><a href="#settings">設定</a></td><td>右上の ⚙ / <kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>保存フォルダ・テーマと色・ウィンドウ・キー設定・テキストファイルの取り込み</td></tr>
                   <tr><td>使い方</td><td>エディタの「?」ボタン / <kbd>F1</kbd></td><td>エディタの機能を入力例つきで確認</td></tr>
                 </tbody>
               </table>
@@ -246,8 +260,9 @@
             <h3 id="save">保存のしくみ</h3>
             <ul>
               <li><strong>自動保存</strong>：書いている途中も、手を止めると自動で保存されます。保存場所やファイル名を決める必要はありません。</li>
-              <li><kbd>Ctrl</kbd>+<kbd>S</kbd>：その場で一時保存します（画面下に「一時保存しました」と出ます）。</li>
+              <li><kbd>Ctrl</kbd>+<kbd>S</kbd>：その場で途中保存します（画面下に「途中保存しました」と出ます）。</li>
               <li><kbd>Ctrl</kbd>+<kbd>Enter</kbd>：保存して、新しいメモに切り替えます（窓は開いたままです）。続けて次のメモを書けます。</li>
+              <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd>：保存して、窓を隠します。メモは開いたままなので、次に呼び出したときに続きから書けます。</li>
               <li><strong>タイトルとファイル名</strong>：1 行目がメモのタイトルになり、そのままファイル名になります。タイトルを書き換えると、ファイル名も自動で変わります。</li>
               <li>何も書かずに閉じたメモは保存されません。書いたメモを全部消すと、そのメモはなくなります。</li>
             </ul>
@@ -258,22 +273,22 @@
               <li><strong>前回のメモに戻る</strong>：新しいメモの画面では、上部に「<span class="ui">← 前回: メモの名前</span>」が出ます。クリックするか <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> で、直前まで開いていたメモに戻れます。アプリを再起動しても覚えています。</li>
             </ul>
 
-            <h3 id="keep-scratch">Keep と Scratch</h3>
-            <p>メモは 2 種類に分けて保存されます。画面下の「Keep / Scratch」スイッチか、<kbd>Ctrl</kbd>+<kbd>L</kbd> で切り替えます。</p>
+            <h3 id="keep-scratch">保管と一時</h3>
+            <p>メモは 2 種類に分けて保存されます。画面下の「保管 / 一時」スイッチか、<kbd>Ctrl</kbd>+<kbd>L</kbd> で切り替えます。</p>
             <div class="table-scroll">
               <table>
                 <thead>
                   <tr><th></th><th>向いているメモ</th><th>古くなると</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td><strong>Keep</strong>（残す）</td><td>手順書、アイデア、調べたことのまとめなど、あとで読み返すメモ</td><td>何も起きません</td></tr>
-                  <tr><td><strong>Scratch</strong>（使い捨て）</td><td>電話番号、買い物リスト、一時的なコピーなど、すぐいらなくなるメモ</td><td>「まもなく期限切れ」の印が付きます（消えはしません）</td></tr>
+                  <tr><td><strong>保管</strong>（残す）</td><td>手順書、アイデア、調べたことのまとめなど、あとで読み返すメモ</td><td>何も起きません</td></tr>
+                  <tr><td><strong>一時</strong>（使い捨て）</td><td>電話番号、買い物リスト、一時的なコピーなど、すぐいらなくなるメモ</td><td>「まもなく期限切れ」の印が付きます（消えはしません）</td></tr>
                 </tbody>
               </table>
             </div>
             <p>
-              今どちらのメモを書いているかは、上部のタイトルの色でも分かります。前回選んだほうを覚えているので、普段使うほうを選んでおけば、毎回切り替える必要はありません。
-              古くなった Scratch は <a href="#triage">整理画面</a> でまとめて片づけられます。
+              今どちらのメモを書いているかは、上部のタイトルや窓の枠の色でも分かります（色の組み合わせは <a href="#settings">設定</a> で選べます）。前回選んだほうを覚えているので、普段使うほうを選んでおけば、毎回切り替える必要はありません。
+              古くなった一時のメモは <a href="#triage">整理画面</a> でまとめて片づけられます。
             </p>
 
             <h3 id="headings">見出し</h3>
@@ -418,7 +433,7 @@
               <li><strong>複数の言葉で探す</strong>：空白で区切ると、すべての言葉を含むメモだけに絞り込みます（例: <code>会議 予算</code>）。</li>
               <li><strong>タグで探す</strong>：<code>#仕事</code> のように入力すると、そのタグのメモが見つかります。</li>
               <li>見つかった言葉は、タイトルと本文の抜粋で色付きで表示されます。</li>
-              <li><strong>絞り込み</strong>：右上の「<span class="ui">All / Keep / Scratch</span>」で、表示するメモの種類を選べます。</li>
+              <li><strong>絞り込み</strong>：右上の「<span class="ui">すべて / 保管 / 一時</span>」で、表示するメモの種類を選べます。</li>
               <li>画面の一番下に、表示中のメモの件数が出ます。</li>
             </ul>
             <p><strong>キーボードだけでも操作できます。</strong></p>
@@ -430,7 +445,7 @@
                 <tbody>
                   <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>選ぶメモを移動</td></tr>
                   <tr><td><kbd>Enter</kbd></td><td>選んでいるメモを開く</td></tr>
-                  <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>選んでいるメモを Keep ⇔ Scratch に移動</td></tr>
+                  <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>選んでいるメモを 保管 ⇔ 一時 に移動</td></tr>
                   <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>検索欄に戻る</td></tr>
                 </tbody>
               </table>
@@ -441,11 +456,11 @@
             <ul>
               <li><strong>📌</strong>：ピン留めしたメモ（一覧の一番上に並びます）</li>
               <li><strong>タイトル</strong>：メモの 1 行目</li>
-              <li><strong>まもなく期限切れ</strong>：古くなった Scratch に付く印（<a href="#triage">整理する</a>）</li>
+              <li><strong>まもなく期限切れ</strong>：古くなった一時のメモに付く印（<a href="#triage">整理する</a>）</li>
               <li><strong>文字数・更新日時</strong>：右上に表示（「now」は 1 分以内、「6m」は 6 分前、「3h」は 3 時間前、「2d」は 2 日前。1 週間より前は日付）</li>
               <li><strong>本文の抜粋</strong>：検索中は、見つかった言葉のまわりが表示されます</li>
               <li><strong>タグ</strong>：クリックするとそのタグで絞り込みます</li>
-              <li><strong>ボタン</strong>：「ピン留め」「→ Scratch（または → Keep）」「削除」</li>
+              <li><strong>ボタン</strong>：「ピン留め」「→ 一時（または → 保管）」「削除」</li>
             </ul>
 
             <h3 id="pin">ピン留め</h3>
@@ -454,8 +469,8 @@
               ピン留めの情報はメモの保存フォルダに保存されるので、<a href="#sync">同期</a> している別の PC にも反映されます。
             </p>
 
-            <h3 id="move">Keep / Scratch の移動</h3>
-            <p>「<span class="ui">→ Scratch</span>」「<span class="ui">→ Keep</span>」で、メモの種類をあとから変えられます。メモを開かなくても、一覧からそのまま移動できます。</p>
+            <h3 id="move">保管 / 一時 の移動</h3>
+            <p>「<span class="ui">→ 一時</span>」「<span class="ui">→ 保管</span>」で、メモの種類をあとから変えられます。メモを開かなくても、一覧からそのまま移動できます。</p>
 
             <h3 id="delete">削除と復元</h3>
             <ul>
@@ -477,47 +492,47 @@
 
           <!-- ======================= 整理 ======================= -->
           <section id="triage">
-            <h2>Scratch を整理する</h2>
+            <h2>一時のメモを整理する</h2>
             <p>
-              古くなった Scratch を 1 件ずつ表示して、残すか捨てるかを決めていく画面です。
-              Scratch はいつのまにか溜まりがちなので、ときどきここで片づけると一覧がすっきりします。
+              古くなった一時のメモを 1 件ずつ表示して、残すか捨てるかを決めていく画面です。
+              一時のメモはいつのまにか溜まりがちなので、ときどきここで片づけると一覧がすっきりします。
             </p>
 
             <figure class="guide-shot">
-              <img src="images/triage.png" alt="Scratch 整理画面。メモの本文が大きく表示され、下に Keep に残す・ゴミ箱へ・あとで・開いて編集・戻るのボタンが並んでいる" loading="lazy" />
+              <img src="images/triage.png" alt="一時のメモの整理画面。メモの本文が大きく表示され、下に 保管に残す・ゴミ箱へ・あとで・開いて編集・戻るのボタンが並んでいる" loading="lazy" />
             </figure>
 
             <h3>開き方</h3>
             <p>
               <a href="#search">一覧・検索画面</a> の右上にある「<span class="ui">整理</span>」ボタンを押します。
-              ボタンの横の数字は、期限切れの Scratch の件数です。
+              ボタンの横の数字は、期限切れの一時のメモの件数です。
             </p>
 
             <h3>「期限切れ」とは</h3>
             <p>
-              作ってから一定の日数（はじめは 14 日）がたった Scratch に「期限切れ」の印が付きます。日数は <a href="#settings">設定</a> の「期限切れの目安（日数）」で変えられます。
+              作ってから一定の日数（はじめは 14 日）がたった一時のメモに「期限切れ」の印が付きます。日数は <a href="#settings">設定</a> の「期限切れの目安（日数）」で変えられます。
               <strong>印が付くだけで、メモが勝手に消えることはありません。</strong>
             </p>
 
             <h3>操作</h3>
-            <p>画面上部の「<span class="ui">期限切れ</span>」「<span class="ui">すべての Scratch</span>」で、整理する範囲を選びます（期限切れのメモがなければ、すべての Scratch が対象になります）。期限切れのものから、作った日が古い順に表示されます。</p>
+            <p>画面上部の「<span class="ui">期限切れ</span>」「<span class="ui">すべての一時メモ</span>」で、整理する範囲を選びます（期限切れのメモがなければ、すべての一時のメモが対象になります）。期限切れのものから、作った日が古い順に表示されます。</p>
             <div class="table-scroll">
               <table>
                 <thead>
                   <tr><th>ボタン</th><th>キー</th><th>動作</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Keep に残す</td><td><kbd>K</kbd></td><td>Keep に移して、次のメモへ</td></tr>
+                  <tr><td>保管に残す</td><td><kbd>K</kbd></td><td>保管に移して、次のメモへ</td></tr>
                   <tr><td>ゴミ箱へ</td><td><kbd>D</kbd> / <kbd>Delete</kbd></td><td>Windows のごみ箱に送って、次のメモへ</td></tr>
                   <tr><td>あとで</td><td><kbd>S</kbd> / <kbd>→</kbd></td><td>今は決めずに、次のメモへ</td></tr>
                   <tr><td>開いて編集</td><td><kbd>E</kbd> / <kbd>Enter</kbd></td><td>そのメモをエディタで開く</td></tr>
-                  <tr><td>戻る</td><td><kbd>←</kbd></td><td>1 つ前のメモに戻る（「Keep に残す」は取り消されます）</td></tr>
+                  <tr><td>戻る</td><td><kbd>←</kbd></td><td>1 つ前のメモに戻る（「保管に残す」は取り消されます）</td></tr>
                   <tr><td>終了</td><td><kbd>Esc</kbd></td><td>一覧・検索画面に戻る</td></tr>
                 </tbody>
               </table>
             </div>
             <p class="note">ゴミ箱に送ったメモは、この画面の「戻る」では戻せません。Windows のごみ箱から復元してください。</p>
-            <p>最後まで終わると「整理完了」と、Keep・ゴミ箱・あとでの件数が出ます。「<span class="ui">「あとで」の◯件をもう一度</span>」で、保留にしたメモだけをもう一度整理できます。</p>
+            <p>最後まで終わると「整理完了」と、保管・ゴミ箱・あとでの件数が出ます。「<span class="ui">「あとで」の◯件をもう一度</span>」で、保留にしたメモだけをもう一度整理できます。</p>
           </section>
 
           <!-- ======================= 設定 ======================= -->
@@ -530,14 +545,16 @@
                   <tr><th>タブ</th><th>項目</th><th>説明</th><th>はじめの値</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>一般</td><td>メモの保存フォルダ</td><td>メモを保存する場所。変えると、新しいフォルダに <code>keep</code> と <code>scratch</code> が作られます（今までのメモは自動では移動しません）。「<span class="ui">エクスプローラーで開く</span>」でフォルダが開きます</td><td><code>ドキュメント\Rmemo</code></td></tr>
-                  <tr><td>一般</td><td>期限切れの目安（日数）</td><td>作ってから何日たった Scratch に「期限切れ」の印を付けるか</td><td>14 日</td></tr>
+                  <tr><td>一般</td><td>メモの保存フォルダ</td><td>メモを保存する場所。変えると、新しいフォルダに <code>keep</code>（保管）と <code>scratch</code>（一時）が作られます（今までのメモは自動では移動しません）。「<span class="ui">エクスプローラーで開く</span>」でフォルダが開きます</td><td><code>ドキュメント\Rmemo</code></td></tr>
+                  <tr><td>一般</td><td>期限切れの目安（日数）</td><td>作ってから何日たった一時のメモに「期限切れ」の印を付けるか</td><td>14 日</td></tr>
                   <tr><td>一般</td><td>インデント幅</td><td>インデント（<kbd>Ctrl</kbd>+<kbd>]</kbd> / <kbd>Ctrl</kbd>+<kbd>[</kbd>）で増減する空白の数</td><td>4</td></tr>
+                  <tr><td>ウィンドウ</td><td>テーマ</td><td>ライトかダークか。選ぶまでは Windows の設定に合わせます</td><td>Windows に合わせる</td></tr>
+                  <tr><td>ウィンドウ</td><td>保管 / 一時 の色</td><td>保管と一時の色の組み合わせ。「オレンジ / アクア」「オレンジ / ミント」「レモン / スカイ」「イエロー / ミント」から選びます。ライトでは、白の上で見やすいように黄色がローズ（赤）になります</td><td>オレンジ / アクア</td></tr>
                   <tr><td>ウィンドウ</td><td>Windows の起動時に自動で起動する</td><td>PC にサインインしたとき、タスクトレイに常駐した状態で起動します</td><td>オン</td></tr>
                   <tr><td>ウィンドウ</td><td>ほかの画面をクリックしても開いたままにする</td><td>オフのときは、ほかの画面をクリックすると Rmemo が隠れます</td><td>オフ</td></tr>
                   <tr><td>キー設定</td><td>呼び出しのホットキー</td><td>どのアプリからでも Rmemo を呼び出すキー</td><td><code>Ctrl+N</code></td></tr>
                   <tr><td>キー設定</td><td>各ショートカット</td><td>保存・検索・書式・行の移動などのキー。欄を押してから新しいキーを押すと変わります。× でなし、↺ で初期値に戻ります。ほかと重なると注意が出ます</td><td>このガイドに書いてあるキー</td></tr>
-                  <tr><td>取り込み</td><td>テキストファイルの取り込み</td><td>フォルダの中の <code>.txt</code> や、選んだ <code>.txt</code> を Keep のメモにします</td><td>—</td></tr>
+                  <tr><td>取り込み</td><td>テキストファイルの取り込み</td><td>今まで書きためた <code>.txt</code> を、まとめて保管のメモにします。フォルダごと（サブフォルダも含む）か、ファイルを選んで取り込めます。文字化けせず、元のファイルの日付のまま並びます。取り込んだあと、1 件ずつ Markdown への整形を確認できます。元の <code>.txt</code> は残ります</td><td>—</td></tr>
                 </tbody>
               </table>
             </div>
@@ -555,8 +572,8 @@
                   <tr><th>場所</th><th>中身</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td><code>ドキュメント\Rmemo\keep</code></td><td>Keep のメモ</td></tr>
-                  <tr><td><code>ドキュメント\Rmemo\scratch</code></td><td>Scratch のメモ</td></tr>
+                  <tr><td><code>ドキュメント\Rmemo\keep</code></td><td>保管のメモ</td></tr>
+                  <tr><td><code>ドキュメント\Rmemo\scratch</code></td><td>一時のメモ</td></tr>
                   <tr><td><code>ドキュメント\Rmemo\assets</code></td><td>メモに貼った画像</td></tr>
                   <tr><td><code>ドキュメント\Rmemo\.rmemo</code></td><td>ピン留めの情報</td></tr>
                 </tbody>
@@ -604,7 +621,7 @@
           <!-- ======================= ショートカット ======================= -->
           <section id="shortcuts">
             <h2>ショートカット一覧</h2>
-            <p>よく使うショートカットを、VS Code や Notion などおなじみのアプリに合わせています。</p>
+            <p>よく使うショートカットを、VS Code や Notion などおなじみのアプリに合わせています。ここに書いてあるのは初期値で、設定の「キー設定」タブで変えられます。</p>
 
             <h3>どこでも</h3>
             <div class="table-scroll">
@@ -624,11 +641,12 @@
             <div class="table-scroll">
               <table>
                 <tbody>
-                  <tr><td>一時保存</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td></tr>
+                  <tr><td>途中保存</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td></tr>
                   <tr><td>保存して新しいメモへ</td><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td></tr>
+                  <tr><td>保存して窓を隠す</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd></td></tr>
                   <tr><td>新しいメモ</td><td><kbd>Esc</kbd></td></tr>
                   <tr><td>前回のメモに戻る</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td></tr>
-                  <tr><td>Keep / Scratch を切り替え</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
+                  <tr><td>保管 / 一時 を切り替え</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
                   <tr><td>見出し 1〜4 / 本文</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>〜<kbd>4</kbd> / <kbd>0</kbd></td></tr>
                   <tr><td>太字・斜体・インラインコード</td><td><kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>E</kbd></td></tr>
                   <tr><td>リンク</td><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td></tr>
@@ -650,17 +668,17 @@
               <table>
                 <tbody>
                   <tr><td>選ぶメモを移動 / 開く</td><td><kbd>↑</kbd> <kbd>↓</kbd> / <kbd>Enter</kbd></td></tr>
-                  <tr><td>Keep ⇔ Scratch に移動</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
+                  <tr><td>保管 ⇔ 一時 に移動</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
                   <tr><td>検索欄に戻る</td><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td></tr>
                 </tbody>
               </table>
             </div>
 
-            <h3>Scratch 整理</h3>
+            <h3>一時のメモの整理</h3>
             <div class="table-scroll">
               <table>
                 <tbody>
-                  <tr><td>Keep に残す / ゴミ箱へ / あとで</td><td><kbd>K</kbd> / <kbd>D</kbd> / <kbd>S</kbd></td></tr>
+                  <tr><td>保管に残す / ゴミ箱へ / あとで</td><td><kbd>K</kbd> / <kbd>D</kbd> / <kbd>S</kbd></td></tr>
                   <tr><td>開いて編集 / 戻る</td><td><kbd>E</kbd> / <kbd>←</kbd></td></tr>
                 </tbody>
               </table>

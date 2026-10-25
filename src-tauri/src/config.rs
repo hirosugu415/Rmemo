@@ -57,6 +57,10 @@ pub struct Settings {
     /// In-app shortcuts the user rebound, action id → combo (`""` = none).
     /// Only the changed ones are stored; the defaults live in the frontend.
     pub keybindings: BTreeMap<String, String>,
+    /// "light" / "dark"; empty until picked, which follows the OS.
+    pub theme: String,
+    /// Keep/Scratch colour pair id (see `theme.ts`).
+    pub palette: String,
 }
 
 /// Bounds of the zoom the UI offers.
@@ -79,6 +83,8 @@ impl Default for Settings {
             autostart: true,
             zoom: 1.0,
             keybindings: BTreeMap::new(),
+            theme: String::new(),
+            palette: "orange-aqua".into(),
         }
     }
 }

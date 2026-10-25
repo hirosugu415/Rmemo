@@ -108,7 +108,7 @@
           <div class="guide-banner">
             <div>
               <h3>使い方ガイド</h3>
-              <p>基本の使い方から、エディタ、一覧・検索、Scratch の整理、設定、同期、ショートカット一覧まで。Rmemo のすべての機能を 1 ページにまとめています。</p>
+              <p>基本の使い方から、エディタ、一覧・検索、一時メモの整理、設定、同期、ショートカット一覧まで。Rmemo のすべての機能を 1 ページにまとめています。</p>
             </div>
             <a class="btn btn-primary" href="guide.html">使い方ガイドを見る →</a>
           </div>
@@ -123,19 +123,43 @@
             <kbd>Ctrl</kbd>+<kbd>L</kbd> でいつでも切り替えられます。
           </p>
           <div class="split">
-            <div class="lane lane-scratch">
-              <h3>Scratch</h3>
-              <p>電話番号、買い物リスト、一時的なコピー。とりあえず書く場所です。古くなると印が付き、整理画面で 1 件ずつ「残す / 捨てる」を決められます。</p>
-            </div>
             <div class="lane lane-keep">
-              <h3>Keep</h3>
+              <h3>保管</h3>
               <p>あとで読み返したいメモ。手順書、アイデア、調べたことのまとめ。ピン留めでよく使うメモを一番上に置けます。</p>
+            </div>
+            <div class="lane lane-scratch">
+              <h3>一時</h3>
+              <p>電話番号、買い物リスト、一時的なコピー。とりあえず書く場所です。古くなると印が付き、整理画面で 1 件ずつ「残す / 捨てる」を決められます。</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="alt">
+      <section class="alt" id="import">
+        <div class="wrap">
+          <h2>今までのメモも、まとめてお引っ越し</h2>
+          <p class="section-lead">
+            Windows のメモ帳などで書きためた <code>.txt</code> ファイルを、フォルダごと Rmemo に取り込めます。
+            設定の「取り込み」タブで、フォルダかファイルを選ぶだけです。
+          </p>
+          <div class="features">
+            <div class="feature">
+              <h3><span class="mark"></span>文字化けしない</h3>
+              <p>文字コードをファイルごとに見分けるので、昔のメモ帳で保存した Shift_JIS のメモも、そのまま読めます。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>書いた頃の順番で並ぶ</h3>
+              <p>元のファイルの日付を引き継ぐので、取り込んだメモが一覧の先頭に固まりません。入っていたフォルダの名前はタグになります。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>1 件ずつ整えられる</h3>
+              <p>取り込んだあと、元の txt と整形後のメモを並べて確認できます。見出しや箇条書きに整えるかどうかを選べます。元の <code>.txt</code> はそのまま残ります。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
         <div class="wrap">
           <h2>メモは、ただのテキストファイル</h2>
           <p class="section-lead">
@@ -160,7 +184,7 @@
         </div>
       </section>
 
-      <section>
+      <section class="alt">
         <div class="wrap">
           <h2>画面</h2>
           <p class="section-lead">クリックすると大きく表示されます。</p>
@@ -174,8 +198,8 @@
               <figcaption>一覧・検索。タグで絞り込み、よく使うメモはピン留め。</figcaption>
             </figure>
             <figure class="shot">
-              <a href="images/triage.png"><img src="images/triage.png" alt="Scratch の整理画面。古いメモを 1 件ずつ残すか捨てるか選ぶ" loading="lazy" /></a>
-              <figcaption>整理画面。古い Scratch を 1 件ずつ片づけます。</figcaption>
+              <a href="images/triage.png"><img src="images/triage.png" alt="一時のメモの整理画面。古いメモを 1 件ずつ残すか捨てるか選ぶ" loading="lazy" /></a>
+              <figcaption>整理画面。古い一時のメモを 1 件ずつ片づけます。</figcaption>
             </figure>
             <figure class="shot">
               <a href="images/tutorial.png"><img src="images/tutorial.png" alt="使い方ページ。入力例と表示結果が並んでいる" loading="lazy" /></a>
@@ -185,10 +209,10 @@
         </div>
       </section>
 
-      <section class="alt">
+      <section>
         <div class="wrap">
           <h2>よく使うキー</h2>
-          <p class="section-lead">エディタの機能はアプリの中で <kbd>F1</kbd> を押すと確認できます。すべての画面の使い方は <a href="guide.html">使い方ガイド</a> にまとめています。</p>
+          <p class="section-lead">キーは設定の「キー設定」タブで自由に変えられます。エディタの機能はアプリの中で <kbd>F1</kbd> を押すと確認できます。すべての画面の使い方は <a href="guide.html">使い方ガイド</a> にまとめています。</p>
           <div class="table-scroll">
             <table>
               <thead>
@@ -197,8 +221,9 @@
               <tbody>
                 <tr><td>入力窓を開く / 閉じる</td><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td></tr>
                 <tr><td>保存して新しいメモへ</td><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td></tr>
+                <tr><td>保存して窓を隠す</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd></td></tr>
                 <tr><td>前回のメモに戻る</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td></tr>
-                <tr><td>Scratch / Keep を切り替え</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
+                <tr><td>保管 / 一時 を切り替え</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
                 <tr><td>メモを探す</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td></tr>
                 <tr><td>リンクを付ける</td><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td></tr>
                 <tr><td>同じ語を次々に選ぶ</td><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td></tr>
@@ -210,7 +235,7 @@
         </div>
       </section>
 
-      <section id="faq">
+      <section class="alt" id="faq">
         <div class="wrap">
           <h2>よくある質問</h2>
           <details>
@@ -236,6 +261,14 @@
           <details>
             <summary>アンインストールするとメモは消えますか？</summary>
             <p>消えません。メモのフォルダ（既定では <code>Documents\Rmemo</code>）はそのまま残ります。</p>
+          </details>
+          <details>
+            <summary>今まで使っていたメモ帳のメモを移せますか？</summary>
+            <p>はい。設定の「取り込み」タブで、<code>.txt</code> の入ったフォルダかファイルを選ぶと、まとめて Rmemo のメモになります。元のファイルは消えません。くわしくは <a href="#import">今までのメモも、まとめてお引っ越し</a> を見てください。</p>
+          </details>
+          <details>
+            <summary>ダークモードはありますか？</summary>
+            <p>あります。最初は Windows の設定に合わせて、ライトかダークで表示されます。設定の「ウィンドウ」タブで、どちらかに固定することもできます。</p>
           </details>
           <details>
             <summary>不具合の報告や要望はどこに送ればいいですか？</summary>
