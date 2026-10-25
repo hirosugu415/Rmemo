@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { searchTerms, type NoteSummary, type Status, type TagCount } from "../api";
 import NoteList from "./NoteList";
 import TagCloud from "./TagCloud";
+import { type Keymap, withKey } from "../keybindings";
 
 interface Props {
   notes: NoteSummary[];
@@ -12,6 +13,7 @@ interface Props {
   statusFilter: Status | "all";
   onStatusFilterChange: (status: Status | "all") => void;
   onOpenSettings: () => void;
+  keymap: Keymap;
   /** Back to the compose box (the same as Esc). */
   onClose: () => void;
   /** Expiring scratch notes — shown on the triage button. */
@@ -32,6 +34,7 @@ export default function SearchView({
   statusFilter,
   onStatusFilterChange,
   onOpenSettings,
+  keymap,
   onClose,
   expiringCount,
   onOpenTriage,
@@ -152,7 +155,7 @@ export default function SearchView({
           整理
           {expiringCount > 0 && <span className="triage-open-count">{expiringCount}</span>}
         </button>
-        <button className="gear" title="設定 (Ctrl+,)" onClick={onOpenSettings}>
+        <button className="gear" title={withKey("設定", keymap.openSettings)} onClick={onOpenSettings}>
           ⚙
         </button>
       </div>

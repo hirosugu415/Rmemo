@@ -5,6 +5,7 @@
 //! notes folder location itself).
 
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 /// Loopback port for the read-only "R経済圏" API (see `api.rs`). The scheme
@@ -53,6 +54,9 @@ pub struct Settings {
     pub autostart: bool,
     /// UI zoom (1.0 = 100%), changed with Ctrl +/-/0 and Ctrl+wheel.
     pub zoom: f64,
+    /// In-app shortcuts the user rebound, action id → combo (`""` = none).
+    /// Only the changed ones are stored; the defaults live in the frontend.
+    pub keybindings: BTreeMap<String, String>,
 }
 
 /// Bounds of the zoom the UI offers.
@@ -74,6 +78,7 @@ impl Default for Settings {
             indent_width: 4,
             autostart: true,
             zoom: 1.0,
+            keybindings: BTreeMap::new(),
         }
     }
 }

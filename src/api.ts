@@ -43,6 +43,8 @@ export interface Settings {
   indentWidth: number;
   autostart: boolean;
   zoom: number;
+  /** Rebound shortcuts only, action id → combo (`""` = none); see keybindings.ts. */
+  keybindings: Record<string, string>;
 }
 
 export interface TagCount {
@@ -139,6 +141,9 @@ export const importTxt = (preview: ImportPreview, options: ImportOptions) =>
 export const getSettings = () => invoke<Settings>("get_settings");
 
 export const setSettings = (next: Settings) => invoke<Settings>("set_settings", { next });
+
+/** Releases (or re-registers) the global hotkey while a new one is recorded. */
+export const pauseHotkey = (paused: boolean) => invoke<void>("pause_hotkey", { paused });
 
 /** Sets and persists the UI zoom; resolves to the value actually applied. */
 export const setZoom = (zoom: number) => invoke<number>("set_zoom", { zoom });

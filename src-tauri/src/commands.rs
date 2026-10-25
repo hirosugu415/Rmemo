@@ -402,6 +402,20 @@ pub fn set_zoom(app: AppHandle, zoom: f64) -> Result<f64, String> {
     Ok(applied)
 }
 
+/// Lets go of the global hotkey while the settings panel records a new one —
+/// otherwise pressing the current combo would toggle the window away instead
+/// of reaching the recorder. Resuming registers the saved hotkey again.
+#[tauri::command]
+pub fn pause_hotkey(app: AppHandle, paused: bool) -> Result<(), String> {
+    if paused {
+        use tauri_plugin_global_shortcut::GlobalShortcutExt;
+        app.global_shortcut().unregister_all().map_err(|e| e.to_string())
+    } else {
+        let hotkey = app.state::<AppState>().config.read().hotkey.clone();
+        crate::register_hotkey(&app, &hotkey)
+    }
+}
+
 #[tauri::command]
 pub fn hide_window(app: AppHandle) {
     crate::hide_window(&app);

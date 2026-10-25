@@ -311,6 +311,7 @@ pub fn run() {
             commands::import_txt,
             commands::get_settings,
             commands::set_settings,
+            commands::pause_hotkey,
             commands::hide_window,
         ])
         .setup(|app| {

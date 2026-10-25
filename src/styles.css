@@ -872,8 +872,132 @@ body,
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.settings-tabs {
+  flex: none;
+  display: flex;
+  gap: 2px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--line);
+}
+.settings-tab {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.settings-tab:hover {
+  color: var(--text);
+}
+.settings-tab-active {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+}
+/* 保存 / 閉じる stay at the bottom whichever tab is open. */
+.settings-footer {
+  margin-top: auto;
   padding-top: 12px;
   border-top: 1px solid var(--line);
+  justify-content: flex-end;
+}
+.settings-actions .settings-primary {
+  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+  padding: 6px 18px;
+}
+.settings-actions .settings-primary:hover {
+  color: white;
+  filter: brightness(1.1);
+}
+.settings-actions .settings-outlined {
+  color: var(--accent);
+  background: transparent;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.settings-actions .settings-outlined:hover {
+  background: var(--selected);
+}
+.settings-actions .settings-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.settings-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.settings-keys-group {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+.settings-key-row {
+  display: grid;
+  grid-template-columns: 1fr auto 44px;
+  align-items: center;
+  column-gap: 8px;
+  font-size: 12.5px;
+  padding: 1px 0;
+}
+.settings-key-label {
+  min-width: 0;
+}
+.settings-key {
+  font: inherit;
+  font-size: 12px;
+  min-width: 132px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.settings-key:hover {
+  border-color: var(--accent);
+}
+.settings-key-recording {
+  color: var(--accent);
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+.settings-key-tools {
+  display: flex;
+  gap: 2px;
+}
+.settings-key-tools button {
+  font: inherit;
+  font-size: 12px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.settings-key-tools button:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.settings .settings-key-warning {
+  grid-column: 1 / -1;
+  color: var(--expiring);
+  font-size: 11px;
 }
 
 .settings-import .settings-note {
@@ -1552,6 +1676,13 @@ body,
 .format-help:hover {
   color: var(--accent);
   border-color: var(--accent);
+}
+
+/* ⚙ at the right end of the compose title strip. */
+.compose-gear {
+  font-size: 14px;
+  line-height: 1;
+  padding: 3px 5px;
 }
 
 .note-chars {

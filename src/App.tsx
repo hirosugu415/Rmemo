@@ -10,6 +10,7 @@ import TriageView from "./components/TriageView";
 import Tutorial from "./components/Tutorial";
 import { checkForUpdate, installUpdate, UPDATE_CHECK_INTERVAL_MS, UPDATES_ENABLED } from "./updater";
 import { cleanupImages, setNotesDir } from "./images";
+import { actionFor, layoutReady, resolveKeymap } from "./keybindings";
 import {
   backlinks as fetchBacklinks,
   createNote,
@@ -177,6 +178,13 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const [update, setUpdate] = useState<Update | null>(null);
   const [installing, setInstalling] = useState(false);
+  /** Bumped once the keyboard layout is known: defaults like Ctrl+: follow
+   *  their character to wherever this layout puts it. */
+  const [layoutTick, setLayoutTick] = useState(0);
+  useEffect(() => {
+    void layoutReady.then(() => setLayoutTick((t) => t + 1));
+  }, []);
+  const keymap = useMemo(() => resolveKeymap(settings?.keybindings), [settings, layoutTick]);
 
   const nextReqId = useRef(0);
   const newestSeen = useRef(0);
@@ -417,6 +425,16 @@ export default function App() {
       if (isCurrent(s)) resetToBlank();
     });
   }, [commitSave, resetToBlank, flash]);
+
+  /** Done for now: save and get out of the way. The note stays open, so the
+   *  next summon carries on where this left off. */
+  const saveAndHide = useCallback(() => {
+    const body = composeBodyRef.current;
+    const saved = body.trim() === "" ? Promise.resolve(true) : commitSave(sessionRef.current, body);
+    saved.then((ok) => {
+      if (ok) hideWindow();
+    });
+  }, [commitSave]);
 
   // Autosave: any pause in typing long enough to be "done for now" flushes
   // to disk, so forgetting to hit Ctrl+S can't lose anything.
@@ -851,22 +869,23 @@ export default function App() {
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 
-    if (e.ctrlKey && e.shiftKey && (e.key === "f" || e.key === "F")) {
+    const action = actionFor(e.nativeEvent, keymap);
+    if (action === "toggleSearch") {
       e.preventDefault();
       setView((v) => (v === "search" ? "compose" : "search"));
       return;
     }
-    if (e.ctrlKey && e.key === ",") {
+    if (action === "openSettings") {
       e.preventDefault();
       setView((v) => (v === "settings" ? "compose" : "settings"));
       return;
     }
-    if (e.ctrlKey && e.shiftKey && (e.key === "t" || e.key === "T")) {
+    if (action === "reopenPrevious") {
       e.preventDefault();
       if (view === "compose") reopenPrevious();
       return;
     }
-    if (e.key === "F1") {
+    if (action === "openTutorial") {
       e.preventDefault();
       setView((v) => (v === "tutorial" ? "compose" : "tutorial"));
       return;
@@ -907,6 +926,7 @@ export default function App() {
           onStatusChange={handleComposeStatusChange}
           onSaveDraft={saveDraft}
           onSaveAndClose={saveAndClose}
+          onSaveAndHide={saveAndHide}
           openTitle={openTitle}
           loadToken={loadToken}
           pendingSelection={pendingSelection}
@@ -920,6 +940,8 @@ export default function App() {
           onOpenBacklink={openNoteInCompose}
           onOpenTutorial={() => setView("tutorial")}
           onOpenSearch={() => setView("search")}
+          onOpenSettings={() => setView("settings")}
+          keymap={keymap}
           previousTitle={previousNote?.title ?? null}
           onReopenPrevious={reopenPrevious}
           onNewNote={resetToBlank}
@@ -935,6 +957,7 @@ export default function App() {
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
           onOpenSettings={() => setView("settings")}
+          keymap={keymap}
           onClose={() => setView("compose")}
           expiringCount={expiringCount}
           onOpenTriage={() => setView("triage")}

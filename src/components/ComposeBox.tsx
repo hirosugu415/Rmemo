@@ -29,6 +29,7 @@ import {
   outlineOf,
 } from "../markdown";
 import TableOfContents from "./TableOfContents";
+import { type ActionId, actionFor, formatCombo, type Keymap, withKey } from "../keybindings";
 
 /** What App can ask of the editor without reaching into its DOM. */
 export interface ComposeHandle {
@@ -45,6 +46,8 @@ interface Props {
   onStatusChange: (status: Status) => void;
   onSaveDraft: () => void;
   onSaveAndClose: () => void;
+  /** Save, then hide the window — the note stays open for next time. */
+  onSaveAndHide: () => void;
   /** Title of the note currently open for editing, or null for a fresh one. */
   openTitle: string | null;
   /** Bumped by App every time it loads a (possibly different) note in —
@@ -68,6 +71,9 @@ interface Props {
   onOpenBacklink: (note: NoteSummary) => void;
   onOpenTutorial: () => void;
   onOpenSearch: () => void;
+  onOpenSettings: () => void;
+  /** The shortcuts as currently bound (settings → キー設定). */
+  keymap: Keymap;
   /** Title of the note that was open before this blank one, if any. */
   previousTitle: string | null;
   onReopenPrevious: () => void;
@@ -206,12 +212,40 @@ const CODE_LANGS = [
 ];
 
 const HEADING_BUTTONS = [
-  { level: 0, label: "本文", title: "本文に戻す (Ctrl+Alt+0)" },
-  { level: 1, label: "H1", title: "見出し1 (Ctrl+Alt+1)" },
-  { level: 2, label: "H2", title: "見出し2 (Ctrl+Alt+2)" },
-  { level: 3, label: "H3", title: "見出し3 (Ctrl+Alt+3)" },
-  { level: 4, label: "H4", title: "見出し4 (Ctrl+Alt+4)" },
+  { level: 0, label: "本文", title: "本文に戻す", action: "heading0" },
+  { level: 1, label: "H1", title: "見出し1", action: "heading1" },
+  { level: 2, label: "H2", title: "見出し2", action: "heading2" },
+  { level: 3, label: "H3", title: "見出し3", action: "heading3" },
+  { level: 4, label: "H4", title: "見出し4", action: "heading4" },
+] as const;
+
+/** The toolbar's shortcut cheat line, as currently bound. */
+const HINT: [ActionId, string][] = [
+  ["find", "ノート内検索"],
+  ["replace", "置換"],
+  ["toggleSearch", "検索"],
+  ["reopenPrevious", "前回のメモ"],
+  ["toggleStatus", "切替"],
+  ["openSettings", "設定"],
+  ["openTutorial", "使い方"],
+  ["heading1", "見出し1"],
+  ["insertDate", "日付"],
+  ["bold", "太字"],
+  ["italic", "斜体"],
+  ["code", "コード"],
+  ["link", "リンク"],
+  ["selectNext", "複数カーソル"],
+  ["indent", "インデント"],
+  ["moveLineUp", "行を上へ"],
+  ["copyLineUp", "行を上へ複製"],
 ];
+
+function hint(keymap: Keymap): string {
+  return HINT.filter(([id]) => keymap[id])
+    .map(([id, label]) => `${formatCombo(keymap[id])} ${label}`)
+    .concat(["Alt+クリック 複数カーソル", "Ctrl+クリック リンク/タグ"])
+    .join(" ・ ");
+}
 
 /**
  * The whole point of this screen: writing. Enter is a plain newline — saving
@@ -230,6 +264,7 @@ export default function ComposeBox({
   onStatusChange,
   onSaveDraft,
   onSaveAndClose,
+  onSaveAndHide,
   openTitle,
   loadToken,
   pendingSelection,
@@ -242,6 +277,8 @@ export default function ComposeBox({
   onOpenBacklink,
   onOpenTutorial,
   onOpenSearch,
+  onOpenSettings,
+  keymap,
   previousTitle,
   onReopenPrevious,
   onNewNote,
@@ -461,20 +498,21 @@ export default function ComposeBox({
     viewRef.current?.focus();
   };
 
-  type KeyLike = Pick<KeyboardEvent, "ctrlKey" | "shiftKey" | "key" | "preventDefault">;
+  type KeyLike = Pick<KeyboardEvent, "ctrlKey" | "altKey" | "shiftKey" | "code" | "preventDefault">;
 
   // Ctrl+F/Ctrl+H are handled identically from the editor and from inside
   // the find/replace inputs themselves — without this, a second Ctrl+F press
   // while focus was already in the find box fell through to the browser's
   // own find-in-page instead of being caught here.
   const handleFindHotkeys = (e: KeyLike): boolean => {
-    if (e.ctrlKey && !e.shiftKey && (e.key === "f" || e.key === "F")) {
+    const action = actionFor(e, keymap);
+    if (action === "find") {
       e.preventDefault();
       if (findOpen) closeFind();
       else openFind(false);
       return true;
     }
-    if (e.ctrlKey && (e.key === "h" || e.key === "H")) {
+    if (action === "replace") {
       e.preventDefault();
       openFind(true);
       return true;
@@ -764,7 +802,7 @@ export default function ComposeBox({
     view.focus();
   };
 
-  // ---------- links (Ctrl+L / toolbar) ----------
+  // ---------- links (Ctrl+K) ----------
   // A small box under the selection asks for the URL — typing it straight
   // into `[...](...)` would mean typing into text the preview hides.
   const [linkEdit, setLinkEdit] = useState<
@@ -905,24 +943,12 @@ export default function ComposeBox({
 
   // ---------- keys ----------
 
+  const insertStamp = (view: EditorView, withTime: boolean) =>
+    view.dispatch(view.state.replaceSelection(formatNow(withTime)), { userEvent: "input", scrollIntoView: true });
+
   keyHandlerRef.current = (e, view) => {
     if (e.isComposing || view.composing) return false;
     if (handleSuggestKeys(e)) return true;
-    if (e.ctrlKey && (e.key === "s" || e.key === "S")) {
-      e.preventDefault();
-      onSaveDraft();
-      return true;
-    }
-    if (e.ctrlKey && e.key === "Enter") {
-      e.preventDefault();
-      onSaveAndClose();
-      return true;
-    }
-    if (e.ctrlKey && !e.shiftKey && !e.altKey && e.code === "KeyL") {
-      e.preventDefault();
-      onStatusChange(status === "keep" ? "scratch" : "keep");
-      return true;
-    }
     if (handleFindHotkeys(e)) return true;
     if (e.key === "Escape" && view.state.selection.ranges.length > 1) {
       // Back to a single cursor — not "leave this note", which is what App
@@ -932,40 +958,6 @@ export default function ComposeBox({
       view.dispatch({ selection: EditorSelection.create([view.state.selection.main]) });
       return true;
     }
-    const plainCtrl = e.ctrlKey && !e.altKey && !e.shiftKey;
-    const inlineKind = plainCtrl
-      ? ({ KeyB: "bold", KeyI: "italic", KeyE: "code" } as const)[e.code as "KeyB"]
-      : undefined;
-    if (inlineKind) {
-      e.preventDefault();
-      toggleInline(view, inlineKind);
-      return true;
-    }
-    if (plainCtrl && e.code === "KeyK") {
-      e.preventDefault();
-      openLink();
-      return true;
-    }
-    if (plainCtrl && e.code === "KeyD") {
-      e.preventDefault();
-      selectNextOccurrence(view);
-      return true;
-    }
-    if (e.ctrlKey && e.shiftKey && !e.altKey && e.code === "KeyL") {
-      e.preventDefault();
-      selectSelectionMatches(view);
-      return true;
-    }
-    // Ctrl+: today's date, Ctrl+Shift+: date and time. By the physical key
-    // (JIS `:` reports "Quote"), since Shift turns its character into `*`.
-    // The `;` key is left alone: on JIS, Ctrl+Shift+; is Ctrl++ (zoom).
-    if (e.ctrlKey && !e.altKey && (e.code === "Quote" || e.key === ":")) {
-      e.preventDefault();
-      // Where `:` sits elsewhere (US: Shift+;), Ctrl+: still gives the date.
-      const stamp = formatNow(e.code === "Quote" && e.shiftKey);
-      view.dispatch(view.state.replaceSelection(stamp), { userEvent: "input", scrollIntoView: true });
-      return true;
-    }
     if (e.key === "Tab" && !e.ctrlKey && !e.altKey) {
       if (listIndent(view, indentWidth, e.shiftKey ? -1 : 1)) {
         e.preventDefault();
@@ -973,27 +965,38 @@ export default function ComposeBox({
       }
       return false;
     }
-    // By physical key, so it works whatever the layout makes of Ctrl+Alt+n.
-    const digit = /^(?:Digit|Numpad)([0-4])$/.exec(e.code);
-    if (e.ctrlKey && e.altKey && !e.shiftKey && digit) {
+    const action = actionFor(e, keymap);
+    const run: (() => unknown) | undefined = action
+      ? ({
+          saveDraft: onSaveDraft,
+          saveAndNew: onSaveAndClose,
+          saveAndHide: onSaveAndHide,
+          toggleStatus: () => onStatusChange(status === "keep" ? "scratch" : "keep"),
+          bold: () => toggleInline(view, "bold"),
+          italic: () => toggleInline(view, "italic"),
+          code: () => toggleInline(view, "code"),
+          link: openLink,
+          selectNext: () => selectNextOccurrence(view),
+          selectAllMatches: () => selectSelectionMatches(view),
+          insertDate: () => insertStamp(view, false),
+          insertDateTime: () => insertStamp(view, true),
+          heading0: () => setHeading(view, 0),
+          heading1: () => setHeading(view, 1),
+          heading2: () => setHeading(view, 2),
+          heading3: () => setHeading(view, 3),
+          heading4: () => setHeading(view, 4),
+          // Line operations act on every cursor / selection, VSCode-style.
+          indent: () => indentLines(view, indentWidth, 1),
+          outdent: () => indentLines(view, indentWidth, -1),
+          moveLineUp: () => moveLineUp(view),
+          moveLineDown: () => moveLineDown(view),
+          copyLineUp: () => copyLineUp(view),
+          copyLineDown: () => copyLineDown(view),
+        } as Partial<Record<ActionId, () => unknown>>)[action]
+      : undefined;
+    if (run) {
       e.preventDefault();
-      setHeading(view, Number(digit[1]));
-      return true;
-    }
-    // Line operations act on every cursor / selection, VSCode-style.
-    if (e.ctrlKey && (e.key === "]" || e.key === "[")) {
-      e.preventDefault();
-      indentLines(view, indentWidth, e.key === "]" ? 1 : -1);
-      return true;
-    }
-    if (e.shiftKey && e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
-      e.preventDefault();
-      (e.key === "ArrowUp" ? copyLineUp : copyLineDown)(view);
-      return true;
-    }
-    if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
-      e.preventDefault();
-      (e.key === "ArrowUp" ? moveLineUp : moveLineDown)(view);
+      run();
       return true;
     }
     if (e.key === "Backspace" && !e.ctrlKey && !e.altKey && !e.shiftKey) {
@@ -1026,7 +1029,7 @@ export default function ComposeBox({
             <button
               type="button"
               className="compose-title-action compose-title-previous"
-              title="前回のメモに戻る (Ctrl+Shift+T)"
+              title={withKey("前回のメモに戻る", keymap.reopenPrevious)}
               onMouseDown={(e) => e.preventDefault()}
               onClick={onReopenPrevious}
             >
@@ -1045,7 +1048,7 @@ export default function ComposeBox({
                   b.level === currentLevel ? "format-btn format-btn-active" : "format-btn"
                 }
                 data-level={b.level}
-                title={b.title}
+                title={withKey(b.title, keymap[b.action])}
                 // Keep the editor's focus and selection through the click.
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => applyHeading(b.level)}
@@ -1061,7 +1064,7 @@ export default function ComposeBox({
             <button
               type="button"
               className="format-btn format-menu-toggle"
-              title="見出し (Ctrl+Alt+0〜4)"
+              title="見出し"
               aria-haspopup="menu"
               aria-expanded={headingMenuOpen}
               onMouseDown={(e) => e.preventDefault()}
@@ -1078,7 +1081,7 @@ export default function ComposeBox({
                       role="menuitem"
                       className={b.level === currentLevel ? "format-menu-item format-menu-item-active" : "format-menu-item"}
                       data-level={b.level}
-                      title={b.title}
+                      title={withKey(b.title, keymap[b.action])}
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => {
                         applyHeading(b.level);
@@ -1096,7 +1099,7 @@ export default function ComposeBox({
         <button
           type="button"
           className="compose-search-btn"
-          title="メモの一覧・検索 (Ctrl+Shift+F)"
+          title={withKey("メモの一覧・検索", keymap.toggleSearch)}
           onMouseDown={(e) => e.preventDefault()}
           onClick={onOpenSearch}
         >
@@ -1109,23 +1112,22 @@ export default function ComposeBox({
         <button
           type="button"
           className="format-help"
-          title="エディタの使い方 (F1)"
+          title={withKey("エディタの使い方", keymap.openTutorial)}
           onMouseDown={(e) => e.preventDefault()}
           onClick={onOpenTutorial}
         >
           ?
         </button>
-        <div className="format-bar" role="toolbar" aria-label="書式">
-          <button
-            type="button"
-            className="format-btn"
-            title="選択範囲をリンクにする / リンクを編集 (Ctrl+K)"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={openLink}
-          >
-            リンク
-          </button>
-        </div>
+        <button
+          type="button"
+          className="gear compose-gear"
+          title={withKey("設定", keymap.openSettings)}
+          aria-label="設定"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={onOpenSettings}
+        >
+          ⚙
+        </button>
       </div>
       <div
         ref={editorAreaRef}
@@ -1408,18 +1410,13 @@ export default function ComposeBox({
             ? `選択 ${selectionChars.toLocaleString()} / ${totalChars.toLocaleString()}字`
             : `${totalChars.toLocaleString()}字`}
         </span>
-        <span className="compose-hint">
-          Ctrl+F ノート内検索 ・ Ctrl+H 置換 ・ Ctrl+Shift+F 検索 ・ Ctrl+Shift+T 前回のメモ ・ Ctrl+L 切替 ・ Ctrl+, 設定 ・
-          F1 使い方 ・ Ctrl+Alt+0〜4 見出し ・ Ctrl+: 日付 ・ Ctrl+B/I/E 太字/斜体/コード ・ Ctrl+K リンク ・ Alt+クリック/Ctrl+D 複数カーソル ・
-          Ctrl+クリック リンク/タグ ・ Ctrl+]/[ インデント ・ Alt+↑/↓
-          行移動 ・ Shift+Alt+↑/↓ 行複製
-        </span>
+        <span className="compose-hint">{hint(keymap)}</span>
         <div className="compose-actions">
           <button type="button" className="compose-save" onClick={onSaveDraft}>
-            一時保存 (Ctrl+S)
+            {withKey("一時保存", keymap.saveDraft)}
           </button>
           <button type="button" className="compose-save compose-save-primary" onClick={onSaveAndClose}>
-            保存して新規 (Ctrl+Enter)
+            {withKey("保存して新規", keymap.saveAndNew)}
           </button>
         </div>
       </div>

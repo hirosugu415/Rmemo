@@ -151,7 +151,7 @@
               <div class="qa-item">
                 <dt><kbd>Ctrl</kbd>+<kbd>N</kbd> がほかのアプリの操作とかぶります</dt>
                 <dd>
-                  設定（<kbd>Ctrl</kbd>+<kbd>,</kbd>）の「ホットキー」で、呼び出すキーを変えられます。
+                  設定（<kbd>Ctrl</kbd>+<kbd>,</kbd>）の「キー設定」タブで、呼び出すキーを変えられます。
                   <a class="qa-more" href="#settings">詳しくは「設定」へ</a>
                 </dd>
               </div>
@@ -197,7 +197,7 @@
             </p>
             <ul>
               <li><strong>隠れるタイミング</strong>：<kbd>Ctrl</kbd>+<kbd>N</kbd> を押したとき、新しいメモの画面で <kbd>Esc</kbd> を押したとき、ほかの画面をクリックしたとき。</li>
-              <li><strong>ほかの画面をクリックしても隠したくない</strong>ときは、設定の「フォーカスを外したら自動で隠す」をオフにします。調べものをしながら書きたいときに便利です。</li>
+              <li><strong>ほかの画面をクリックしても隠したくない</strong>ときは、設定の「ウィンドウ」タブで「ほかの画面をクリックしても開いたままにする」をオンにします。調べものをしながら書きたいときに便利です。</li>
               <li><strong>窓を動かす</strong>：エディタの一番上の帯（「新規メモ」「編集中: …」と書いてあるところ）をドラッグします。</li>
               <li><strong>窓の大きさを変える</strong>：窓のふちをドラッグします。位置と大きさは次回も覚えています。</li>
               <li>窓は、ほかのアプリの上に常に表示されます。</li>
@@ -215,7 +215,7 @@
                   <tr><td><a href="#editor">エディタ</a></td><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>メモを書く・編集する</td></tr>
                   <tr><td><a href="#search">一覧・検索</a></td><td>「一覧」ボタン / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td><td>メモを探す・開く・ピン留め・削除</td></tr>
                   <tr><td><a href="#triage">Scratch 整理</a></td><td>一覧・検索の「整理」ボタン</td><td>古い Scratch を 1 件ずつ片づける</td></tr>
-                  <tr><td><a href="#settings">設定</a></td><td>一覧・検索の ⚙ / <kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>ホットキーや保存フォルダの変更</td></tr>
+                  <tr><td><a href="#settings">設定</a></td><td>右上の ⚙ / <kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>保存フォルダ・ウィンドウ・キー設定・テキストファイルの取り込み</td></tr>
                   <tr><td>使い方</td><td>エディタの「?」ボタン / <kbd>F1</kbd></td><td>エディタの機能を入力例つきで確認</td></tr>
                 </tbody>
               </table>
@@ -342,7 +342,7 @@
 
             <h3 id="links">Web へのリンク</h3>
             <ul>
-              <li><strong>リンクを付ける</strong>：文字を選んで <kbd>Ctrl</kbd>+<kbd>K</kbd>（またはエディタ上部の「<span class="ui">リンク</span>」）を押し、URL を入力します。</li>
+              <li><strong>リンクを付ける</strong>：文字を選んで <kbd>Ctrl</kbd>+<kbd>K</kbd> を押し、URL を入力します。</li>
               <li><strong>URL を貼ってリンクにする</strong>：文字を選んだ状態で URL を <kbd>Ctrl</kbd>+<kbd>V</kbd> すると、選んだ文字がそのままリンクになります。</li>
               <li><strong>リンクを開く</strong>：<kbd>Ctrl</kbd>+クリックでブラウザが開きます。<code>https://…</code> をそのまま書いた場合も同じです。</li>
               <li><strong>直す・外す</strong>：リンクをクリックすると出る「<span class="ui">編集</span>」（またはリンクの上で <kbd>Ctrl</kbd>+<kbd>K</kbd>）で、表示テキストや URL を変えたり、リンクを外したりできます。</li>
@@ -523,23 +523,24 @@
           <!-- ======================= 設定 ======================= -->
           <section id="settings">
             <h2>設定</h2>
-            <p>一覧・検索画面の右上の ⚙ か、<kbd>Ctrl</kbd>+<kbd>,</kbd> で開きます。変更したら「<span class="ui">保存</span>」を押してください。</p>
+            <p>画面右上の ⚙ か、<kbd>Ctrl</kbd>+<kbd>,</kbd> で開きます。上のタブで項目を切り替えます。変更したら「<span class="ui">保存</span>」を押してください。</p>
             <div class="table-scroll">
               <table>
                 <thead>
-                  <tr><th>項目</th><th>説明</th><th>はじめの値</th></tr>
+                  <tr><th>タブ</th><th>項目</th><th>説明</th><th>はじめの値</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>ホットキー</td><td>Rmemo を呼び出すキー。<code>Ctrl+Shift+M</code> のように入力します</td><td><code>Ctrl+N</code></td></tr>
-                  <tr><td>メモの保存フォルダ</td><td>メモを保存する場所。変えると、新しいフォルダに <code>keep</code> と <code>scratch</code> が作られます（今までのメモは自動では移動しません）</td><td><code>ドキュメント\Rmemo</code></td></tr>
-                  <tr><td>期限切れの目安（日数）</td><td>作ってから何日たった Scratch に「期限切れ」の印を付けるか</td><td>14 日</td></tr>
-                  <tr><td>Windows の起動時に自動で起動する</td><td>PC にサインインしたとき、タスクトレイに常駐した状態で起動します</td><td>オン</td></tr>
-                  <tr><td>フォーカスを外したら自動で隠す</td><td>ほかの画面をクリックしたときに Rmemo を隠すかどうか</td><td>オン</td></tr>
-                  <tr><td>インデント幅</td><td><kbd>Ctrl</kbd>+<kbd>]</kbd> / <kbd>Ctrl</kbd>+<kbd>[</kbd> で増減する空白の数</td><td>4</td></tr>
+                  <tr><td>一般</td><td>メモの保存フォルダ</td><td>メモを保存する場所。変えると、新しいフォルダに <code>keep</code> と <code>scratch</code> が作られます（今までのメモは自動では移動しません）。「<span class="ui">エクスプローラーで開く</span>」でフォルダが開きます</td><td><code>ドキュメント\Rmemo</code></td></tr>
+                  <tr><td>一般</td><td>期限切れの目安（日数）</td><td>作ってから何日たった Scratch に「期限切れ」の印を付けるか</td><td>14 日</td></tr>
+                  <tr><td>一般</td><td>インデント幅</td><td>インデント（<kbd>Ctrl</kbd>+<kbd>]</kbd> / <kbd>Ctrl</kbd>+<kbd>[</kbd>）で増減する空白の数</td><td>4</td></tr>
+                  <tr><td>ウィンドウ</td><td>Windows の起動時に自動で起動する</td><td>PC にサインインしたとき、タスクトレイに常駐した状態で起動します</td><td>オン</td></tr>
+                  <tr><td>ウィンドウ</td><td>ほかの画面をクリックしても開いたままにする</td><td>オフのときは、ほかの画面をクリックすると Rmemo が隠れます</td><td>オフ</td></tr>
+                  <tr><td>キー設定</td><td>呼び出しのホットキー</td><td>どのアプリからでも Rmemo を呼び出すキー</td><td><code>Ctrl+N</code></td></tr>
+                  <tr><td>キー設定</td><td>各ショートカット</td><td>保存・検索・書式・行の移動などのキー。欄を押してから新しいキーを押すと変わります。× でなし、↺ で初期値に戻ります。ほかと重なると注意が出ます</td><td>このガイドに書いてあるキー</td></tr>
+                  <tr><td>取り込み</td><td>テキストファイルの取り込み</td><td>フォルダの中の <code>.txt</code> や、選んだ <code>.txt</code> を Keep のメモにします</td><td>—</td></tr>
                 </tbody>
               </table>
             </div>
-            <p>「<span class="ui">エクスプローラーで開く</span>」を押すと、メモの保存フォルダが開きます。</p>
           </section>
 
           <!-- ======================= ファイルと同期 ======================= -->
