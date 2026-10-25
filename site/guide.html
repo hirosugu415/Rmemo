@@ -48,6 +48,7 @@
               <ol>
                 <li><a href="#save">保存のしくみ</a></li>
                 <li><a href="#new-note">新しいメモ・前回のメモ</a></li>
+                <li><a href="#history">履歴（前の版に戻す）</a></li>
                 <li><a href="#keep-scratch">保管と一時</a></li>
                 <li><a href="#headings">見出し</a></li>
                 <li><a href="#heading-vs-tag">見出しとタグの違い</a></li>
@@ -149,6 +150,13 @@
                 </dd>
               </div>
               <div class="qa-item">
+                <dt>メモの中身を間違えて消した・書き換えてしまいました</dt>
+                <dd>
+                  メモを開いて、上部の「<span class="ui">履歴</span>」（<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd>）から前の版に戻せます。
+                  <a class="qa-more" href="#history">詳しくは「履歴（前の版に戻す）」へ</a>
+                </dd>
+              </div>
+              <div class="qa-item">
                 <dt><kbd>Ctrl</kbd>+<kbd>N</kbd> がほかのアプリの操作とかぶります</dt>
                 <dd>
                   設定（<kbd>Ctrl</kbd>+<kbd>,</kbd>）の「キー設定」タブで、呼び出すキーを変えられます。
@@ -219,7 +227,7 @@
             <p class="note">隠れている間もアプリは動いています。完全に終了したいときは、タスクトレイのメニューから「終了」を選びます。</p>
 
             <h3 id="screens">画面の種類</h3>
-            <p>Rmemo には、次の 5 つの画面があります。エディタ以外の画面では、<kbd>Esc</kbd> で 1 つ前の画面に戻れます。</p>
+            <p>Rmemo には、次の 6 つの画面があります。エディタ以外の画面では、<kbd>Esc</kbd> で 1 つ前の画面に戻れます。</p>
             <div class="table-scroll">
               <table>
                 <thead>
@@ -230,6 +238,7 @@
                   <tr><td><a href="#search">一覧・検索</a></td><td>「一覧」ボタン / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td><td>メモを探す・開く・ピン留め・削除</td></tr>
                   <tr><td><a href="#triage">一時のメモの整理</a></td><td>一覧・検索の「整理」ボタン</td><td>古い一時のメモを 1 件ずつ片づける</td></tr>
                   <tr><td><a href="#settings">設定</a></td><td>右上の ⚙ / <kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>保存フォルダ・テーマと色・ウィンドウ・キー設定・テキストファイルの取り込み</td></tr>
+                  <tr><td><a href="#history">履歴</a></td><td>メモを開いて上部の「履歴」 / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd></td><td>そのメモの前の版を見る・戻す</td></tr>
                   <tr><td>使い方</td><td>エディタの「?」ボタン / <kbd>F1</kbd></td><td>エディタの機能を入力例つきで確認</td></tr>
                 </tbody>
               </table>
@@ -272,6 +281,19 @@
               <li><strong>新しいメモを書く</strong>：エディタ上部の「<span class="ui">＋ 新規</span>」を押すか、<kbd>Esc</kbd> を押します。開いていたメモは保存されてから閉じます。</li>
               <li><strong>前回のメモに戻る</strong>：新しいメモの画面では、上部に「<span class="ui">← 前回: メモの名前</span>」が出ます。クリックするか <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> で、直前まで開いていたメモに戻れます。アプリを再起動しても覚えています。</li>
             </ul>
+
+            <h3 id="history">履歴（前の版に戻す）</h3>
+            <p>
+              メモを編集すると、<strong>10 分ごとに直前の内容が「版」として残ります</strong>。タグやリンクの名前の一括変更、取り込みの整形の前にも残ります。
+              間違えて消したり書き換えたりしても、前の版に戻せます。
+            </p>
+            <ul>
+              <li><strong>開き方</strong>：メモを開いて、上部の「<span class="ui">履歴</span>」を押すか、<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd>。</li>
+              <li>左に残っている版が新しい順に並びます（<kbd>↑</kbd> / <kbd>↓</kbd> で選べます）。右にその版の中身が表示されます。</li>
+              <li>「<span class="ui">この版に戻す</span>」を押すと、エディタの中身がその版に置き換わります。戻す前の内容も履歴に残るので、戻したことも取り消せます。</li>
+              <li>1 つのメモにつき 50 版まで、60 日分を残します。</li>
+            </ul>
+            <p class="note">履歴はこの PC の中（<code>%APPDATA%\Rmemo\history</code>）にだけ保存されます。同期している別の PC には送られません。</p>
 
             <h3 id="keep-scratch">保管と一時</h3>
             <p>メモは 2 種類に分けて保存されます。画面下の「保管 / 一時」スイッチか、<kbd>Ctrl</kbd>+<kbd>L</kbd> で切り替えます。</p>
@@ -432,6 +454,8 @@
               <li><strong>検索</strong>：上の検索欄に入力すると、1 文字打つごとに絞り込まれます。タイトルだけでなく、<strong>本文の中身（リストの奥に書いた言葉も）すべて</strong>が対象です。</li>
               <li><strong>複数の言葉で探す</strong>：空白で区切ると、すべての言葉を含むメモだけに絞り込みます（例: <code>会議 予算</code>）。</li>
               <li><strong>タグで探す</strong>：<code>#仕事</code> のように入力すると、そのタグのメモが見つかります。</li>
+              <li><strong>書き方の違いは気にしなくていい</strong>：ひらがなとカタカナ、全角と半角、大文字と小文字は区別しません。ローマ字で打っても見つかります（<code>りんご</code> / <code>リンゴ</code> / <code>ringo</code> のどれでも「リンゴ」が見つかります）。</li>
+              <li><strong>画像の中の文字</strong>：貼ったスクリーンショットや写真の中の文字でも見つかります。画像の中だけで見つかったメモは、抜粋の頭に「画像」と付きます。文字の読み取りは Windows に組み込まれた機能で、PC の中だけで行います。貼ってから検索できるようになるまで、少しかかることがあります。</li>
               <li>見つかった言葉は、タイトルと本文の抜粋で色付きで表示されます。</li>
               <li><strong>絞り込み</strong>：右上の「<span class="ui">すべて / 保管 / 一時</span>」で、表示するメモの種類を選べます。</li>
               <li>画面の一番下に、表示中のメモの件数が出ます。</li>
@@ -538,7 +562,7 @@
           <!-- ======================= 設定 ======================= -->
           <section id="settings">
             <h2>設定</h2>
-            <p>画面右上の ⚙ か、<kbd>Ctrl</kbd>+<kbd>,</kbd> で開きます。上のタブで項目を切り替えます。変更したら「<span class="ui">保存</span>」を押してください。</p>
+            <p>画面右上の ⚙ か、<kbd>Ctrl</kbd>+<kbd>,</kbd> で開きます。上のタブで項目を切り替えます。変更したら、画面の下の「<span class="ui">保存</span>」を押してください。保存しないまま閉じようとすると、保存するかどうかを確認されます。</p>
             <div class="table-scroll">
               <table>
                 <thead>
@@ -646,6 +670,7 @@
                   <tr><td>保存して窓を隠す</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd></td></tr>
                   <tr><td>新しいメモ</td><td><kbd>Esc</kbd></td></tr>
                   <tr><td>前回のメモに戻る</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td></tr>
+                  <tr><td>このメモの履歴</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd></td></tr>
                   <tr><td>保管 / 一時 を切り替え</td><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td></tr>
                   <tr><td>見出し 1〜4 / 本文</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd>〜<kbd>4</kbd> / <kbd>0</kbd></td></tr>
                   <tr><td>太字・斜体・インラインコード</td><td><kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>E</kbd></td></tr>

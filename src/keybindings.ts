@@ -15,6 +15,7 @@ export type ActionId =
   | "openSettings"
   | "reopenPrevious"
   | "openTutorial"
+  | "openHistory"
   | "saveDraft"
   | "saveAndNew"
   | "saveAndHide"
@@ -57,6 +58,7 @@ export const ACTIONS: ActionDef[] = [
   { id: "openSettings", label: "設定", group: "画面", default: "Ctrl+Comma", char: "," },
   { id: "reopenPrevious", label: "前回のメモに戻る", group: "画面", default: "Ctrl+Shift+T" },
   { id: "openTutorial", label: "使い方", group: "画面", default: "F1" },
+  { id: "openHistory", label: "このメモの履歴", group: "画面", default: "Ctrl+Shift+H" },
   { id: "saveDraft", label: "途中保存", group: "保存", default: "Ctrl+S" },
   { id: "saveAndNew", label: "保存して新規", group: "保存", default: "Ctrl+Enter" },
   { id: "saveAndHide", label: "保存してウィンドウを閉じる", group: "保存", default: "Ctrl+Shift+Enter" },

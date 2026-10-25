@@ -10,7 +10,7 @@ use tauri_plugin_opener::OpenerExt;
 
 #[tauri::command]
 pub fn list_notes(state: State<'_, AppState>, filter: Filter) -> Vec<NoteSummary> {
-    let mut items = crate::notes::search::apply(&state.notes.read(), &filter);
+    let mut items = crate::notes::search::apply(&state.notes.read(), &filter, &state.ocr_text.read());
     let settings = state.config.read().clone();
     crate::notes::scan::refresh_expiry(&mut items, settings.expiry_days);
     // Pinned notes first, in pin order; the rest keep newest-first.
@@ -21,6 +21,13 @@ pub fn list_notes(state: State<'_, AppState>, filter: Filter) -> Vec<NoteSummary
     }
     items.sort_by_key(|n| rank(n).unwrap_or(usize::MAX));
     items
+}
+
+/// Everything a search for `query` matches, folded (kana, width, case) and
+/// with romaji read as kana too — the list highlights these.
+#[tauri::command]
+pub fn search_needles(query: String) -> Vec<String> {
+    crate::notes::search::terms(&query).into_iter().flatten().collect()
 }
 
 #[tauri::command]
@@ -54,6 +61,9 @@ pub fn rename_links(app: AppHandle, from: String, to: String, filename: String) 
             .map(|n| (n.filename.clone(), n.status))
             .collect()
     };
+    for (name, status) in &targets {
+        keep_version(&settings, name, *status, true);
+    }
     let outcome = store::rename_links(&settings, &targets, &from, &to);
     for (previous, note) in &outcome.updated {
         upsert(&state, previous, note);
@@ -81,7 +91,9 @@ pub fn save_image(state: State<'_, AppState>, request: tauri::ipc::Request<'_>) 
         .unwrap_or("png")
         .to_string();
     let settings = state.config.read().clone();
-    crate::notes::images::save(&settings, bytes, &ext).map_err(|e| e.to_string())
+    let name = crate::notes::images::save(&settings, bytes, &ext).map_err(|e| e.to_string())?;
+    state.wake_ocr(); // make its text searchable
+    Ok(name)
 }
 
 /// Recycles images no note mentions any more (see `notes::images`). `extra`
@@ -134,6 +146,9 @@ pub fn rename_tag(app: AppHandle, from: String, to: String) -> Result<usize, Str
         .map(|n| (n.filename.clone(), n.status))
         .collect();
 
+    for (name, status) in &targets {
+        keep_version(&settings, name, *status, true);
+    }
     let outcome = store::rename_tag(&settings, &targets, &from, &to);
     for (previous, note) in &outcome.updated {
         upsert(&state, previous, note);
@@ -168,6 +183,19 @@ fn locate(state: &AppState, filename: &str) -> Result<Status, String> {
         .ok_or_else(|| NOTE_GONE.into())
 }
 
+/// Keeps what's on disk for `filename` as a version before it's overwritten
+/// (see `notes::history`). `force` for rewrites the user didn't type — tag
+/// and link renames, the 整形, a restore — which always keep one. A failure
+/// here never fails the save.
+fn keep_version(settings: &Settings, filename: &str, status: Status, force: bool) {
+    use crate::notes::history;
+    let path = crate::notes::scan::status_dir(settings, status).join(filename);
+    let Ok(old) = std::fs::read_to_string(&path) else { return };
+    if let Err(e) = history::record(&history::root(), filename, &old, history::GAP, force) {
+        eprintln!("[history] could not keep a version of {filename:?}: {e}");
+    }
+}
+
 /// Puts `note` into the cache in place of whatever was cached under
 /// `previous` (its name before a save/move renamed it) or under its own
 /// name, then re-sorts — a save changes `modified_at`, i.e. its position.
@@ -176,6 +204,7 @@ fn upsert(state: &AppState, previous: &str, note: &Note) {
     // follows the note to its new name.
     if previous != note.filename {
         crate::notes::pins::rename(&state.config.read(), previous, &note.filename);
+        crate::notes::history::rename(&crate::notes::history::root(), previous, &note.filename);
     }
     let mut notes = state.notes.write();
     notes.retain(|n| n.filename != previous && n.filename != note.filename);
@@ -224,9 +253,31 @@ pub fn update_note(app: AppHandle, filename: String, body: String) -> Result<Not
     let state = app.state::<AppState>();
     let status = locate(&state, &filename)?;
     let settings = state.config.read().clone();
+    keep_version(&settings, &filename, status, false);
     let note = store::update(&settings, &filename, &body, status).map_err(|e| e.to_string())?;
     upsert(&state, &filename, &note);
     Ok(note)
+}
+
+/// `filename`'s earlier versions, newest first.
+#[tauri::command]
+pub fn list_history(filename: String) -> Vec<crate::notes::history::Version> {
+    crate::notes::history::list(&crate::notes::history::root(), &filename)
+}
+
+#[tauri::command]
+pub fn read_history(filename: String, id: String) -> Result<String, String> {
+    crate::notes::history::read(&crate::notes::history::root(), &filename, &id).map_err(|e| e.to_string())
+}
+
+/// Keeps the note's current content as a version right now — before a
+/// restore replaces it, so the restore itself can be undone.
+#[tauri::command]
+pub fn keep_note_version(state: State<'_, AppState>, filename: String) -> Result<(), String> {
+    let status = locate(&state, &filename)?;
+    let settings = state.config.read().clone();
+    keep_version(&settings, &filename, status, true);
+    Ok(())
 }
 
 /// `update_note` without bumping the modified time — the 整形 review's save,
@@ -236,6 +287,7 @@ pub fn rewrite_note(app: AppHandle, filename: String, body: String) -> Result<No
     let state = app.state::<AppState>();
     let status = locate(&state, &filename)?;
     let settings = state.config.read().clone();
+    keep_version(&settings, &filename, status, true);
     let note = store::update_keeping_dates(&settings, &filename, &body, status).map_err(|e| e.to_string())?;
     upsert(&state, &filename, &note);
     Ok(note)
@@ -378,6 +430,7 @@ pub fn set_settings(app: AppHandle, mut next: Settings) -> Result<Settings, Stri
             .map_err(|e| e.to_string())?;
         *state.notes.write() = crate::notes::scan::scan_all(&next);
         crate::allow_assets(&app, &next);
+        state.wake_ocr();
         state.watch_generation.fetch_add(1, Ordering::SeqCst);
         watcher::spawn(app.clone());
     } else if previous.expiry_days != next.expiry_days {

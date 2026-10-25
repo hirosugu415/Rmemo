@@ -13,6 +13,7 @@ import {
 import {
   ACTIONS,
   type ActionId,
+  actionFor,
   comboFromEvent,
   defaultKeymap,
   formatCombo,
@@ -73,8 +74,25 @@ export default function SettingsPanel({ settings, onClose, onSaved, onImported }
       .finally(() => setSaving(false));
   };
 
+  // Leaving with changes not saved asks first: the theme and colours preview
+  // live and a rebound key shows its new combo at once, so it's easy to
+  // think a change already took.
+  const dirty = !sameSettings(draft, settings);
+  const [confirmClose, setConfirmClose] = useState(false);
+  const requestClose = () => (dirty ? setConfirmClose(true) : onClose());
+  const savedKeymap = resolveKeymap(settings.keybindings);
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (!dirty || e.nativeEvent.isComposing) return;
+    // Esc and the settings key would close the panel (App handles them).
+    if (e.key === "Escape" || actionFor(e.nativeEvent, savedKeymap) === "openSettings") {
+      e.preventDefault();
+      e.stopPropagation();
+      setConfirmClose(true);
+    }
+  };
+
   return (
-    <>
+    <div className="settings-panel" onKeyDown={onKeyDown}>
       <div className="view-title" data-drag-region>
         設定
       </div>
@@ -218,21 +236,49 @@ export default function SettingsPanel({ settings, onClose, onSaved, onImported }
         {tab === "import" && <ImportSection onError={setError} onImported={onImported} />}
 
         {error && <p className="settings-error">{error}</p>}
+      </div>
 
+      {/* Outside the scrolling area, so 保存 stays in view on long tabs. */}
+      {confirmClose ? (
+        <div className="settings-actions settings-footer settings-confirm">
+          <span className="settings-confirm-text">保存していない変更があります。</span>
+          <button type="button" className="settings-primary" onClick={save} disabled={saving}>
+            保存して閉じる
+          </button>
+          <button type="button" onClick={onClose}>
+            保存しないで閉じる
+          </button>
+          <button type="button" onClick={() => setConfirmClose(false)}>
+            戻る
+          </button>
+        </div>
+      ) : (
         <div className="settings-actions settings-footer">
+          {dirty && <span className="settings-dirty">未保存の変更があります</span>}
           {/* The import tab has its own buttons and nothing to save. */}
           {tab !== "import" && (
             <button type="button" className="settings-primary" onClick={save} disabled={saving}>
               保存
             </button>
           )}
-          <button type="button" onClick={onClose}>
+          <button type="button" onClick={requestClose}>
             閉じる
           </button>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
+}
+
+/** Whether `a` and `b` would save the same — keybindings compared as a set,
+ *  so rebinding a key and putting it back reads as no change. */
+function sameSettings(a: Settings, b: Settings): boolean {
+  const canon = (s: Settings) =>
+    JSON.stringify({
+      ...s,
+      keybindings: Object.entries(s.keybindings ?? {}).sort(([x], [y]) => x.localeCompare(y)),
+    });
+  return canon(a) === canon(b);
 }
 
 /** The global hotkey, then every in-app shortcut, each rebound by pressing it. */

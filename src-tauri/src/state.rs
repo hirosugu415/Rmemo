@@ -2,9 +2,10 @@
 //! command reads and writes.
 
 use crate::config::Settings;
-use crate::notes::Note;
-use parking_lot::RwLock;
+use crate::notes::{ocr::OcrText, Note};
+use parking_lot::{Mutex, RwLock};
 use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicUsize};
+use std::sync::mpsc::Sender;
 use std::sync::Arc;
 
 pub struct AppState {
@@ -28,10 +29,14 @@ pub struct AppState {
     /// Set while a native dialog of ours is open: it takes the foreground,
     /// and hide-on-blur must not hide the window it belongs to.
     pub dialog_open: Arc<AtomicBool>,
+    /// Text read out of pasted images (see `notes::ocr`), for the search.
+    pub ocr_text: Arc<RwLock<OcrText>>,
+    /// Tells the OCR thread to look for new images now.
+    ocr_wake: Mutex<Sender<()>>,
 }
 
 impl AppState {
-    pub fn new(config: Settings, notes: Vec<Note>) -> Self {
+    pub fn new(config: Settings, notes: Vec<Note>, ocr_wake: Sender<()>) -> Self {
         Self {
             config: Arc::new(RwLock::new(config)),
             notes: Arc::new(RwLock::new(notes)),
@@ -39,6 +44,12 @@ impl AppState {
             focused: Arc::new(AtomicBool::new(true)),
             our_hwnd: Arc::new(AtomicIsize::new(0)),
             dialog_open: Arc::new(AtomicBool::new(false)),
+            ocr_text: Arc::new(RwLock::new(OcrText::new())),
+            ocr_wake: Mutex::new(ocr_wake),
         }
+    }
+
+    pub fn wake_ocr(&self) {
+        let _ = self.ocr_wake.lock().send(());
     }
 }

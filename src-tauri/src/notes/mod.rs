@@ -5,9 +5,14 @@
 //! Explorer with the app not even running.
 
 pub mod images;
+pub mod history;
 pub mod import;
+pub mod kana;
 pub mod links;
 pub mod naming;
+pub mod ocr;
+#[cfg(windows)]
+pub mod ocr_engine;
 pub mod pins;
 pub mod scan;
 pub mod search;
@@ -51,6 +56,9 @@ pub struct NoteSummary {
     pub char_count: usize,
     /// Pinned to the top of the list (see `pins`). Filled in by `list_notes`.
     pub pinned: bool,
+    /// The snippet is text read out of the note's images (or, empty, just
+    /// says there are images) — the list labels it 画像.
+    pub from_image: bool,
 }
 
 impl Note {
@@ -66,6 +74,7 @@ impl Note {
             is_expiring: self.is_expiring,
             char_count: self.char_count,
             pinned: false,
+            from_image: false,
         }
     }
 }
@@ -239,22 +248,23 @@ fn snippet_of(body: &str) -> String {
 /// Characters of context kept before the first match in a search snippet.
 const SNIPPET_LEAD: usize = 30;
 
-/// Per-character lowercase used for matching. Comparing char-by-char (rather
-/// than lowercasing whole strings) keeps match positions valid in the
-/// original text even for the rare letters whose lowercase is longer.
-fn fold(c: char) -> char {
-    c.to_lowercase().next().unwrap_or(c)
-}
-
 /// A search-result snippet centred on the first place in the body (after
 /// the title line) where any of `terms` occurs — `…前後の文脈 match 続き…` —
 /// so the list shows *why* a note matched instead of just its opening. A
 /// leading `#` on a term is ignored, so `#仕事` finds `仕事`. `None` when no
 /// term occurs outside the title (the regular opening snippet is used then).
+/// Matching folds kana / width / case char-by-char (`kana::fold`), which
+/// keeps match positions valid in the original text.
 pub fn snippet_around(body: &str, terms: &[String]) -> Option<String> {
     let skip = title_line(body).map_or(0, |(i, _)| i + 1);
     let rest = body.lines().skip(skip).filter_map(plain_line).collect::<Vec<_>>().join("\n");
-    let chars: Vec<char> = rest.split_whitespace().collect::<Vec<_>>().join(" ").chars().collect();
+    snippet_in(&rest, terms)
+}
+
+/// `snippet_around` over already plain text.
+pub(crate) fn snippet_in(text: &str, terms: &[String]) -> Option<String> {
+    use kana::fold;
+    let chars: Vec<char> = text.split_whitespace().collect::<Vec<_>>().join(" ").chars().collect();
     let folded: Vec<char> = chars.iter().map(|&c| fold(c)).collect();
 
     let needles: Vec<Vec<char>> = terms

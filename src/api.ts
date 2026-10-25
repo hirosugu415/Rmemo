@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { foldText } from "./kana";
 
 export type Status = "keep" | "scratch";
 
@@ -27,6 +28,8 @@ export interface NoteSummary {
   charCount: number;
   /** Pinned to the top of the list. */
   pinned: boolean;
+  /** The snippet is text read out of the note's images (labelled 画像). */
+  fromImage?: boolean;
 }
 
 export interface NoteFilter {
@@ -157,14 +160,33 @@ export const hideWindow = () => invoke<void>("hide_window");
 export { extractTags, isTagChar } from "./markdown";
 
 /** The search box's text as highlightable terms: whitespace-separated,
- *  with a leading `#` dropped (`#仕事` should light up `仕事` too). */
+ *  with a leading `#` dropped (`#仕事` should light up `仕事` too), folded
+ *  like the search folds them. `searchNeedles` adds romaji's kana reading. */
 export function searchTerms(query: string): string[] {
   return query
     .trim()
     .split(/\s+/)
-    .map((t) => t.replace(/^#+/, ""))
+    .map((t) => foldText(t.replace(/^#+/, "")))
     .filter(Boolean);
 }
+
+/** An earlier version of a note, kept on this PC (see `notes::history`). */
+export interface NoteVersion {
+  id: string;
+  savedAt: string;
+  title: string;
+  charCount: number;
+}
+
+/** A note's earlier versions, newest first. */
+export const listHistory = (filename: string) => invoke<NoteVersion[]>("list_history", { filename });
+export const readHistory = (filename: string, id: string) => invoke<string>("read_history", { filename, id });
+/** Keeps the note's current content as a version now (before a restore). */
+export const keepNoteVersion = (filename: string) => invoke<void>("keep_note_version", { filename });
+
+/** Everything a search for `query` matches, as the backend folds it —
+ *  `searchTerms` plus kana readings of romaji (`ringo` → `りんご`). */
+export const searchNeedles = (query: string) => invoke<string[]>("search_needles", { query });
 
 /**
  * How long ago, at the resolution that matters for a note list — recent

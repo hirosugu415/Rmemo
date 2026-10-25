@@ -8,10 +8,12 @@ import SettingsPanel from "./components/SettingsPanel";
 import FormatReview from "./components/FormatReview";
 import TriageView from "./components/TriageView";
 import Tutorial from "./components/Tutorial";
+import HistoryView from "./components/HistoryView";
 import { checkForUpdate, installUpdate, UPDATE_CHECK_INTERVAL_MS, UPDATES_ENABLED } from "./updater";
 import { cleanupImages, setNotesDir } from "./images";
 import { actionFor, layoutReady, resolveKeymap } from "./keybindings";
 import { applyPalette, followTheme } from "./theme";
+import { findMatches } from "./kana";
 import {
   backlinks as fetchBacklinks,
   createNote,
@@ -20,10 +22,13 @@ import {
   getNote,
   getSettings,
   hideWindow,
+  keepNoteVersion,
   listNotes,
   listTags,
   renameLinks,
   renameTag,
+  searchNeedles,
+  searchTerms,
   setPinned,
   setZoom,
   NOTE_GONE,
@@ -37,7 +42,7 @@ import {
   type TagCount,
 } from "./api";
 
-type View = "compose" | "search" | "settings" | "triage" | "tutorial" | "review";
+type View = "compose" | "search" | "settings" | "triage" | "tutorial" | "review" | "history";
 
 /** A full note as the list-row shape (the triage screen deals in those). */
 const toSummary = (note: Note): NoteSummary => ({ ...note, snippet: "", pinned: false });
@@ -427,6 +432,28 @@ export default function App() {
     });
   }, [commitSave, resetToBlank, flash]);
 
+  /** Puts an earlier version (from the history screen) back into the open
+   *  note. The current text is saved and kept as a version first — through
+   *  the queue, so it's the latest — so the restore can be undone from the
+   *  history too. Autosave then writes the restored text. */
+  const restoreVersion = useCallback(
+    (body: string) => {
+      const s = sessionRef.current;
+      const filename = s.filename;
+      if (!filename) return;
+      flushDraft();
+      enqueue(() => keepNoteVersion(filename))
+        .catch(() => {})
+        .then(() => {
+          if (!isCurrent(s)) return;
+          setBody(body);
+          setView("compose");
+          flash("この版に戻しました（戻す前の内容も履歴に残っています）");
+        });
+    },
+    [enqueue, flushDraft, setBody, flash],
+  );
+
   /** Done for now: save and get out of the way. The note stays open, so the
    *  next summon carries on where this left off. */
   const saveAndHide = useCallback(() => {
@@ -527,18 +554,14 @@ export default function App() {
       // note that's already open must see its latest edits, not the copy on
       // disk from before they were saved.
       flushDraft();
+      const query = queryRef.current;
+      const needles = searchNeedles(query).catch(() => searchTerms(query));
       enqueue(() => getNote(summary.filename))
-        .then((note) => {
-          // Highlight the first search term that occurs in the body.
-          let selection: { start: number; end: number } | null = null;
-          const lower = note.body.toLowerCase();
-          for (const term of queryRef.current.trim().split(/\s+/).filter(Boolean)) {
-            const idx = lower.indexOf(term.toLowerCase());
-            if (idx >= 0) {
-              selection = { start: idx, end: idx + term.length };
-              break;
-            }
-          }
+        .then(async (note) => {
+          // Select the first search hit in the body (kana / romaji aware,
+          // like the search itself).
+          const first = findMatches(note.body, await needles)[0];
+          const selection = first ? { start: first[0], end: first[1] } : null;
           startSession(
             {
               filename: note.filename,
@@ -630,6 +653,22 @@ export default function App() {
       .filter((t) => t.count > 0)
       .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
   }, [tags, openFilename, loadToken]);
+
+  // The frame is sized from the window's real pixel size, not `100%`: at
+  // 150% scaling an 863 px tall window is 575.33 CSS px, the page rounds up
+  // to 576, and the frame's bottom line falls one pixel outside the window.
+  useEffect(() => {
+    const win = getCurrentWindow();
+    const fit = async () => {
+      const [size, scale] = await Promise.all([win.innerSize(), win.scaleFactor()]);
+      const root = document.documentElement.style;
+      root.setProperty("--app-width", `${size.width / scale}px`);
+      root.setProperty("--app-height", `${size.height / scale}px`);
+    };
+    void fit().catch(() => {});
+    const offs = [win.onResized(() => void fit().catch(() => {})), win.onScaleChanged(() => void fit().catch(() => {}))];
+    return () => offs.forEach((p) => void p.then((off) => off()));
+  }, []);
 
   // Light/dark and the Keep/Scratch colours live on <html>, so
   // `:root[data-…]` can restyle everything. The settings panel previews
@@ -894,6 +933,12 @@ export default function App() {
       if (view === "compose") reopenPrevious();
       return;
     }
+    if (action === "openHistory") {
+      e.preventDefault();
+      if (view === "compose" && openFilename) setView("history");
+      else if (view === "history") setView("compose");
+      return;
+    }
     if (action === "openTutorial") {
       e.preventDefault();
       setView((v) => (v === "tutorial" ? "compose" : "tutorial"));
@@ -901,7 +946,7 @@ export default function App() {
     }
     if (e.key === "Escape") {
       e.preventDefault();
-      if (view === "tutorial") {
+      if (view === "tutorial" || view === "history") {
         setView("compose");
       } else if (view === "triage" || view === "review") {
         setView("search");
@@ -950,6 +995,7 @@ export default function App() {
           onOpenTutorial={() => setView("tutorial")}
           onOpenSearch={() => setView("search")}
           onOpenSettings={() => setView("settings")}
+          onOpenHistory={() => setView("history")}
           keymap={keymap}
           previousTitle={previousNote?.title ?? null}
           onReopenPrevious={reopenPrevious}
@@ -979,6 +1025,16 @@ export default function App() {
       )}
 
       {view === "tutorial" && <Tutorial onClose={() => setView("compose")} />}
+
+      {view === "history" && openFilename && (
+        <HistoryView
+          filename={openFilename}
+          title={openTitle ?? ""}
+          currentBody={composeBody}
+          onRestore={restoreVersion}
+          onClose={() => setView("compose")}
+        />
+      )}
 
       {view === "triage" && (
         <TriageView

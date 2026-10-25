@@ -4,6 +4,7 @@
 // (file id, modified time), so a refresh only downloads what changed and the
 // last snapshot opens offline.
 
+import { foldText } from "../src/kana";
 import { charCount, extractTags, snippetOf, titleOf } from "../src/markdown";
 import { type DriveApi, type DriveFile, FOLDER_MIME } from "./drive";
 
@@ -177,15 +178,17 @@ export function imageUrl(api: DriveApi, file: DriveFile): Promise<string | null>
 
 /** Every term must hit the title, the body, or a tag (`#仕事` also matches
  *  the tag `仕事`) — the desktop search's rule. */
+/** Kana / width / case don't matter, as on the desktop (romaji reading is
+ *  desktop-only). */
 export function searchNotes(notes: WebNote[], query: string, status: Status | "all"): WebNote[] {
-  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const terms = foldText(query.trim()).split(/\s+/).filter(Boolean);
   return notes.filter((n) => {
     if (status !== "all" && n.status !== status) return false;
-    const title = n.title.toLowerCase();
-    const body = n.body.toLowerCase();
+    const title = foldText(n.title);
+    const body = foldText(n.body);
     return terms.every((q) => {
       const bare = q.replace(/^#+/, "") || q;
-      return title.includes(q) || body.includes(q) || n.tags.some((t) => t.toLowerCase().includes(bare));
+      return title.includes(q) || body.includes(q) || n.tags.some((t) => foldText(t).includes(bare));
     });
   });
 }

@@ -72,6 +72,8 @@ interface Props {
   onOpenTutorial: () => void;
   onOpenSearch: () => void;
   onOpenSettings: () => void;
+  /** The open note's earlier versions (only offered while one is open). */
+  onOpenHistory: () => void;
   /** The shortcuts as currently bound (settings → キー設定). */
   keymap: Keymap;
   /** Title of the note that was open before this blank one, if any. */
@@ -278,6 +280,7 @@ export default function ComposeBox({
   onOpenTutorial,
   onOpenSearch,
   onOpenSettings,
+  onOpenHistory,
   keymap,
   previousTitle,
   onReopenPrevious,
@@ -1015,15 +1018,26 @@ export default function ComposeBox({
           {openTitle ? `編集中: ${openTitle}` : "新規メモ"}
         </span>
         {openTitle ? (
-          <button
-            type="button"
-            className="compose-title-action"
-            title="このメモを閉じて新しいメモを書く (Esc)"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={onNewNote}
-          >
-            ＋ 新規
-          </button>
+          <>
+            <button
+              type="button"
+              className="compose-title-action"
+              title="このメモを閉じて新しいメモを書く (Esc)"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={onNewNote}
+            >
+              ＋ 新規
+            </button>
+            <button
+              type="button"
+              className="compose-title-action"
+              title={withKey("このメモの前の版を見る・戻す", keymap.openHistory)}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={onOpenHistory}
+            >
+              履歴
+            </button>
+          </>
         ) : (
           previousTitle && (
             <button

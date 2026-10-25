@@ -157,7 +157,9 @@ body,
 .app {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* The window's exact size, set by App (see there); `100%` until then. */
+  width: var(--app-width, 100%);
+  height: var(--app-height, 100%);
   overflow: hidden;
   border: 1px solid var(--status-accent, var(--line));
   border-radius: 10px;
@@ -473,6 +475,33 @@ body,
   border-bottom: 1px solid var(--line);
 }
 
+.search-box {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* × at the box's right end: clears the search. */
+.search-clear {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.search-clear:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+
 .search {
   flex: 1;
   min-width: 0;
@@ -604,6 +633,19 @@ body,
   overflow: hidden;
   word-break: break-word;
   white-space: pre-line;
+}
+
+/* "画像": the snippet is text read out of the note's pictures. */
+.snippet-image {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 6px;
+  font-size: 10.5px;
+  line-height: 16px;
+  vertical-align: 1px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 4px;
 }
 
 .note-tags {
@@ -1011,9 +1053,10 @@ body,
 }
 /* 保存 / 閉じる stay at the bottom whichever tab is open. */
 .settings-footer {
-  margin-top: auto;
-  padding-top: 12px;
+  flex: none;
+  padding: 10px 14px;
   border-top: 1px solid var(--line);
+  background: var(--panel);
   justify-content: flex-end;
 }
 .settings-actions .settings-primary {
@@ -1026,6 +1069,23 @@ body,
 .settings-actions .settings-primary:hover {
   color: white;
   filter: brightness(1.1);
+}
+/* Only there to catch keys; the panel's parts lay out as before. */
+.settings-panel {
+  display: contents;
+}
+.settings-dirty,
+.settings-confirm-text {
+  margin-right: auto;
+  align-self: center;
+  font-size: 12px;
+}
+.settings-dirty {
+  color: var(--muted);
+}
+.settings-confirm-text {
+  font-weight: 600;
+  color: var(--text);
 }
 .settings-actions .settings-outlined {
   color: var(--accent);
@@ -1855,6 +1915,97 @@ body,
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+/* ---------- history (a note's earlier versions) ---------- */
+
+.history-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.history-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 10px;
+  padding: 0 14px 10px;
+}
+.history-list {
+  flex: none;
+  width: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  outline: none;
+}
+.history-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+.history-item:hover {
+  background: var(--bg);
+}
+.history-item-active {
+  background: var(--selected);
+  border-color: var(--selected-line);
+}
+.history-when {
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.history-when small,
+.history-meta {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.history-title {
+  margin-right: 6px;
+}
+.history-preview {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.history-doc {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 6px 12px;
+}
+.history-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--line);
+}
+.history-note {
+  margin-right: auto;
+  font-size: 11.5px;
+  color: var(--muted);
 }
 
 .tutorial-body {

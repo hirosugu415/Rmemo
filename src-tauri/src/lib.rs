@@ -273,6 +273,7 @@ pub fn run() {
     let cfg: Settings = config::load();
     let notes = notes::scan::scan_all(&cfg);
     eprintln!("[boot] loaded {} notes from {:?}", notes.len(), cfg.notes_dir);
+    let (ocr_wake, ocr_wakeups) = std::sync::mpsc::channel();
 
     tauri::Builder::default()
         // Must come first: this plugin only wins the race for the lock if it
@@ -289,9 +290,10 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_dialog::init())
-        .manage(AppState::new(cfg, notes))
+        .manage(AppState::new(cfg, notes, ocr_wake))
         .invoke_handler(tauri::generate_handler![
             commands::list_notes,
+            commands::search_needles,
             commands::list_tags,
             commands::backlinks,
             commands::save_image,
@@ -304,6 +306,9 @@ pub fn run() {
             commands::create_note,
             commands::update_note,
             commands::rewrite_note,
+            commands::list_history,
+            commands::read_history,
+            commands::keep_note_version,
             commands::set_status,
             commands::delete_note,
             commands::open_notes_folder,
@@ -349,6 +354,16 @@ pub fn run() {
 
             spawn_focus_watch(handle.clone());
             watcher::spawn(handle.clone());
+            notes::ocr::spawn(handle.clone(), ocr_wakeups);
+            // Old versions and the history of long-deleted notes go (see
+            // `history::sweep`), off the startup path.
+            let names: std::collections::HashSet<String> =
+                app.state::<AppState>().notes.read().iter().map(|n| n.filename.to_lowercase()).collect();
+            std::thread::spawn(move || {
+                let t = std::time::Instant::now();
+                let swept = notes::history::sweep(&notes::history::root(), &names);
+                eprintln!("[history] swept {} folders ({} removed) in {:?}", swept.folders, swept.removed_folders, t.elapsed());
+            });
             api::spawn(handle.clone());
             let at_sign_in = std::env::args().any(|arg| arg == MINIMIZED_FLAG)
                 || (packaged::is_packaged() && packaged::launched_by_startup_task());

@@ -363,7 +363,7 @@ fn notes_endpoint(handle: &AppHandle, params: &HashMap<String, String>) -> Strin
         let s = state.config.read();
         (s.notes_dir.clone(), s.expiry_days)
     };
-    let mut all = apply(&state.notes.read(), &filter);
+    let mut all = apply(&state.notes.read(), &filter, &state.ocr_text.read());
     crate::notes::scan::refresh_expiry(&mut all, expiry_days);
     let total = all.len();
     let items: Vec<serde_json::Value> = all

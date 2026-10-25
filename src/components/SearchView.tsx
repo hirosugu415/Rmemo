@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { searchTerms, type NoteSummary, type Status, type TagCount } from "../api";
+import { searchNeedles, searchTerms, type NoteSummary, type Status, type TagCount } from "../api";
 import NoteList from "./NoteList";
 import TagCloud from "./TagCloud";
 import { type Keymap, withKey } from "../keybindings";
@@ -46,6 +46,7 @@ export default function SearchView({
 }: Props) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const selectOnMouseUp = useRef(false);
   // While an IME is composing, the input's own value must not be clobbered
   // by a re-render — only the committed text (on compositionend) should
   // trigger a search.
@@ -64,6 +65,19 @@ export default function SearchView({
     inputRef.current?.focus();
   }, []);
 
+  // What to mark in the results: the typed terms right away, then the
+  // backend's full set (romaji's kana reading too) once it answers.
+  const [needles, setNeedles] = useState<string[]>([]);
+  useEffect(() => {
+    let live = true;
+    setNeedles(searchTerms(query));
+    searchNeedles(query)
+      .then((n) => live && setNeedles(n))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [query]);
 
   const handleTagClick = (tag: string) => {
     onStatusFilterChange("all");
@@ -119,21 +133,50 @@ export default function SearchView({
         </button>
       </div>
       <div className="searchbar">
-        <input
-          ref={inputRef}
-          className="search"
-          value={query}
-          spellCheck={false}
-          placeholder="検索…"
-          onChange={(e) => onQueryChange(e.target.value)}
-          onCompositionStart={() => {
-            composing.current = true;
-          }}
-          onCompositionEnd={(e) => {
-            composing.current = false;
-            onQueryChange(e.currentTarget.value);
-          }}
-        />
+        <div className="search-box">
+          <input
+            ref={inputRef}
+            className="search"
+            value={query}
+            spellCheck={false}
+            placeholder="検索…"
+            onChange={(e) => onQueryChange(e.target.value)}
+            onCompositionStart={() => {
+              composing.current = true;
+            }}
+            onCompositionEnd={(e) => {
+              composing.current = false;
+              onQueryChange(e.currentTarget.value);
+            }}
+            // Coming into the box selects what's there, so typing replaces
+            // the last search. A click would put the caret back on mouseup,
+            // so that one mouseup is cancelled.
+            onFocus={(e) => e.currentTarget.select()}
+            onMouseDown={(e) => {
+              selectOnMouseUp.current = document.activeElement !== e.currentTarget;
+            }}
+            onMouseUp={(e) => {
+              if (selectOnMouseUp.current) e.preventDefault();
+              selectOnMouseUp.current = false;
+            }}
+          />
+          {query && (
+            <button
+              type="button"
+              className="search-clear"
+              title="検索をクリア"
+              aria-label="検索をクリア"
+              // Keep the focus in the box.
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                onQueryChange("");
+                inputRef.current?.focus();
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
         <div className="chips">
           {(["all", "keep", "scratch"] as const).map((s) => (
             <button
@@ -175,7 +218,7 @@ export default function SearchView({
         onTogglePin={onTogglePin}
         onDelete={onDelete}
         onTagClick={handleTagClick}
-        highlight={searchTerms(query)}
+        highlight={needles}
       />
     </div>
   );

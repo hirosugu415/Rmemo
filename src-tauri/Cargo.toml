@@ -1,6 +1,6 @@
 [package]
 name = "rmemo"
-version = "1.0.8"
+version = "1.1.0"
 description = "Quick-capture notes for Windows"
 authors = ["hirosugu415"]
 edition = "2021"
@@ -37,12 +37,24 @@ windows-sys = { version = "0.61.2", features = [
 ] }
 # `Window::hwnd()` returns this crate's HWND (not windows-sys's) — same
 # representation, different type, so both crates are needed side by side.
-# The WinRT StartupTask/activation APIs (packaged.rs) only exist in `windows`.
+# The WinRT StartupTask/activation APIs (packaged.rs) and the OCR engine
+# (notes/ocr.rs) only exist in `windows`.
 windows = { version = "0.61", features = [
     "Win32_Foundation",
+    "Win32_System_WinRT",
     "ApplicationModel",
     "ApplicationModel_Activation",
+    "Foundation",
+    "Foundation_Collections",
+    "Globalization",
+    "Graphics_Imaging",
+    "Media_Ocr",
+    "Security_Cryptography",
+    "Storage_Streams",
 ] }
+# Decodes pasted images for OCR — in-process, since Windows only reads WebP
+# (what screenshots are saved as) with an optional codec installed.
+image = { version = "0.25", default-features = false, features = ["webp", "png", "jpeg", "gif"] }
 
 [profile.release]
 opt-level = 3

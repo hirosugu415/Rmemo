@@ -91,5 +91,7 @@ fn rescan(app: &AppHandle) {
     let settings = state.config.read().clone();
     let notes = scan::scan_all(&settings);
     *state.notes.write() = notes;
+    // A note synced from another PC may bring images with it.
+    state.wake_ocr();
     let _ = app.emit(NOTES_CHANGED, ());
 }

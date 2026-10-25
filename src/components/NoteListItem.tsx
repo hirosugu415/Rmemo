@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { formatWhen, type NoteSummary } from "../api";
+import { findMatches } from "../kana";
 
 const CONFIRM_MS = 3000;
 
@@ -12,29 +13,25 @@ interface Props {
   onTogglePin: () => void;
   onDelete: () => void;
   onTagClick: (tag: string) => void;
-  /** Search terms to mark in the title and snippet. */
+  /** Search terms to mark in the title and snippet, already folded (see
+   *  `searchNeedles`). */
   highlight: string[];
 }
 
-function escapeRegExp(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-/** `text` with every case-insensitive occurrence of `terms` wrapped in
- *  <mark>, so a result shows at a glance why it matched. */
+/** `text` with every occurrence of `terms` wrapped in <mark>, so a result
+ *  shows at a glance why it matched. Kana / width / case don't matter, the
+ *  same as for the search itself (see kana.ts). */
 function Highlight({ text, terms }: { text: string; terms: string[] }) {
   if (terms.length === 0 || !text) return <>{text}</>;
-  // Longest first, so `rust-lang` wins over `rust` where both match.
-  const pattern = [...terms].sort((a, b) => b.length - a.length).map(escapeRegExp).join("|");
-  const parts = text.split(new RegExp(`(${pattern})`, "giu"));
-  return (
-    <>
-      {parts.map((part, i) =>
-        // split() with one capture group puts the matches at odd indexes.
-        i % 2 === 1 ? <mark key={i}>{part}</mark> : part,
-      )}
-    </>
-  );
+  const parts: React.ReactNode[] = [];
+  let at = 0;
+  for (const [start, end] of findMatches(text, terms)) {
+    if (start > at) parts.push(text.slice(at, start));
+    parts.push(<mark key={start}>{text.slice(start, end)}</mark>);
+    at = end;
+  }
+  parts.push(text.slice(at));
+  return <>{parts}</>;
 }
 
 export default function NoteListItem({
@@ -93,7 +90,8 @@ export default function NoteListItem({
       </div>
 
       <div className="note-snippet">
-        {note.snippet ? <Highlight text={note.snippet} terms={highlight} /> : "(空)"}
+        {note.fromImage && <span className="snippet-image">画像</span>}
+        {note.snippet ? <Highlight text={note.snippet} terms={highlight} /> : note.fromImage ? null : "(空)"}
       </div>
 
       {note.tags.length > 0 && (
