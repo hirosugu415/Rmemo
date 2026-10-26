@@ -4,7 +4,12 @@
 書式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に、
 バージョン番号は [セマンティック バージョニング](https://semver.org/lang/ja/) に従います。
 
-## [Unreleased]
+## [1.1.1] - 2026-10-26
+
+### 変更
+
+- 閉じたまま 10 分たつと、画面の描画に使う WebView2 のプロセスを終了してメモリを解放し、常駐中のメモリを約 105MB から約 10MB に減らすようにした（メモ 1,000 件のとき。メモが多いほど増える）。
+  その後の最初の 1 回だけ、開くのに 0.3〜0.4 秒ほどかかる。10 分以内に開き直すときは、これまでどおりすぐ開く。
 
 ## [1.1.0] - 2026-10-26
 
@@ -205,7 +210,7 @@
 - **スマホ用の閲覧アプリ（PWA、ベータ版）**: Google ドライブに同期したメモを
   スマホのブラウザから読める。読み取り専用。
 
-[Unreleased]: https://github.com/hirosugu415/Rmemo/compare/v1.1.0...HEAD
+[1.1.1]: https://github.com/hirosugu415/Rmemo/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/hirosugu415/Rmemo/compare/v1.0.8...v1.1.0
 [1.0.8]: https://github.com/hirosugu415/Rmemo/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/hirosugu415/Rmemo/compare/v1.0.6...v1.0.7

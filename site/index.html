@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rmemo — ホットキーひとつで書きとめる Windows メモアプリ</title>
-    <meta name="description" content="Rmemo は、思いついた瞬間に Ctrl+N で呼び出して書きとめる Windows 用のメモアプリです。メモは Markdown のテキストファイルとして保存されます。無料・オープンソース。" />
+    <meta name="description" content="Rmemo は、思いついた瞬間に Ctrl+N で呼び出して書きとめる Windows 用のメモアプリです。待機中のメモリは約 10MB（メモ 1,000 件のとき）と軽く、メモは Markdown のテキストファイルとして保存されます。無料・オープンソース。" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Rmemo — ホットキーひとつで書きとめる Windows メモアプリ" />
     <meta property="og:description" content="思いついた瞬間に Ctrl+N。書いたそばから整って見える、Windows 用のすばやいメモアプリ。" />
@@ -35,8 +35,13 @@
             <h1>思いついたら、<br /><kbd>Ctrl</kbd> + <kbd>N</kbd>。</h1>
             <p class="lead">
               Rmemo は、どの画面からでもホットキーひとつで呼び出せる Windows 用のメモアプリです。
-              書いたそばから見出しやリストが整い、閉じれば元の作業にすぐ戻れます。
+              常駐しても軽いのに、メモの中身まで探せる全文検索、ハッシュタグでの整理、Markdown の整った表示、編集の履歴までそろっています。
             </p>
+            <ul class="stats">
+              <li><strong>0.04<small>秒</small></strong><span>ホットキーから<br />表示まで</span></li>
+              <li><strong>10<small>MB</small></strong><span>待機中のメモリ<br />（メモ 1,000 件）</span></li>
+              <li><strong>3.6<small>MB</small></strong><span>インストーラーの<br />大きさ</span></li>
+            </ul>
             <div class="cta">
               <a class="store-badge" href="https://apps.microsoft.com/detail/9n2mdp1460w3?hl=ja-JP&amp;gl=JP">
                 <picture>
@@ -63,34 +68,156 @@
 
       <section class="alt" id="features">
         <div class="wrap">
-          <h2>書くことだけに集中できる</h2>
+          <h2>ほかのメモアプリと、ここが違う</h2>
           <p class="section-lead">アプリを探して、開いて、保存場所を選ぶ。そういう手間をなくしました。</p>
           <div class="features">
             <div class="feature">
-              <h3><span class="mark"></span>どこからでもすぐ開く</h3>
-              <p><kbd>Ctrl</kbd>+<kbd>N</kbd> で、今の作業の上に小さな入力窓が開きます。キーは設定で変えられます。</p>
+              <h3><span class="mark"></span>どの画面からでも、すぐ書ける</h3>
+              <p><kbd>Ctrl</kbd>+<kbd>N</kbd> で、今の作業の上に小さな入力窓が開きます。ほかの画面をクリックすれば隠れて、元の作業にそのまま戻れます。キーは設定で変えられます。</p>
             </div>
             <div class="feature">
-              <h3><span class="mark"></span>保存を気にしなくていい</h3>
-              <p>書いている途中も自動で保存。前の版も残るので、間違えて消しても履歴から戻せます。</p>
+              <h3><span class="mark"></span>常駐していても軽い</h3>
+              <p>しばらく使わないと画面のメモリを解放し、本体だけで待機します。<a href="#light">なぜ軽いのか</a></p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>アカウントもネットもいらない</h3>
+              <p>登録なしで、インストールしたらすぐ使えます。画像の文字の読み取りも含めて、メモは PC の外に送りません。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>メモはただの <code>.md</code> ファイル</h3>
+              <p>独自の形式やデータベースはありません。メモ帳や VS Code でも開けて、Rmemo をやめてもメモは残ります。<a href="#files">くわしく</a></p>
             </div>
             <div class="feature">
               <h3><span class="mark"></span>書いたそばから整う</h3>
               <p>見出し・リスト・チェックボックス・コードブロックを、Markdown で打ったその場できれいに表示。日本語入力のままでも使えます。</p>
             </div>
             <div class="feature">
+              <h3><span class="mark"></span>残すメモと、使い捨てのメモ</h3>
+              <p>とりあえずのメモは「一時」に。一覧が埋まらず、古くなったら 1 件ずつ片づけられます。<a href="#lanes">くわしく</a></p>
+            </div>
+          </div>
+
+          <h3 class="subhead" id="compare">よくあるメモの取り方と比べると</h3>
+          <div class="table-scroll">
+            <table class="compare">
+              <thead>
+                <tr><th></th><th class="us">Rmemo</th><th>Windows のメモ帳</th><th>クラウド型のノートアプリ</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>呼び出し方</td><td class="us">どの画面からでもホットキー</td><td>スタートメニューなどから起動</td><td>アプリかブラウザを開く</td></tr>
+                <tr><td>表示されるまで</td><td class="us">約 0.04 秒</td><td>約 0.18 秒（起動から）</td><td class="none">アプリによる</td></tr>
+                <tr><td>メモの整理</td><td class="us">一覧・タグ・リンク・検索</td><td>ファイルを自分で管理</td><td>一覧・タグ・検索</td></tr>
+                <tr><td>画像の中の文字で検索</td><td class="us">できる（PC の中で読み取り）</td><td class="none">—</td><td class="none">サービスによる</td></tr>
+                <tr><td>保存形式</td><td class="us"><code>.md</code>（テキスト）</td><td><code>.txt</code>（テキスト）</td><td>サービス独自の形式が多い</td></tr>
+                <tr><td>アカウント</td><td class="us">不要</td><td>不要</td><td>必要なことが多い</td></tr>
+                <tr><td>インターネット接続</td><td class="us">不要</td><td>不要</td><td>必要なことが多い</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fine-print">時間は開発者の PC（Windows 11）での実測です。Rmemo は常駐している状態から、メモ帳は起動してから、ウィンドウが表示されるまでを測りました。</p>
+        </div>
+      </section>
+
+      <section id="light">
+        <div class="wrap">
+          <h2>常駐していても、ほとんど場所をとらない</h2>
+          <p class="section-lead">
+            いつでも呼び出せるように、Rmemo はタスクトレイで待機しています。
+            そのぶん、待っている間はできるだけ PC の負担にならないように作りました。
+            機能を削って軽くしたのではありません（<a href="#more">できること</a>）。
+          </p>
+          <div class="table-scroll">
+            <table class="metrics">
+              <thead>
+                <tr><th>状態</th><th>メモリ（メモ 1,000 件）</th><th>呼び出してから表示まで</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>閉じて 10 分以上たったとき</td><td><strong>約 10MB</strong></td><td>約 0.3〜0.4 秒（最初の 1 回だけ）</td></tr>
+                <tr><td>開いているとき・閉じて 10 分以内</td><td>約 105MB</td><td><strong>約 0.04 秒</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="subhead">メモの量とメモリ</h3>
+          <p class="subhead-lead">検索を速くするために、メモはすべてメモリ上に読み込んでいます。そのため、メモが増えるほど使うメモリも増えます。目安は、メモの文字の量のおよそ 2〜3 倍です。</p>
+          <div class="table-scroll">
+            <table class="metrics">
+              <thead>
+                <tr><th>メモの量</th><th>閉じて 10 分以上たったとき</th><th>開いているとき</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>0 件</td><td>約 6MB</td><td>約 100MB</td></tr>
+                <tr><td>1,000 件（約 1MB）</td><td>約 10MB</td><td>約 105MB</td></tr>
+                <tr><td>5,000 件（約 5MB）</td><td>約 20MB</td><td>約 135MB</td></tr>
+                <tr><td>10,000 件（約 10MB）</td><td>約 30MB</td><td>約 155MB</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="fine-print">開発者の PC（Windows 11）での実測です。メモは 1 件あたり約 1KB（日本語で 300 字ほど）で測りました。メモリはタスクマネージャーの「メモリ」の値で、Rmemo が使うすべてのプロセスの合計です。</p>
+          <!-- TODO: 呼び出しの速さが分かる動画（タイマー付き）をここに -->
+          <!-- TODO: 待機中のタスクマネージャーのスクリーンショットをここに -->
+
+          <div class="features why">
+            <div class="feature">
+              <h3><span class="mark"></span>本体は Rust 製</h3>
+              <p>メモの読み書きや検索をする本体（<code>rmemo.exe</code>）は、Rust で書いた約 9MB の実行ファイルひとつです。メモはメモリ上に読み込んでおくので、検索のたびにディスクを読み直しません。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>UI は Windows 標準の WebView2 で描画</h3>
+              <p>画面の描画には、Windows に標準で入っている WebView2 を使います。Electron のように Chromium をアプリに同梱しないので、インストーラーは 3.6MB です。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>使わない間は、画面のメモリを解放</h3>
+              <p>閉じたまま 10 分たつと、WebView2 のプロセスを終了してメモリを解放します。10 分以内なら一瞬で開き、それより後も最初の 1 回だけ 0.3 秒ほどです。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="alt" id="more">
+        <div class="wrap">
+          <h2>軽いのに、できることは多い</h2>
+          <p class="section-lead">本体は約 9MB の実行ファイルひとつ。それでも、メモアプリに欲しい機能はひととおり入っています。</p>
+          <div class="features">
+            <div class="feature">
+              <h3><span class="mark"></span>メモの中身まで、全部検索</h3>
+              <p>タイトルだけでなく本文も、貼った画像の中の文字も対象です。1 文字打つごとに絞り込まれ、ひらがな・カタカナ・ローマ字・全角半角も区別しないので、うろ覚えでも見つかります。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>ハッシュタグでまとめる</h3>
+              <p>本文に <code>#仕事</code> のように書くだけでタグが付きます。<code>#</code> を打てば使ったタグが候補に出て、一覧ではタグを選ぶだけで絞り込めます。タグの名前もまとめて変えられます。</p>
+            </div>
+            <div class="feature">
+              <h3><span class="mark"></span>保存を気にしなくていい</h3>
+              <p>書いている途中も自動で保存。前の版も残るので、間違えて消しても履歴から戻せます。</p>
+            </div>
+            <div class="feature">
               <h3><span class="mark"></span>画像も貼れて、中の文字で探せる</h3>
               <p>スクリーンショットは <kbd>Ctrl</kbd>+<kbd>V</kbd> で貼るだけ。画像の中の文字も検索で見つかります（読み取りは PC の中だけ）。</p>
             </div>
             <div class="feature">
-              <h3><span class="mark"></span>メモ同士をつなぐ・すぐ探せる</h3>
-              <p><code>[[メモ名]]</code> でリンク、<code>#タグ</code> で分類。検索はひらがな・カタカナ・ローマ字を区別しません。</p>
+              <h3><span class="mark"></span>メモ同士をつなぐ</h3>
+              <p><code>[[メモ名]]</code> でほかのメモにリンク。リンクされた側には参照元が出るので、関連するメモをたどれます。</p>
             </div>
             <div class="feature">
               <h3><span class="mark"></span>エディタとしても本格的</h3>
               <p>複数カーソル、行の移動、見出しの折りたたみ、目次、検索・置換。VS Code に慣れた手でもそのまま使えます。</p>
             </div>
           </div>
+
+          <h3 class="subhead">ほかにも</h3>
+          <ul class="chips">
+            <li>コードブロックの色分け</li>
+            <li>チェックボックス</li>
+            <li>ピン留め</li>
+            <li>一時のメモの整理画面</li>
+            <li><code>.txt</code> の取り込み（文字コードを自動で判別）</li>
+            <li>ライト / ダークと配色</li>
+            <li>文字の大きさの変更</li>
+            <li>キーの割り当ての変更</li>
+            <li>Google ドライブなどで複数の PC と同期</li>
+            <li>アプリ内からアップデート</li>
+          </ul>
 
           <div class="media-row">
             <figure class="shot">
@@ -115,7 +242,7 @@
         </div>
       </section>
 
-      <section>
+      <section id="lanes">
         <div class="wrap">
           <h2>残すメモと、使い捨てのメモ</h2>
           <p class="section-lead">
@@ -159,7 +286,7 @@
         </div>
       </section>
 
-      <section>
+      <section id="files">
         <div class="wrap">
           <h2>メモは、ただのテキストファイル</h2>
           <p class="section-lead">
@@ -258,6 +385,10 @@
           <details>
             <summary>窓が閉じてしまいます。どこにいますか？</summary>
             <p>Rmemo はタスクトレイに常駐しています。<kbd>Ctrl</kbd>+<kbd>N</kbd> か、トレイのアイコンをクリックすると開きます。</p>
+          </details>
+          <details>
+            <summary>常駐させておくと、PC が重くなりませんか？</summary>
+            <p>ほとんど影響しません。閉じたまま 10 分たつと画面（WebView2）のメモリを解放するので、待っている間のメモリは、メモが 1,000 件ほどなら約 10MB です（タスクマネージャーの値）。開いている間と、閉じてから 10 分以内は約 105MB を使いますが、そのかわり一瞬で開きます。メモが多いほど少しずつ増えます。くわしくは <a href="#light">常駐していても、ほとんど場所をとらない</a> を見てください。</p>
           </details>
           <details>
             <summary>アンインストールするとメモは消えますか？</summary>

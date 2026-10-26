@@ -7,6 +7,7 @@ use parking_lot::{Mutex, RwLock};
 use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicUsize};
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
+use std::time::Instant;
 
 pub struct AppState {
     pub config: Arc<RwLock<Settings>>,
@@ -29,6 +30,12 @@ pub struct AppState {
     /// Set while a native dialog of ours is open: it takes the foreground,
     /// and hide-on-blur must not hide the window it belongs to.
     pub dialog_open: Arc<AtomicBool>,
+    /// When the window was last hidden; `None` while it is showing. Read by
+    /// `spawn_webview_reaper` to let go of the webview after a long absence.
+    pub hidden_at: Arc<Mutex<Option<Instant>>>,
+    /// Set once the reaper has destroyed the window, so the next summon knows
+    /// to build it again.
+    pub released: Arc<AtomicBool>,
     /// Text read out of pasted images (see `notes::ocr`), for the search.
     pub ocr_text: Arc<RwLock<OcrText>>,
     /// Tells the OCR thread to look for new images now.
@@ -44,6 +51,8 @@ impl AppState {
             focused: Arc::new(AtomicBool::new(true)),
             our_hwnd: Arc::new(AtomicIsize::new(0)),
             dialog_open: Arc::new(AtomicBool::new(false)),
+            hidden_at: Arc::new(Mutex::new(None)),
+            released: Arc::new(AtomicBool::new(false)),
             ocr_text: Arc::new(RwLock::new(OcrText::new())),
             ocr_wake: Mutex::new(ocr_wake),
         }

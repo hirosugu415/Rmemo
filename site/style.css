@@ -7,6 +7,7 @@
   --muted: #646469;
   --line: #e6e6e3;
   --accent: #2f6feb;
+  --accent-wash: rgba(47, 111, 235, 0.07);
   --keep: #b4546a;
   --keep-wash: rgba(180, 84, 106, 0.08);
   --scratch: #2a8bd0;
@@ -24,6 +25,7 @@
     --muted: #9a9a9f;
     --line: #2a2a2a;
     --accent: #6e9cf5;
+    --accent-wash: rgba(110, 156, 245, 0.1);
     --keep: #d0708a;
     --keep-wash: rgba(208, 112, 138, 0.1);
     --scratch: #7cc4f5;
@@ -205,6 +207,37 @@ img {
   color: var(--muted);
 }
 
+/* The three numbers under the lead. */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 32px;
+  margin: -8px 0 30px;
+  padding: 0;
+  list-style: none;
+}
+
+.stats strong {
+  display: block;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats small {
+  margin-left: 3px;
+  font-size: 0.5em;
+  color: var(--muted);
+}
+
+.stats span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
 .cta-note {
   margin: 14px 0 0;
   font-size: 13px;
@@ -372,6 +405,73 @@ h2 {
 
 .feature:nth-child(even) .mark {
   background: var(--keep);
+}
+
+.features.why {
+  margin-top: 40px;
+}
+
+.subhead {
+  margin: 56px 0 16px;
+  font-size: 1.2rem;
+}
+
+/* The long tail of features, as tags. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 14px;
+}
+
+.subhead-lead {
+  margin: -6px 0 16px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.fine-print {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Rmemo's own column stands out from the ones it is compared with. */
+.compare {
+  min-width: 600px;
+}
+
+.compare td:first-child {
+  color: var(--muted);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.compare .us {
+  background: var(--accent-wash);
+}
+
+.compare th.us {
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.compare .none {
+  color: var(--muted);
+}
+
+.metrics {
+  min-width: 480px;
 }
 
 /* 保管 / 一時 */

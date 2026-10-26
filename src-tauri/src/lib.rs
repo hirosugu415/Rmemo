@@ -9,9 +9,10 @@ pub mod watcher;
 use crate::config::Settings;
 use crate::state::AppState;
 use std::sync::atomic::Ordering;
+use std::time::{Duration, Instant};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-use tauri::{AppHandle, Emitter, Manager, RunEvent, WindowEvent};
+use tauri::{AppHandle, Emitter, Manager, RunEvent, WebviewWindow, WindowEvent};
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
@@ -22,8 +23,16 @@ const FOCUS_COMPOSE: &str = "focus-compose";
 /// flush an unsaved draft to disk. Hiding does not tear down the webview —
 /// its JS keeps running in the background — so the async save this triggers
 /// completes fine even though the window is no longer visible by the time it
-/// resolves.
+/// resolves. (The webview is only torn down much later — see
+/// `WEBVIEW_RELEASE_AFTER`.)
 const WINDOW_HIDING: &str = "window-hiding";
+
+/// How long the window may stay hidden before its webview is destroyed.
+/// WebView2 holds ~100 MB (Task Manager) across its processes even while
+/// hidden; destroying it leaves only this process (~7 MB). Rebuilding takes
+/// ~0.4 s versus ~0.04 s for a plain show, so a burst of quick notes stays
+/// instant and only the first summon after a long break pays for it.
+const WEBVIEW_RELEASE_AFTER: Duration = Duration::from_secs(10 * 60);
 
 /// Passed by the autostart entry so a login does not throw a window in your
 /// face. Any launch without it is someone asking for the window.
@@ -38,6 +47,7 @@ pub fn hide_window(app: &AppHandle) {
     save_window_geometry(app);
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.hide();
+        *app.state::<AppState>().hidden_at.lock() = Some(Instant::now());
     }
 }
 
@@ -110,12 +120,103 @@ pub fn toggle_window(app: &AppHandle) {
 }
 
 pub fn show_window(app: &AppHandle) {
-    let Some(window) = app.get_webview_window("main") else {
+    let state = app.state::<AppState>();
+    *state.hidden_at.lock() = None;
+    if state.released.swap(false, Ordering::SeqCst) {
+        // Off this thread: callers include the hotkey and tray handlers, and
+        // building a webview from inside the event loop's callbacks can
+        // deadlock on Windows.
+        let app = app.clone();
+        std::thread::spawn(move || match recreate_main_window(&app) {
+            Some(window) => reveal(&app, &window),
+            None => app.state::<AppState>().released.store(true, Ordering::SeqCst),
+        });
         return;
-    };
+    }
+    // `None` while a rebuild is under way; that summon is already coming.
+    if let Some(window) = app.get_webview_window("main") {
+        reveal(app, &window);
+    }
+}
+
+fn reveal(app: &AppHandle, window: &WebviewWindow) {
     let _ = window.show();
     let _ = window.set_focus();
     let _ = app.emit(FOCUS_COMPOSE, ());
+}
+
+/// Builds the main window again from its tauri.conf.json entry (hidden, as
+/// configured there), with everything `setup` gave the first one.
+fn recreate_main_window(app: &AppHandle) -> Option<WebviewWindow> {
+    // `destroy` completes on the event loop; wait for the old window to be
+    // gone so its label is free.
+    let deadline = Instant::now() + Duration::from_secs(2);
+    while app.get_webview_window("main").is_some() && Instant::now() < deadline {
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let conf = app.config().app.windows.iter().find(|w| w.label == "main")?.clone();
+    let window = match tauri::WebviewWindowBuilder::from_config(app, &conf).and_then(|b| b.build()) {
+        Ok(w) => w,
+        Err(e) => {
+            eprintln!("[window] could not rebuild: {e}");
+            return None;
+        }
+    };
+    prepare_main_window(app, &window);
+    Some(window)
+}
+
+/// Per-window setup, shared by the first window and every rebuilt one.
+fn prepare_main_window(app: &AppHandle, window: &WebviewWindow) {
+    restore_window_geometry(app);
+    let zoom = app.state::<AppState>().config.read().zoom;
+    if zoom != 1.0 {
+        apply_zoom(app, zoom);
+    }
+    #[cfg(windows)]
+    match window.hwnd() {
+        Ok(handle) => app.state::<AppState>().our_hwnd.store(handle.0 as isize, Ordering::SeqCst),
+        Err(_) => eprintln!("[focus] no window handle; hide-on-blur disabled"),
+    }
+    let handle = app.clone();
+    window.on_window_event(move |event| {
+        // Closing must not tear the process down: the tray icon,
+        // hotkey, and watcher all need the process to stay alive.
+        if let WindowEvent::CloseRequested { api, .. } = event {
+            api.prevent_close();
+            hide_window(&handle);
+        }
+    });
+}
+
+/// Destroys the window once it has been hidden for `WEBVIEW_RELEASE_AFTER`,
+/// taking WebView2's processes with it; `show_window` builds a new one.
+fn spawn_webview_reaper(app: AppHandle) {
+    std::thread::spawn(move || loop {
+        std::thread::sleep(Duration::from_secs(30));
+        let state = app.state::<AppState>();
+        let Some(window) = app.get_webview_window("main") else {
+            continue;
+        };
+        {
+            // Only the check runs under the lock: window calls wait on the
+            // main thread, which may itself be waiting for this lock in
+            // `show_window`. Once `released` is set, a summon that comes
+            // before the destroy lands simply waits for it and rebuilds.
+            let mut hidden_at = state.hidden_at.lock();
+            let due = hidden_at.is_some_and(|t| t.elapsed() >= WEBVIEW_RELEASE_AFTER);
+            if !due || state.dialog_open.load(Ordering::SeqCst) {
+                continue;
+            }
+            *hidden_at = None;
+            state.released.store(true, Ordering::SeqCst);
+        }
+        state.our_hwnd.store(0, Ordering::SeqCst);
+        if let Err(e) = window.destroy() {
+            eprintln!("[window] could not release the webview: {e}");
+            state.released.store(false, Ordering::SeqCst);
+        }
+    });
 }
 
 /// Makes the Windows sign-in entry (`HKCU\...\Run`, written by the autostart
@@ -178,25 +279,22 @@ pub(crate) fn register_hotkey(app: &AppHandle, accelerator: &str) -> Result<(), 
 /// lives in a child HWND, so the event fires only sometimes and
 /// `Window::is_focused` answers `false` for a window you are typing into.
 /// Hide-on-blur depends on knowing the truth here, so this polls for it
-/// instead. One syscall every 200 ms.
+/// instead. One syscall every 200 ms. The HWND it compares against is set by
+/// `prepare_main_window`.
 #[cfg(windows)]
 fn spawn_focus_watch(app: AppHandle) {
     use windows_sys::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
-
-    let Some(window) = app.get_webview_window("main") else {
-        return;
-    };
-    let Ok(handle) = window.hwnd() else {
-        eprintln!("[focus] no window handle; hide-on-blur disabled");
-        return;
-    };
-    let ours = handle.0 as isize;
-    app.state::<AppState>().our_hwnd.store(ours, Ordering::SeqCst);
 
     std::thread::spawn(move || {
         let mut was_focused = true;
         loop {
             std::thread::sleep(std::time::Duration::from_millis(200));
+            // Re-read each time: a rebuilt window has a new HWND, and there
+            // is none while it is released.
+            let ours = app.state::<AppState>().our_hwnd.load(Ordering::SeqCst);
+            if ours == 0 {
+                continue;
+            }
             // SAFETY: no arguments; returns the foreground HWND.
             let foreground = unsafe { GetForegroundWindow() } as isize;
             let focused = foreground == ours;
@@ -322,16 +420,15 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle().clone();
 
-            let (hotkey, autostart, zoom) = {
+            let (hotkey, autostart) = {
                 let state = app.state::<AppState>();
                 let cfg = state.config.read();
-                (cfg.hotkey.clone(), cfg.autostart, cfg.zoom)
+                (cfg.hotkey.clone(), cfg.autostart)
             };
-            restore_window_geometry(&handle);
-            allow_assets(&handle, &app.state::<AppState>().config.read().clone());
-            if zoom != 1.0 {
-                apply_zoom(&handle, zoom);
+            if let Some(window) = app.get_webview_window("main") {
+                prepare_main_window(&handle, &window);
             }
+            allow_assets(&handle, &app.state::<AppState>().config.read().clone());
             if let Err(e) = register_hotkey(&handle, &hotkey) {
                 eprintln!("[boot] {e}");
             }
@@ -340,19 +437,8 @@ pub fn run() {
             }
             build_tray(&handle)?;
 
-            if let Some(window) = app.get_webview_window("main") {
-                let handle = handle.clone();
-                window.on_window_event(move |event| {
-                    // Closing must not tear the process down: the tray icon,
-                    // hotkey, and watcher all need the process to stay alive.
-                    if let WindowEvent::CloseRequested { api, .. } = event {
-                        api.prevent_close();
-                        hide_window(&handle);
-                    }
-                });
-            }
-
             spawn_focus_watch(handle.clone());
+            spawn_webview_reaper(handle.clone());
             watcher::spawn(handle.clone());
             notes::ocr::spawn(handle.clone(), ocr_wakeups);
             // Old versions and the history of long-deleted notes go (see
@@ -379,6 +465,9 @@ pub fn run() {
             // Notes are persisted on every write; on the way out only the
             // window's spot (if it's showing) and the API registry entry
             // need handling.
+            // Without a code, this is the last window going away — the
+            // reaper releasing the webview, not a request to quit.
+            RunEvent::ExitRequested { api, code: None, .. } => api.prevent_exit(),
             RunEvent::ExitRequested { .. } => save_window_geometry(app),
             RunEvent::Exit => api::remove_service_file(),
             _ => {}
