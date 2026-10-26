@@ -107,7 +107,11 @@ pub(crate) fn apply_zoom(app: &AppHandle, zoom: f64) -> f64 {
 }
 
 pub fn toggle_window(app: &AppHandle) {
+    // No window means it was released (see `spawn_webview_reaper`) or is
+    // being rebuilt — either way it's hidden, so this is a summon.
+    // `show_window` rebuilds it (or leaves a rebuild under way alone).
     let Some(window) = app.get_webview_window("main") else {
+        show_window(app);
         return;
     };
     let visible = window.is_visible().unwrap_or(false);

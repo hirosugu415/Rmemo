@@ -9,7 +9,7 @@
     <meta property="og:title" content="Rmemo — ホットキーひとつで書きとめる Windows メモアプリ" />
     <meta property="og:description" content="思いついた瞬間に Ctrl+N。書いたそばから整って見える、Windows 用のすばやいメモアプリ。" />
     <meta property="og:url" content="https://hirosugu415.github.io/Rmemo/" />
-    <meta property="og:image" content="https://hirosugu415.github.io/Rmemo/images/demo-poster.jpg" />
+    <meta property="og:image" content="https://hirosugu415.github.io/Rmemo/images/compose.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="okiba-verification" content="okiba-0f52ec2003395cd6739084a8836e3efa" />
     <link rel="icon" type="image/png" href="images/favicon.png" />
@@ -60,8 +60,9 @@
           </div>
 
           <figure class="shot shot-hero">
-            <video class="demo-video" src="images/demo.mp4" poster="images/demo-poster.jpg" autoplay loop muted playsinline
-              aria-label="Wikipedia を読みながら Ctrl+N で Rmemo を呼び出し、文章を貼り付けて閉じる様子"></video>
+            <!-- MP4, not the 9.7MB demo.gif (that one is for the README). -->
+            <video src="images/demo.mp4" poster="images/demo-poster.jpg" autoplay loop muted playsinline
+              aria-label="Wikipedia で兼六園の記事を読みながら Rmemo を呼び出し、記事の文章をメモに書きとめる様子"></video>
           </figure>
         </div>
       </div>
@@ -155,7 +156,10 @@
           </div>
           <p class="fine-print">開発者の PC（Windows 11）での実測です。メモは 1 件あたり約 1KB（日本語で 300 字ほど）で測りました。メモリはタスクマネージャーの「メモリ」の値で、Rmemo が使うすべてのプロセスの合計です。</p>
           <!-- TODO: 呼び出しの速さが分かる動画（タイマー付き）をここに -->
-          <!-- TODO: 待機中のタスクマネージャーのスクリーンショットをここに -->
+          <figure class="shot shot-metric">
+            <img src="images/using-memory.png" alt="タスクマネージャーで、閉じている Rmemo のメモリが 14.1MB と表示されている" loading="lazy" />
+            <figcaption>閉じているときの Rmemo（タスクマネージャー）。</figcaption>
+          </figure>
 
           <div class="features why">
             <div class="feature">
@@ -221,13 +225,13 @@
 
           <div class="media-row">
             <figure class="shot">
-              <video class="demo-video" src="images/edit.mp4" poster="images/edit-poster.jpg" autoplay loop muted playsinline
-                aria-label="見出しやチェックボックスを入力すると、その場で整って表示される様子"></video>
-              <figcaption>Markdown で打つと、その場で見出しやチェックボックスになります。</figcaption>
+              <img src="images/edit.gif" loading="lazy"
+                alt="旅行の計画メモに見出し・チェックボックス・太字・タグ・メモへのリンクを打ち込むと、その場で整って表示される様子" />
+              <figcaption>Markdown で打つと、その場で見出しやチェックボックスに。<code>[[</code> でほかのメモにもつなげます。</figcaption>
             </figure>
             <figure class="shot">
-              <video class="demo-video" src="images/paste.mp4" poster="images/paste-poster.jpg" autoplay loop muted playsinline
-                aria-label="切り取ったスクリーンショットを Ctrl+V でメモに貼り付ける様子"></video>
+              <img src="images/paste.gif" loading="lazy"
+                alt="新幹線の予約完了画面を切り取り、Ctrl+V でメモに貼り付ける様子" />
               <figcaption>切り取った画面を <kbd>Ctrl</kbd>+<kbd>V</kbd> で、そのままメモに。</figcaption>
             </figure>
           </div>
@@ -321,8 +325,8 @@
               <figcaption>編集画面。見出しから目次が自動でできます。</figcaption>
             </figure>
             <figure class="shot">
-              <a href="images/search.png"><img src="images/search.png" alt="メモの一覧と検索の画面。タグの一覧とピン留めしたメモが並んでいる" loading="lazy" /></a>
-              <figcaption>一覧・検索。タグで絞り込み、よく使うメモはピン留め。</figcaption>
+              <a href="images/search.gif"><img src="images/search.gif" alt="PowerShell の作業中に Rmemo を呼び出し、「power」と打ってコマンド集のメモを見つけ、コマンドをそのまま使う様子" loading="lazy" /></a>
+              <figcaption>一覧・検索。打ったそばから絞り込まれ、見つけたメモをすぐ使えます。</figcaption>
             </figure>
             <figure class="shot">
               <a href="images/triage.png"><img src="images/triage.png" alt="一時のメモの整理画面。古いメモを 1 件ずつ残すか捨てるか選ぶ" loading="lazy" /></a>
@@ -331,6 +335,14 @@
             <figure class="shot">
               <a href="images/tutorial.png"><img src="images/tutorial.png" alt="使い方ページ。入力例と表示結果が並んでいる" loading="lazy" /></a>
               <figcaption>使い方ページ（<kbd>F1</kbd>）。入力例つきで全機能を確認できます。</figcaption>
+            </figure>
+            <figure class="shot">
+              <a href="images/history.png"><img src="images/history.png" alt="履歴の画面。左に前の版が日時つきで並び、右に選んだ版の中身が表示されている" loading="lazy" /></a>
+              <figcaption>履歴。前の版を見て、「この版に戻す」でいつでも戻せます。</figcaption>
+            </figure>
+            <figure class="shot">
+              <a href="images/import.png"><img src="images/import.png" alt="取り込みの整形画面。左に元の txt、右に見出しや箇条書きに整えたメモが並んでいる" loading="lazy" /></a>
+              <figcaption>メモ帳の .txt の取り込み。元の文と整えた結果を見比べて決められます。</figcaption>
             </figure>
           </div>
         </div>
@@ -423,15 +435,5 @@
         <a class="listing-badge" href="https://tsukutta.app/apps/bfb22750-d484-40c4-9d60-38cd82e3545f"><img src="https://tsukutta.app/api/badge/bfb22750-d484-40c4-9d60-38cd82e3545f?lang=ja" alt="Tsukuttaに掲載中" width="200" height="40"></a>
       </div>
     </footer>
-    <script>
-      // Respect "reduce motion": show the first frame with controls instead of autoplaying.
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        for (const v of document.querySelectorAll(".demo-video")) {
-          v.removeAttribute("autoplay");
-          v.pause();
-          v.controls = true;
-        }
-      }
-    </script>
   </body>
 </html>

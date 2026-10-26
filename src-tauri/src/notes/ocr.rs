@@ -77,16 +77,10 @@ pub fn spawn(app: AppHandle, wake: Receiver<()>) {
     std::thread::spawn(move || {
         let mut cache = load_cache();
         publish(&app, &cache);
-        let mut engine = engine::Engine::new();
-        if engine.is_none() {
-            eprintln!("[ocr] no OCR engine for this PC's languages — image text won't be searchable");
-        }
         loop {
-            if let Some(engine) = engine.as_mut() {
-                if read_new_images(&app, engine, &mut cache) {
-                    save_cache(&cache);
-                    publish(&app, &cache);
-                }
+            if read_new_images(&app, &mut cache) {
+                save_cache(&cache);
+                publish(&app, &cache);
             }
             match wake.recv_timeout(IDLE_POLL) {
                 Ok(()) | Err(RecvTimeoutError::Timeout) => {}
@@ -100,23 +94,38 @@ pub fn spawn(app: AppHandle, wake: Receiver<()>) {
 
 /// OCRs every image in `assets/` not in `cache` yet (or changed size).
 /// Returns whether the cache changed.
-fn read_new_images(app: &AppHandle, engine: &mut engine::Engine, cache: &mut Cache) -> bool {
+///
+/// The engine is made here and dropped at the end, not kept: reading loads
+/// Windows' recognition models, about 7.5 MB that would otherwise stay for
+/// as long as the app runs (in the tray, that's days). Dropping it gives
+/// back about 5.5 MB; the rest is Windows' OCR code, which stays loaded.
+/// A pass with nothing new makes no engine at all.
+fn read_new_images(app: &AppHandle, cache: &mut Cache) -> bool {
     let settings = app.state::<AppState>().config.read().clone();
     let Ok(entries) = std::fs::read_dir(super::images::assets_dir(&settings)) else {
         return false;
     };
-    let mut changed = false;
-    for entry in entries.flatten() {
-        let path = entry.path();
-        let Some(name) = path.file_name().and_then(|n| n.to_str()).map(str::to_lowercase) else { continue };
-        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
-        let Ok(meta) = entry.metadata() else { continue };
-        if !meta.is_file() || !READABLE.contains(&ext.as_str()) {
-            continue;
-        }
-        if cache.images.get(&name).is_some_and(|e| e.size == meta.len()) {
-            continue;
-        }
+    let new: Vec<(std::path::PathBuf, String, u64)> = entries
+        .flatten()
+        .filter_map(|entry| {
+            let path = entry.path();
+            let name = path.file_name()?.to_str()?.to_lowercase();
+            let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
+            let meta = entry.metadata().ok()?;
+            let unread = meta.is_file()
+                && READABLE.contains(&ext.as_str())
+                && !cache.images.get(&name).is_some_and(|e| e.size == meta.len());
+            unread.then_some((path, name, meta.len()))
+        })
+        .collect();
+    if new.is_empty() {
+        return false;
+    }
+    let Some(mut engine) = engine::Engine::new() else {
+        eprintln!("[ocr] no OCR engine for this PC's languages — image text won't be searchable");
+        return false;
+    };
+    for (path, name, size) in new {
         // A failure is remembered as "no text", so a broken file isn't
         // retried on every pass.
         let text = match engine.read(&path) {
@@ -126,13 +135,12 @@ fn read_new_images(app: &AppHandle, engine: &mut engine::Engine, cache: &mut Cac
                 String::new()
             }
         };
-        cache.images.insert(name, Entry { size: meta.len(), text });
-        changed = true;
+        cache.images.insert(name, Entry { size, text });
         // Publish as we go: a big first pass shouldn't hide everything
         // until the last image is done.
         publish(app, cache);
     }
-    changed
+    true
 }
 
 fn is_japanese(c: char) -> bool {

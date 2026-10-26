@@ -853,3 +853,39 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod memory {
+    use super::*;
+
+    fn private_mb() -> f64 {
+        use windows_sys::Win32::System::ProcessStatus::{K32GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS_EX};
+        use windows_sys::Win32::System::Threading::GetCurrentProcess;
+        let mut c: PROCESS_MEMORY_COUNTERS_EX = unsafe { std::mem::zeroed() };
+        c.cb = std::mem::size_of::<PROCESS_MEMORY_COUNTERS_EX>() as u32;
+        unsafe { K32GetProcessMemoryInfo(GetCurrentProcess(), &mut c as *mut _ as *mut _, c.cb) };
+        c.PrivateUsage as f64 / 1_048_576.0
+    }
+
+    /// What OCR leaves behind in the process: before, after reading, after
+    /// dropping the engines. `cargo test -- --ignored --nocapture ocr_memory`
+    #[test]
+    #[ignore]
+    fn ocr_memory() {
+        let _ = unsafe {
+            windows::Win32::System::WinRT::RoInitialize(windows::Win32::System::WinRT::RO_INIT_MULTITHREADED)
+        };
+        let file = std::env::var("RMEMO_OCR_FILES").unwrap();
+        eprintln!("start:            {:.1} MB", private_mb());
+        let mut e = Engines::new().unwrap();
+        eprintln!("engines created:  {:.1} MB", private_mb());
+        for f in file.split(';') {
+            let rgba = image::open(f).unwrap().to_rgba8();
+            let (w, h) = rgba.dimensions();
+            e.recognize_rgba(rgba.into_raw(), w, h).unwrap();
+        }
+        eprintln!("after reading:    {:.1} MB", private_mb());
+        drop(e);
+        eprintln!("engines dropped:  {:.1} MB", private_mb());
+    }
+}

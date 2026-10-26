@@ -11,6 +11,9 @@ interface Props {
   onDelete: (filename: string) => void;
   onTagClick: (tag: string) => void;
   highlight: string[];
+  /** Changes when the results are a different set (a new query or filter),
+   *  which is the one time the list goes back to the top. */
+  resetKey: string;
 }
 
 export default function NoteList({
@@ -22,11 +25,19 @@ export default function NoteList({
   onDelete,
   onTagClick,
   highlight,
+  resetKey,
 }: Props) {
   const listRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (listRef.current) listRef.current.scrollTop = 0;
+  }, [resetKey]);
+
   // Keep the keyboard cursor in view as ArrowUp/Down walks past the visible
   // edge: scroll just far enough that the selected row is fully shown.
+  // Only on a cursor move — not when the notes change (a delete, a watcher
+  // refresh), or a list scrolled by the wheel would jump back to the
+  // cursor, which is still on the first row.
   useEffect(() => {
     const list = listRef.current;
     const row = list?.children[selectedIndex] as HTMLElement | undefined;
@@ -38,7 +49,8 @@ export default function NoteList({
     } else if (rowBox.bottom > listBox.bottom) {
       list.scrollTop += rowBox.bottom - listBox.bottom;
     }
-  }, [selectedIndex, notes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIndex]);
 
   if (notes.length === 0) {
     return <div className="empty">見つかりませんでした。</div>;

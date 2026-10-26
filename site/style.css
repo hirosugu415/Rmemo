@@ -115,7 +115,7 @@ img {
 
 .hero .wrap {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.25fr);
   gap: 56px;
   align-items: center;
 }
@@ -335,12 +335,20 @@ img {
 
 /* Columns in proportion to each recording's aspect ratio (edit 1280×1133,
    paste 1280×706), so both play at exactly the same height. */
+/* Column widths in the images' aspect ratios (edit.gif 1143×1011,
+   paste.gif 1791×1101), so the two come out the same height. */
 .media-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.13fr) minmax(0, 1.81fr);
+  grid-template-columns: minmax(0, 1.13fr) minmax(0, 1.63fr);
   align-items: start;
   gap: 32px;
   margin-top: 48px;
+}
+
+/* A small screenshot (a Task Manager row) shown at its own size. */
+.shot-metric {
+  max-width: 672px;
+  margin: 28px 0;
 }
 
 .gallery {

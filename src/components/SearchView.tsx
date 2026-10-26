@@ -219,6 +219,7 @@ export default function SearchView({
         onDelete={onDelete}
         onTagClick={handleTagClick}
         highlight={needles}
+        resetKey={`${statusFilter}\n${query}`}
       />
     </div>
   );
