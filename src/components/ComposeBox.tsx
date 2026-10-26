@@ -24,7 +24,6 @@ import {
   charCount,
   codeMask,
   extractTags,
-  headingLevelOfLine,
   isTagChar,
   outlineOf,
 } from "../markdown";
@@ -212,14 +211,6 @@ const CODE_LANGS = [
   "js", "ts", "tsx", "jsx", "json", "html", "css", "python", "rust", "go", "java", "c", "cpp",
   "csharp", "sql", "bash", "powershell", "yaml", "toml", "markdown", "diff",
 ];
-
-const HEADING_BUTTONS = [
-  { level: 0, label: "本文", title: "本文に戻す", action: "heading0" },
-  { level: 1, label: "H1", title: "見出し1", action: "heading1" },
-  { level: 2, label: "H2", title: "見出し2", action: "heading2" },
-  { level: 3, label: "H3", title: "見出し3", action: "heading3" },
-  { level: 4, label: "H4", title: "見出し4", action: "heading4" },
-] as const;
 
 /** The toolbar's shortcut cheat line, as currently bound. */
 const HINT: [ActionId, string][] = [
@@ -730,21 +721,6 @@ export default function ComposeBox({
 
   // ---------- headings: toolbar state and table of contents ----------
 
-  /** Heading level of the caret's line (0 = body text), for the toolbar. */
-  const currentLevel = useMemo(() => {
-    const lineStart = value.lastIndexOf("\n", sel.start - 1) + 1;
-    if (mask[lineStart]) return 0;
-    const nl = value.indexOf("\n", lineStart);
-    return headingLevelOfLine(value.slice(lineStart, nl === -1 ? value.length : nl));
-  }, [value, mask, sel.start]);
-
-  const applyHeading = (level: number) => {
-    const view = viewRef.current;
-    if (!view) return;
-    setHeading(view, level);
-    view.focus();
-  };
-
   // The section in view: the last heading scrolled past the top. A note
   // too short to scroll uses the caret's section instead.
   const [activeHeading, setActiveHeading] = useState(-1);
@@ -777,22 +753,6 @@ export default function ComposeBox({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-
-  // Narrow window: the heading buttons live in a dropdown (closed by any
-  // click outside it).
-  const [headingMenuOpen, setHeadingMenuOpen] = useState(false);
-  const headingMenuRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!headingMenuOpen) return;
-    const close = (e: MouseEvent) => {
-      if (!headingMenuRef.current?.contains(e.target as Node)) setHeadingMenuOpen(false);
-    };
-    window.addEventListener("mousedown", close);
-    return () => window.removeEventListener("mousedown", close);
-  }, [headingMenuOpen]);
-  useEffect(() => {
-    if (wideToc) setHeadingMenuOpen(false);
-  }, [wideToc]);
 
   const jumpToHeading = (from: number) => {
     const view = viewRef.current;
@@ -1052,64 +1012,6 @@ export default function ComposeBox({
           )
         )}
         <span className="compose-title-spacer" />
-        {wideToc ? (
-          <div className="format-bar" role="toolbar" aria-label="見出し">
-            {HEADING_BUTTONS.map((b) => (
-              <button
-                key={b.level}
-                type="button"
-                className={
-                  b.level === currentLevel ? "format-btn format-btn-active" : "format-btn"
-                }
-                data-level={b.level}
-                title={withKey(b.title, keymap[b.action])}
-                // Keep the editor's focus and selection through the click.
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => applyHeading(b.level)}
-              >
-                {b.label}
-              </button>
-            ))}
-          </div>
-        ) : (
-          // Narrow window: the five buttons fold into one dropdown showing
-          // the current level, so the title keeps the room.
-          <div className="format-menu" ref={headingMenuRef}>
-            <button
-              type="button"
-              className="format-btn format-menu-toggle"
-              title="見出し"
-              aria-haspopup="menu"
-              aria-expanded={headingMenuOpen}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => setHeadingMenuOpen((o) => !o)}
-            >
-              {HEADING_BUTTONS.find((b) => b.level === currentLevel)?.label ?? "本文"} ▾
-            </button>
-            {headingMenuOpen && (
-              <ul className="format-menu-list" role="menu">
-                {HEADING_BUTTONS.map((b) => (
-                  <li key={b.level}>
-                    <button
-                      type="button"
-                      role="menuitem"
-                      className={b.level === currentLevel ? "format-menu-item format-menu-item-active" : "format-menu-item"}
-                      data-level={b.level}
-                      title={withKey(b.title, keymap[b.action])}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => {
-                        applyHeading(b.level);
-                        setHeadingMenuOpen(false);
-                      }}
-                    >
-                      {b.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
         <button
           type="button"
           className="compose-search-btn"
@@ -1426,9 +1328,6 @@ export default function ComposeBox({
         </span>
         <span className="compose-hint">{hint(keymap)}</span>
         <div className="compose-actions">
-          <button type="button" className="compose-save" onClick={onSaveDraft}>
-            {withKey("途中保存", keymap.saveDraft)}
-          </button>
           <button type="button" className="compose-save compose-save-primary" onClick={onSaveAndClose}>
             {withKey("保存して新規", keymap.saveAndNew)}
           </button>

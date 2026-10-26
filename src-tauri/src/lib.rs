@@ -359,11 +359,35 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
             }
         });
 
-    if let Some(icon) = app.default_window_icon() {
-        builder = builder.icon(icon.clone());
+    if let Some(icon) = tray_icon().or_else(|| app.default_window_icon().cloned()) {
+        builder = builder.icon(icon);
     }
     builder.build(app)?;
     Ok(())
+}
+
+/// The tray gets the small-size artwork (`icons/tray/`, from
+/// `icon-small.svg`) at the size the display scale calls for. The window icon
+/// is drawn for 32px and up; shrunk to 16px its cursor turns to noise that
+/// reads as a volume slider.
+fn tray_icon() -> Option<tauri::image::Image<'static>> {
+    #[cfg(windows)]
+    // SAFETY: no pointers; returns the small-icon width for the system DPI.
+    let size = unsafe {
+        use windows_sys::Win32::UI::WindowsAndMessaging::{GetSystemMetrics, SM_CXSMICON};
+        GetSystemMetrics(SM_CXSMICON)
+    };
+    #[cfg(not(windows))]
+    let size = 16;
+    let png: &[u8] = match size {
+        ..=16 => include_bytes!("../icons/tray/16.png"),
+        17..=20 => include_bytes!("../icons/tray/20.png"),
+        21..=24 => include_bytes!("../icons/tray/24.png"),
+        _ => include_bytes!("../icons/tray/32.png"),
+    };
+    let rgba = image::load_from_memory_with_format(png, image::ImageFormat::Png).ok()?.into_rgba8();
+    let (width, height) = rgba.dimensions();
+    Some(tauri::image::Image::new_owned(rgba.into_raw(), width, height))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

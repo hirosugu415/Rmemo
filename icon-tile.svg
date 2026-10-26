@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 256 256">
+  <!-- icon.svg on a full-bleed background, for places that crop or fill the
+       transparency (iOS home screen, Android maskable icons). The artwork sits
+       inside the central 72% so a circular mask doesn't clip it. -->
+  <rect width="256" height="256" fill="#ffffff"/>
+  <g transform="translate(35.84 35.84) scale(0.72)">
+    <g transform="translate(128 128) scale(0.968) translate(-120.15 -132.8)">
+      <rect transform="rotate(-14 110 136)" x="14" y="40" width="150" height="196" rx="22" fill="#4fb3ff"/>
+      <rect x="90" y="14" width="152" height="228" rx="24" fill="#f0ebe5"/>
+      <rect x="114" y="96" width="100" height="22" rx="11" fill="#ff5a3c"/>
+      <rect x="114" y="144" width="56" height="22" rx="11" fill="#cbc0b3"/>
+      <rect x="178" y="134" width="14" height="42" rx="4" fill="#ff5a3c"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- icon.svg cut down for 16-24px (tray, small list views): two thick grey
+       lines and no cursor, which at that size reads as a volume slider. -->
+  <g transform="translate(128 128) scale(0.968) translate(-120.15 -132.8)">
+    <rect transform="rotate(-14 110 136)" x="14" y="40" width="150" height="196" rx="22" fill="#4fb3ff"/>
+    <rect x="90" y="14" width="152" height="228" rx="24" fill="#f0ebe5"/>
+    <rect x="114" y="84" width="104" height="34" rx="17" fill="#b3a698"/>
+    <rect x="114" y="146" width="70" height="34" rx="17" fill="#b3a698"/>
+  </g>
+</svg>

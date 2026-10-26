@@ -7,7 +7,7 @@
 // - Built assets (hashed file names): cache first — a name never changes
 //   content.
 
-const SHELL = "rmemo-shell-v1";
+const SHELL = "rmemo-shell-v2";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();

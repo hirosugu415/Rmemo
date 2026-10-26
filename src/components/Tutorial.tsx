@@ -25,10 +25,10 @@ const SECTIONS: Section[] = [
   {
     title: "見出し",
     items: [
-      { name: "見出し1", input: "# 大見出し", preview: true, keys: ["Ctrl+Alt+1", "上の H1"], note: "行頭で # と空白を打った瞬間に大きくなります。" },
-      { name: "見出し2", input: "## 中見出し", preview: true, keys: ["Ctrl+Alt+2", "上の H2"], note: "# の数で大きさが変わります（4つまで）。" },
+      { name: "見出し1", input: "# 大見出し", preview: true, keys: ["Ctrl+Alt+1"], note: "行頭で # と空白を打った瞬間に大きくなります。" },
+      { name: "見出し2", input: "## 中見出し", preview: true, keys: ["Ctrl+Alt+2"], note: "# の数で大きさが変わります（4つまで）。" },
       { name: "見出し3・4", input: "### 小見出し\n#### さらに小さい見出し", preview: true, keys: ["Ctrl+Alt+3", "Ctrl+Alt+4"], note: "" },
-      { name: "本文に戻す", keys: ["見出しの先頭で Backspace", "Ctrl+Alt+0", "上の 本文"], note: "同じ見出しボタンをもう一度押しても本文に戻ります。" },
+      { name: "本文に戻す", keys: ["見出しの先頭で Backspace", "Ctrl+Alt+0"], note: "同じ見出しのキー（Ctrl+Alt+1 など）をもう一度押しても本文に戻ります。" },
       { name: "全角でもOK", input: "＃＃　見出し", keys: [], note: "日本語入力のまま ＃＃ と全角スペースを打つと、自動で ## に直って見出しになります。" },
       { name: "見出しで折りたたむ", keys: ["見出しの左の ▾ をクリック", "Ctrl+Shift+[ / ]", "Ctrl+Alt+[ / ] で全部"], note: "その見出しの下（次の同じ大きさ以上の見出しまで）を隠します。たたんだ見出しには ▸ が残ります。" },
       { name: "見出しとタグの違い", input: "# 見出し（# のあとに空白）\n#タグ（空白なし）", preview: true, note: "# のすぐ後に文字が続くとタグ、空白をあけると見出しです。" },

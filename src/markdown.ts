@@ -260,12 +260,6 @@ export function outlineOf(s: string, mask: Uint8Array = codeMask(s)): OutlineIte
   return out;
 }
 
-/** Heading level (1–6) of the line starting at `lineFrom`, or 0. */
-export function headingLevelOfLine(line: string): number {
-  const m = HEADING_PREFIX.exec(line);
-  return m ? m[1].length : 0;
-}
-
 /** Inline Markdown markers removed — `**太字**` → `太字`, `[名前](url)` →
  *  `名前`, `[[メモ]]` → `メモ` — for places that show text, not source.
  *  Mirrors `notes::strip_inline` (checked by the shared parity fixture). */

@@ -7,7 +7,6 @@ import {
   findTags,
   findWikiLinks,
   guessLanguage,
-  headingLevelOfLine,
   outlineOf,
   snippetOf,
   stripInline,
@@ -62,7 +61,7 @@ describe("codeMask", () => {
   });
 });
 
-describe("outlineOf / headingLevelOfLine", () => {
+describe("outlineOf", () => {
   it("lists headings outside code, with inline markup stripped", () => {
     const s = "# A\n```\n# not\n```\n## **B** ##\n#tag\n#### \n### C";
     expect(outlineOf(s).map((o) => [o.level, o.text])).toEqual([
@@ -81,9 +80,8 @@ describe("outlineOf / headingLevelOfLine", () => {
   });
 
   it("needs a space after the hashes", () => {
-    expect(headingLevelOfLine("## 見出し")).toBe(2);
-    expect(headingLevelOfLine("##見出し")).toBe(0);
-    expect(headingLevelOfLine("#")).toBe(0);
+    const s = "## 見出し\n##見出し\n#";
+    expect(outlineOf(s).map((o) => [o.level, o.text])).toEqual([[2, "見出し"]]);
   });
 });
 
