@@ -345,10 +345,27 @@ img {
   margin-top: 48px;
 }
 
-/* A small screenshot (a Task Manager row) shown at its own size. */
+/* A Task Manager row at its own size, with its explanation beside it. */
 .shot-metric {
-  max-width: 672px;
-  margin: 28px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 688px) minmax(0, 1fr);
+  align-items: center;
+  gap: 40px;
+  margin: 28px 0 0;
+}
+
+.shot-metric figcaption {
+  margin: 0;
+  max-width: 34em;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.shot-metric figcaption strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 15px;
 }
 
 .gallery {
@@ -873,6 +890,11 @@ code {
 
   .guide-banner .btn {
     margin-left: 0;
+  }
+
+  .shot-metric {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   section {
