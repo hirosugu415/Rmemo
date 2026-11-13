@@ -657,17 +657,26 @@ export default function App() {
   // The frame is sized from the window's real pixel size, not `100%`: at
   // 150% scaling an 863 px tall window is 575.33 CSS px, the page rounds up
   // to 576, and the frame's bottom line falls one pixel outside the window.
+  // `devicePixelRatio` is the OS scaling × the UI zoom (Ctrl +/-), so the
+  // frame shrinks in CSS px as the zoom grows and always fits the window;
+  // the DOM `resize` event fires when only the zoom changes.
   useEffect(() => {
     const win = getCurrentWindow();
     const fit = async () => {
-      const [size, scale] = await Promise.all([win.innerSize(), win.scaleFactor()]);
+      const size = await win.innerSize();
+      const ratio = window.devicePixelRatio || (await win.scaleFactor());
       const root = document.documentElement.style;
-      root.setProperty("--app-width", `${size.width / scale}px`);
-      root.setProperty("--app-height", `${size.height / scale}px`);
+      root.setProperty("--app-width", `${size.width / ratio}px`);
+      root.setProperty("--app-height", `${size.height / ratio}px`);
     };
-    void fit().catch(() => {});
-    const offs = [win.onResized(() => void fit().catch(() => {})), win.onScaleChanged(() => void fit().catch(() => {}))];
-    return () => offs.forEach((p) => void p.then((off) => off()));
+    const refit = () => void fit().catch(() => {});
+    refit();
+    window.addEventListener("resize", refit);
+    const offs = [win.onResized(refit), win.onScaleChanged(refit)];
+    return () => {
+      window.removeEventListener("resize", refit);
+      offs.forEach((p) => void p.then((off) => off()));
+    };
   }, []);
 
   // Light/dark and the Keep/Scratch colours live on <html>, so
