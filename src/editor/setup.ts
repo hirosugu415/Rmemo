@@ -12,6 +12,7 @@ import {
   rectangularSelection,
 } from "@codemirror/view";
 import { tags as t } from "@lezer/highlight";
+import type { BlockParser } from "@lezer/markdown";
 import {
   autoCodeLanguage,
   dedentClosingFence,
@@ -106,9 +107,26 @@ export function markdownSupport(): Extension {
     // Setext headings (`text` over `---`) would turn a line into a heading
     // just because a rule was drawn under it; indented code would turn
     // Ctrl+] indentation into code. Neither matches how Rmemo is written.
-    extensions: [{ remove: ["SetextHeading", "IndentedCode"] }],
+    extensions: [{ remove: ["SetextHeading", "IndentedCode"] }, { parseBlock: [emptyBulletBreaksParagraph] }],
   });
 }
+
+/** CommonMark won't let an empty item (`- ` alone) interrupt a paragraph, so
+ *  `- ` typed under a text line (`#tag`, `メモ`) stayed part of that line and
+ *  never became a bullet until text followed. Here it starts the list right
+ *  away. A bare `-` (no space yet) is still text, and `+` never counts. */
+const emptyBulletBreaksParagraph: BlockParser = {
+  name: "EmptyBulletBreaksParagraph",
+  endLeaf(_cx, line) {
+    const { next, pos, text } = line;
+    return (
+      (next === 45 || next === 42) /* - * */ &&
+      line.indent - line.baseIndent < 4 &&
+      pos + 1 < text.length &&
+      /^[ \t]+$/.test(text.slice(pos + 1))
+    );
+  },
+};
 
 /** The Markdown look on its own — shared by the editor and the read-only
  *  note view (triage screen), so a note looks the same in both. */
